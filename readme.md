@@ -17,6 +17,34 @@ O **Sistema de Gestão de Documentos e OCR** tem como objetivo automatizar o pro
 
 O banco de dados do sistema será estruturado em várias tabelas principais para armazenar informações sobre os pacientes, documentos, e os resultados do OCR. A seguir, as principais tabelas do sistema:
 
+
+## Telas do Sistema
+
+### 1. **Tela de Cadastro de Paciente**
+   - **Descrição**: Permite cadastrar novos pacientes no sistema, preenchendo informações como nome, CPF, data de nascimento, sexo, email, telefone e endereço.
+
+### 2. **Tela de Lista de Pacientes**
+   - **Descrição**: Exibe uma lista de pacientes cadastrados, com filtros por nome, CPF e status. Permite visualizar, editar ou excluir pacientes.
+
+### 3. **Tela de Cadastro de Documento**
+   - **Descrição**: Permite o cadastro de documentos médicos (receitas, exames, prontuários) relacionados aos pacientes, incluindo upload do arquivo e definição do status do processamento.
+
+### 4. **Tela de Lista de Documentos**
+   - **Descrição**: Exibe todos os documentos cadastrados no sistema, com filtros para tipo de documento, paciente e status de processamento. Permite visualizar ou excluir documentos.
+
+### 5. **Tela de Processamento OCR**
+   - **Descrição**: Mostra os resultados do processamento OCR, exibindo o texto extraído ou erros, e permitindo reprocessar documentos que falharam.
+
+### 6. **Tela de Relatório de Documentos**
+   - **Descrição**: Gera relatórios detalhados sobre os documentos, com filtros para tipo de documento, paciente, status e data. Permite exportar os dados para Excel ou PDF.
+
+### 7. **Tela de Cadastro de Resultados de Exame**
+   - **Descrição**: Permite cadastrar resultados de exames médicos, associando-os a um paciente, com campos para tipo de exame, resultado, data e médico responsável.
+
+### 8. **Tela de Histórico de Consultas**
+   - **Descrição**: Exibe o histórico de consultas de cada paciente, com descrição, data e médico responsável, além de permitir o cadastro de novas consultas.
+
+
 ### Tabela de Pacientes
 Esta tabela armazena informações gerais sobre os pacientes, como nome, CPF, data de nascimento, sexo, entre outros.
 
