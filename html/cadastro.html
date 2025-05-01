@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Cadastro de Paciente</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f9f9f9;
+      margin: 0;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 480px;
+      margin: auto;
+      background: #fff;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.05);
+    }
+
+    h2 {
+      text-align: center;
+      margin-bottom: 20px;
+      color: #2c3e50;
+    }
+
+    label {
+      display: block;
+      margin-bottom: 6px;
+      margin-top: 15px;
+      color: #333;
+    }
+
+    input, select {
+      width: 100%;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 8px;
+      font-size: 16px;
+    }
+
+    input:invalid {
+      border-color: red;
+    }
+
+    .btn {
+      margin-top: 20px;
+      background-color: #3498db;
+      color: white;
+      border: none;
+      padding: 12px;
+      font-size: 16px;
+      border-radius: 8px;
+      width: 100%;
+      cursor: pointer;
+    }
+
+    .btn:hover {
+      background-color: #2980b9;
+    }
+
+    .required {
+      color: red;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Cadastro de Paciente</h2>
+    <form onsubmit="return validateForm()">
+      <label>Nome completo <span class="required">*</span></label>
+      <input type="text" required name="nome" placeholder="Digite o nome completo">
+
+      <label>CPF <span class="required">*</span></label>
+      <input type="text" required pattern="\d{11}" maxlength="11" name="cpf" placeholder="Somente números (11 dígitos)">
+
+      <label>Data de nascimento <span class="required">*</span></label>
+      <input type="date" required name="data_nascimento">
+
+      <label>Sexo <span class="required">*</span></label>
+      <select required name="sexo">
+        <option value="">Selecione</option>
+        <option value="Masculino">Masculino</option>
+        <option value="Feminino">Feminino</option>
+        <option value="Outro">Outro</option>
+      </select>
+
+      <label>Email</label>
+      <input type="email" name="email" placeholder="exemplo@email.com">
+
+      <label>Telefone</label>
+      <input type="tel" name="telefone" placeholder="(99) 99999-9999">
+
+      <label>Endereço</label>
+      <input type="text" name="endereco" placeholder="Rua, número, bairro...">
+
+      <label>Senha <span class="required">*</span></label>
+      <input type="password" required name="senha" id="senha" placeholder="Digite uma senha">
+
+      <label>Confirmar Senha <span class="required">*</span></label>
+      <input type="password" required name="confirmar_senha" id="confirmar_senha" placeholder="Repita a senha">
+
+
+      <button type="submit" class="btn">Cadastrar</button>
+    </form>
+  </div>
+
+  <script>
+    function validateForm() {
+      const inputs = document.querySelectorAll("input[required], select[required]");
+      for (const input of inputs) {
+        if (!input.value.trim()) {
+          input.focus();
+          return false;
+        }
+      }
+      alert("Paciente cadastrado com sucesso!");
+      return false; // prevenir envio real
+    }
+  </script>
+</body>
+</html>

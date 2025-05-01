@@ -1,0 +1,29 @@
+flowchart LR
+  %% Bottom Nav Tabs
+  A[Meu Perfil] --- B[Meus Documentos]
+  B --- C[OCR]
+  C --- D[Relatórios Pessoais]
+  D --- A
+
+  %% Meu Perfil
+  A --> A1[Visualizar Meu Perfil]
+  A1 --> A2[Editar Meus Dados]
+
+  %% Meus Documentos
+  B --> B1[Lista de Meus Documentos]
+  B1 --> B2[Upload de Documento]
+  B2 --> B3[Escolher Câmera / Arquivo]
+  B3 --> B4[Preview e Categoria]
+  B4 --> C
+  %% após upload vai para OCR
+
+  %% OCR
+  C --> C1[Processar OCR]
+  C1 --> C2[Classificar Tipo de Registro]
+  C2 --> C3[Inserir em Tabela]
+  C3 --> B1
+
+  %% Relatórios Pessoais
+  D --> D1[Filtros por Data/Tipo]
+  D1 --> D2[Visualizar Meus Registros]
+  D2 --> D3[Exportar PDF/Excel]
