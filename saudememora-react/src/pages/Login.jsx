@@ -18,7 +18,7 @@ export default function Login() {
       });
       navigate("/home");
     } catch (err) {
-
+      // Adicione algum tratamento de erro, se necessário
     }
   };
 
@@ -51,6 +51,11 @@ export default function Login() {
 
           <button type="submit" className="btn">Entrar</button>
         </form>
+
+        <div className="auth-links">
+          <button onClick={() => navigate('/criar-conta')} className="link-btn">Criar conta</button>
+          <button onClick={() => navigate('/esqueci-senha')} className="link-btn">Esqueci a senha</button>
+        </div>
       </div>
     </div>
   );

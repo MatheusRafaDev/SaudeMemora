@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
-import axios from 'axios';
+import { IMaskInput } from 'react-imask';
 import '../styles/CadastroPaciente.css';
+import { cadastrarPaciente, listarPacientes } from '../services/pacienteService'; // Importe as funções
 
 const CadastroPaciente = () => {
   const [formData, setFormData] = useState({
@@ -16,8 +17,8 @@ const CadastroPaciente = () => {
   });
 
   const [error, setError] = useState('');
+  const [pacientes, setPacientes] = useState([]);
 
-  // Função para atualizar os valores do formulário
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({
@@ -26,7 +27,6 @@ const CadastroPaciente = () => {
     });
   };
 
-  // Função para validar os campos do formulário
   const validateForm = () => {
     const { nome, cpf, dataNascimento, sexo, senha, confirmarSenha } = formData;
     if (!nome || !cpf || !dataNascimento || !sexo || !senha || !confirmarSenha) {
@@ -43,30 +43,32 @@ const CadastroPaciente = () => {
     return true;
   };
 
-
-  axios.defaults.baseURL = 'http://localhost:7070'; 
-
   const handleSubmit = async (e) => {
     e.preventDefault();
   
-    if (!validateForm()) return;
+    if (!formData.nome || !formData.cpf || !formData.email) {
+      setError('Todos os campos são obrigatórios!');
+      return;
+    }
   
-    try {
-      const response = await axios.post('/api/paciente/cadastrar', formData);
-      if (response.status === 200) {
-        alert('Paciente cadastrado com sucesso!');
-      }
-    } catch (error) {
-      setError('Erro ao cadastrar paciente!');
-      console.error(error);
+    const result = await cadastrarPaciente(formData);
+  
+    if (result.success) {
+      // Lógica de sucesso, por exemplo, redirecionar ou limpar o formulário
+    } else {
+      // Supondo que `result.message` seja uma string com o erro
+      setError(result.message || 'Erro desconhecido');
     }
   };
+  
+
 
   return (
     <div className="container">
       <h2>Cadastro de Paciente</h2>
       <form onSubmit={handleSubmit}>
-        {error && <div className="error">{error}</div>}
+      {error && <div className="error">{typeof error === 'object' ? error.message : error}</div>}
+
         
         <label>Nome completo <span className="required">*</span></label>
         <input 
@@ -79,15 +81,13 @@ const CadastroPaciente = () => {
         />
 
         <label>CPF <span className="required">*</span></label>
-        <input 
-          type="text" 
-          name="cpf" 
-          value={formData.cpf} 
-          onChange={handleChange} 
-          placeholder="Somente números (11 dígitos)" 
-          pattern="\d{11}" 
-          maxLength="11" 
-          required 
+        <IMaskInput 
+          mask="000.000.000-00"
+          name="cpf"
+          value={formData.cpf}
+          onChange={handleChange}
+          placeholder="Somente números (11 dígitos)"
+          required
         />
 
         <label>Data de nascimento <span className="required">*</span></label>
@@ -112,7 +112,6 @@ const CadastroPaciente = () => {
           <option value="O">Outro</option>
         </select>
 
-
         <label>Email</label>
         <input 
           type="email" 
@@ -123,12 +122,12 @@ const CadastroPaciente = () => {
         />
 
         <label>Telefone</label>
-        <input 
-          type="tel" 
-          name="telefone" 
-          value={formData.telefone} 
-          onChange={handleChange} 
-          placeholder="(99) 99999-9999" 
+        <IMaskInput 
+          mask="(00) 00000-0000"
+          name="telefone"
+          value={formData.telefone}
+          onChange={handleChange}
+          placeholder="(99) 99999-9999"
         />
 
         <label>Endereço</label>
@@ -162,6 +161,8 @@ const CadastroPaciente = () => {
 
         <button type="submit" className="btn">Cadastrar</button>
       </form>
+
+      
     </div>
   );
 };

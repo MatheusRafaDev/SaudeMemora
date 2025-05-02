@@ -50,3 +50,22 @@ body {
     cursor: pointer;
   }
   
+
+  .auth-links {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 10px;
+  }
+  
+  .link-btn {
+    background: none;
+    border: none;
+    color: #3498db;
+    font-size: 14px;
+    cursor: pointer;
+  }
+  
+  .link-btn:hover {
+    text-decoration: underline;
+  }
+  

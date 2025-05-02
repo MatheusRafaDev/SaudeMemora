@@ -24,7 +24,7 @@ public class Paciente {
     @Column(name = "ds_cpf", length = 14, nullable = false, unique = true)  // Tipo String, tamanho de 14 para CPF (mascara)
     private String cpf;
 
-    @Column(name = "ds_data_nascimento", nullable = false)  // Tipo String, você pode usar um tipo de dado de data se preferir
+    @Column(name = "dt_nascimento", nullable = false)  // Tipo String, você pode usar um tipo de dado de data se preferir
     private String dataNascimento;
 
     @Column(name = "ds_sexo", length = 1, nullable = false)  // Tipo String, apenas um caractere (M/F)

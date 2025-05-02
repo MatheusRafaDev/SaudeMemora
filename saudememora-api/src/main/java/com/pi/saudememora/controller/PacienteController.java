@@ -4,11 +4,16 @@ import com.pi.saudememora.model.Paciente;
 import com.pi.saudememora.repository.PacienteRepository;
 import com.pi.saudememora.service.PacienteService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import com.pi.saudememora.util.funcoes;
+
+import java.util.HashMap;
 import java.util.List;
 import java.util.Optional;
+
+import static javax.swing.UIManager.put;
 
 @RestController
 @RequestMapping("/api/paciente")
@@ -43,15 +48,35 @@ public class PacienteController {
         return paciente.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
+
     @PostMapping("/cadastrar")
-    public Paciente adicionarPaciente(@RequestBody Paciente paciente) {
+    public ResponseEntity<?> adicionarPaciente(@RequestBody Paciente paciente) {
+
+        if (pacienteRepository.existsByEmail(paciente.getEmail())) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new HashMap<String, Object>() {{
+                        put("success", false);
+                        put("message", "O email informado já está em uso.");
+                    }});
+        }
+
+        if (pacienteRepository.existsByCpf(paciente.getCpf())) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new HashMap<String, Object>() {{
+                        put("success", false);
+                        put("message", "O CPF informado já está em uso.");
+                    }});
+        }
+
         if (paciente.getSenha() != null && !paciente.getSenha().isEmpty()) {
             String senhaCriptografada = funcoes.criptografarSenha(paciente.getSenha());
             paciente.setSenha(senhaCriptografada);
         }
 
-        return pacienteRepository.save(paciente);
+        Paciente pacienteSalvo = pacienteRepository.save(paciente);
+        return ResponseEntity.status(HttpStatus.CREATED).body(pacienteSalvo);
     }
+
 
     @PutMapping("/{id}")
     public ResponseEntity<Paciente> atualizarPaciente(@PathVariable Long id, @RequestBody Paciente paciente) {

@@ -1,114 +1,66 @@
-import React, { useState } from 'react';
+import React from 'react';
+
 import '../styles/Home.css';
 
-const Dashboard = () => {
-  const [activeScreen, setActiveScreen] = useState('home');
-
-  const navigate = (screen) => {
-    setActiveScreen(screen);
-  };
-
+function Home() {
   return (
-    <div className="dashboard">
+    <div className="home-container">
       <header className="header">
-        <button className="btn-home" onClick={() => navigate('home')}>
-          <img
-            src="https://img.icons8.com/ios-filled/50/ffffff/home.png"
-            alt="Home"
-          />
+        <button className="nav-button">
+          <img src="https://img.icons8.com/ios-filled/50/ffffff/menu.png" alt="Menu" />
         </button>
-        SaúdeMemora
+        <h1 className="title">SaúdeMemora</h1>
       </header>
 
-      <main className="main">
-        <div className="card" onClick={() => navigate('perfil')}>
-          <img
-            className="icon"
-            src="https://img.icons8.com/ios-filled/100/3498db/user.png"
-            alt="Meu Perfil"
-          />
-          <span>Meu Perfil</span>
-        </div>
-        <div className="card" onClick={() => navigate('documentos')}>
-          <img
-            className="icon"
-            src="https://img.icons8.com/ios-filled/100/3498db/document.png"
-            alt="Meus Documentos"
-          />
-          <span>Meus Documentos</span>
-        </div>
-        <div className="card" onClick={() => navigate('ocr')}>
-          <img
-            className="icon"
-            src="https://img.icons8.com/ios-filled/100/3498db/camera.png"
-            alt="OCR"
-          />
-          <span>OCR</span>
-        </div>
-        <div className="card" onClick={() => navigate('relatorios')}>
-          <img
-            className="icon"
-            src="https://img.icons8.com/ios-filled/100/3498db/combo-chart.png"
-            alt="Relatórios"
-          />
-          <span>Relatórios</span>
+      <main className="main-content">
+        <div className="cards-grid">
+          {/* Card 1: Meu Perfil */}
+          <div className="card">
+            <img src="https://img.icons8.com/ios-filled/50/555555//user-male.png" alt="Meu Perfil" />
+            <span>Meu Perfil</span>
+          </div>
+          {/* Card 2: Meus Documentos */}
+          <div className="card">
+            <img src="https://img.icons8.com/ios-filled/50/555555/document.png" alt="Meus Documentos" />
+            <span>Meus Documentos</span>
+          </div>
+          {/* Card 3: OCR */}
+          <div className="card">
+            <img src="https://img.icons8.com/ios-filled/50/555555//camera.png" alt="OCR" />
+            <span>OCR</span>
+          </div>
+          {/* Card 4: Relatórios */}
+          <div className="card">
+            <img src="https://img.icons8.com/ios-filled/50/555555//combo-chart.png" alt="Relatórios" />
+            <span>Relatórios</span>
+          </div>
         </div>
       </main>
 
-      <nav className="bottom-nav">
-        <button
-          className={activeScreen === 'home' ? 'active' : ''}
-          onClick={() => navigate('home')}
-        >
-          <img
-            src="https://img.icons8.com/ios-filled/50/555555/home.png"
-            alt="Home"
-          />
-          Home
+      <footer className="footer">
+        <button className="footer-button">
+          <img src="https://img.icons8.com/ios-filled/24/ffffff/home.png" alt="Home" />
+          <span>Home</span>
         </button>
-        <button
-          className={activeScreen === 'perfil' ? 'active' : ''}
-          onClick={() => navigate('perfil')}
-        >
-          <img
-            src="https://img.icons8.com/ios-filled/50/555555/user.png"
-            alt="Perfil"
-          />
-          Perfil
+        <button className="footer-button">
+          <img src="https://img.icons8.com/ios-filled/24/ffffff/user-male.png" alt="Perfil" />
+          <span>Perfil</span>
         </button>
-        <button
-          className={activeScreen === 'documentos' ? 'active' : ''}
-          onClick={() => navigate('documentos')}
-        >
-          <img
-            src="https://img.icons8.com/ios-filled/50/555555/document.png"
-            alt="Docs"
-          />
-          Docs
+        <button className="footer-button">
+          <img src="https://img.icons8.com/ios-filled/24/ffffff/document.png" alt="Docs" />
+          <span>Docs</span>
         </button>
-        <button
-          className={activeScreen === 'ocr' ? 'active' : ''}
-          onClick={() => navigate('ocr')}
-        >
-          <img
-            src="https://img.icons8.com/ios-filled/50/555555/camera.png"
-            alt="OCR"
-          />
-          OCR
+        <button className="footer-button">
+          <img src="https://img.icons8.com/ios-filled/24/ffffff/camera.png" alt="OCR" />
+          <span>OCR</span>
         </button>
-        <button
-          className={activeScreen === 'relatorios' ? 'active' : ''}
-          onClick={() => navigate('relatorios')}
-        >
-          <img
-            src="https://img.icons8.com/ios-filled/50/555555/combo-chart.png"
-            alt="Relatórios"
-          />
-          Relatórios
+        <button className="footer-button">
+          <img src="https://img.icons8.com/ios-filled/24/ffffff/combo-chart.png" alt="Relatórios" />
+          <span>Relatórios</span>
         </button>
-      </nav>
+      </footer>
     </div>
   );
-};
+}
 
-export default Dashboard;
+export default Home;
