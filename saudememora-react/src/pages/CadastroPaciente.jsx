@@ -1,9 +1,13 @@
 import React, { useState } from 'react';
 import { IMaskInput } from 'react-imask';
-import '../styles/CadastroPaciente.css';
-import { cadastrarPaciente, listarPacientes } from '../services/pacienteService'; // Importe as funções
+import { cadastrarPaciente } from '../services/pacienteService';
+import { useNavigate } from 'react-router-dom';
+
+import 'bootstrap/dist/css/bootstrap.min.css'; 
 
 const CadastroPaciente = () => {
+  const navigate = useNavigate();
+
   const [formData, setFormData] = useState({
     nome: '',
     cpf: '',
@@ -13,17 +17,16 @@ const CadastroPaciente = () => {
     telefone: '',
     endereco: '',
     senha: '',
-    confirmarSenha: ''
+    confirmarSenha: '',
   });
 
   const [error, setError] = useState('');
-  const [pacientes, setPacientes] = useState([]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setFormData({
       ...formData,
-      [name]: value
+      [name]: value,
     });
   };
 
@@ -45,124 +48,164 @@ const CadastroPaciente = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-  
-    if (!formData.nome || !formData.cpf || !formData.email) {
-      setError('Todos os campos são obrigatórios!');
-      return;
-    }
-  
+
+    if (!validateForm()) return;
+
     const result = await cadastrarPaciente(formData);
-  
+
     if (result.success) {
-      // Lógica de sucesso, por exemplo, redirecionar ou limpar o formulário
+      navigate('/formulario-medico');
     } else {
-      // Supondo que `result.message` seja uma string com o erro
       setError(result.message || 'Erro desconhecido');
     }
   };
-  
-
 
   return (
-    <div className="container">
-      <h2>Cadastro de Paciente</h2>
-      <form onSubmit={handleSubmit}>
-      {error && <div className="error">{typeof error === 'object' ? error.message : error}</div>}
+    <div className="container mt-5">
+      <div className="card shadow">
+        <div className="card-body">
+          <h2 className="text-center mb-4">Cadastro de Paciente</h2>
+          <form onSubmit={handleSubmit}>
+            {error && (
+              <div className="alert alert-danger" role="alert">
+                {typeof error === 'object' ? error.message : error}
+              </div>
+            )}
 
-        
-        <label>Nome completo <span className="required">*</span></label>
-        <input 
-          type="text" 
-          name="nome" 
-          value={formData.nome} 
-          onChange={handleChange} 
-          placeholder="Digite o nome completo" 
-          required 
-        />
+            <div className="mb-3">
+              <label className="form-label">
+                Nome completo <span className="text-danger">*</span>
+              </label>
+              <input
+                type="text"
+                name="nome"
+                value={formData.nome}
+                onChange={handleChange}
+                className="form-control"
+                placeholder="Digite o nome completo"
+                required
+              />
+            </div>
 
-        <label>CPF <span className="required">*</span></label>
-        <IMaskInput 
-          mask="000.000.000-00"
-          name="cpf"
-          value={formData.cpf}
-          onChange={handleChange}
-          placeholder="Somente números (11 dígitos)"
-          required
-        />
+            <div className="mb-3">
+              <label className="form-label">
+                CPF <span className="text-danger">*</span>
+              </label>
+              <IMaskInput
+                mask="000.000.000-00"
+                name="cpf"
+                value={formData.cpf}
+                onChange={handleChange}
+                className="form-control"
+                placeholder="Somente números (11 dígitos)"
+                required
+              />
+            </div>
 
-        <label>Data de nascimento <span className="required">*</span></label>
-        <input 
-          type="date" 
-          name="dataNascimento" 
-          value={formData.dataNascimento} 
-          onChange={handleChange} 
-          required 
-        />
+            <div className="mb-3">
+              <label className="form-label">
+                Data de nascimento <span className="text-danger">*</span>
+              </label>
+              <input
+                type="date"
+                name="dataNascimento"
+                value={formData.dataNascimento}
+                onChange={handleChange}
+                className="form-control"
+                required
+              />
+            </div>
 
-        <label>Sexo <span className="required">*</span></label>
-        <select
-          name="sexo"
-          value={formData.sexo}
-          onChange={handleChange}
-          required
-        >
-          <option value="">Selecione</option>
-          <option value="M">Masculino</option>
-          <option value="F">Feminino</option>
-          <option value="O">Outro</option>
-        </select>
+            <div className="mb-3">
+              <label className="form-label">
+                Sexo <span className="text-danger">*</span>
+              </label>
+              <select
+                name="sexo"
+                value={formData.sexo}
+                onChange={handleChange}
+                className="form-select"
+                required
+              >
+                <option value="">Selecione</option>
+                <option value="M">Masculino</option>
+                <option value="F">Feminino</option>
+                <option value="O">Outro</option>
+              </select>
+            </div>
 
-        <label>Email</label>
-        <input 
-          type="email" 
-          name="email" 
-          value={formData.email} 
-          onChange={handleChange} 
-          placeholder="exemplo@email.com" 
-        />
+            <div className="mb-3">
+              <label className="form-label">Email</label>
+              <input
+                type="email"
+                name="email"
+                value={formData.email}
+                onChange={handleChange}
+                className="form-control"
+                placeholder="exemplo@email.com"
+              />
+            </div>
 
-        <label>Telefone</label>
-        <IMaskInput 
-          mask="(00) 00000-0000"
-          name="telefone"
-          value={formData.telefone}
-          onChange={handleChange}
-          placeholder="(99) 99999-9999"
-        />
+            <div className="mb-3">
+              <label className="form-label">Telefone</label>
+              <IMaskInput
+                mask="(00) 00000-0000"
+                name="telefone"
+                value={formData.telefone}
+                onChange={handleChange}
+                className="form-control"
+                placeholder="(99) 99999-9999"
+              />
+            </div>
 
-        <label>Endereço</label>
-        <input 
-          type="text" 
-          name="endereco" 
-          value={formData.endereco} 
-          onChange={handleChange} 
-          placeholder="Rua, número, bairro..." 
-        />
+            <div className="mb-3">
+              <label className="form-label">Endereço</label>
+              <input
+                type="text"
+                name="endereco"
+                value={formData.endereco}
+                onChange={handleChange}
+                className="form-control"
+                placeholder="Rua, número, bairro..."
+              />
+            </div>
 
-        <label>Senha <span className="required">*</span></label>
-        <input 
-          type="password" 
-          name="senha" 
-          value={formData.senha} 
-          onChange={handleChange} 
-          placeholder="Digite uma senha" 
-          required 
-        />
+            <div className="mb-3">
+              <label className="form-label">
+                Senha <span className="text-danger">*</span>
+              </label>
+              <input
+                type="password"
+                name="senha"
+                value={formData.senha}
+                onChange={handleChange}
+                className="form-control"
+                placeholder="Digite uma senha"
+                required
+              />
+            </div>
 
-        <label>Confirmar Senha <span className="required">*</span></label>
-        <input 
-          type="password" 
-          name="confirmarSenha" 
-          value={formData.confirmarSenha} 
-          onChange={handleChange} 
-          placeholder="Repita a senha" 
-          required 
-        />
+            <div className="mb-3">
+              <label className="form-label">
+                Confirmar Senha <span className="text-danger">*</span>
+              </label>
+              <input
+                type="password"
+                name="confirmarSenha"
+                value={formData.confirmarSenha}
+                onChange={handleChange}
+                className="form-control"
+                placeholder="Repita a senha"
+                required
+              />
+            </div>
 
-        <button type="submit" className="btn">Cadastrar</button>
-      </form>
-
-      
+            <button type="submit" className="btn btn-primary w-100">
+              Cadastrar
+            </button>
+          </form>
+        </div>
+      </div>
     </div>
   );
 };

@@ -1,60 +1,80 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import axios from "axios";
-import '../styles/Login.css';
+import { loginPaciente } from '../services/pacienteService';
+import 'bootstrap/dist/css/bootstrap.min.css'; 
+
 
 export default function Login() {
   const [email, setEmail] = useState("");
   const [senha, setSenha] = useState("");
+  const [erro, setErro] = useState(null);
   const navigate = useNavigate();
 
   const handleLogin = async (e) => {
     e.preventDefault();
+    setErro(null);
 
     try {
-      const response = await axios.post("http://localhost:7070/api/paciente/login", {
-        email,
-        senha,
-      });
-      navigate("/home");
+      const result = await loginPaciente(email, senha);
+      if (result.success) {
+
+        localStorage.setItem("paciente", JSON.stringify(result.data));
+        navigate("/home");
+      } else {
+        setErro(result.message || "Falha ao fazer login");
+      }
     } catch (err) {
-      // Adicione algum tratamento de erro, se necessário
+      if (err.response && err.response.data) {
+        const mensagem =
+          typeof err.response.data === "string"
+            ? err.response.data
+            : err.response.data.message || "Erro inesperado ao fazer login.";
+        setErro(mensagem);
+      } else {
+        setErro("Erro ao conectar com o servidor.");
+      }
     }
   };
 
   return (
-    <div className="body">
-      <div className="box">
-        <h2 className="title">Login</h2>
+    <div className="d-flex justify-content-center align-items-center min-vh-100 bg-light">
+      <div className="card shadow-lg p-4 w-100" style={{ maxWidth: '400px' }}>
+        <h2 className="text-center mb-4">SaúdeMemora</h2>
+        <h3 className="text-center mb-3">Login</h3>
         <form onSubmit={handleLogin}>
-          <label className="label" htmlFor="email">Email</label>
-          <input
-            className="input"
-            type="email"
-            id="email"
-            value={email}
-            onChange={e => setEmail(e.target.value)}
-            required
-            placeholder="Digite seu email"
-          />
+          <div className="mb-3">
+            <label className="form-label" htmlFor="email">Email</label>
+            <input
+              className="form-control"
+              type="email"
+              id="email"
+              value={email}
+              onChange={e => setEmail(e.target.value)}
+              required
+              placeholder="Digite seu email"
+            />
+          </div>
 
-          <label className="label" htmlFor="senha">Senha</label>
-          <input
-            className="input"
-            type="password"
-            id="senha"
-            value={senha}
-            onChange={e => setSenha(e.target.value)}
-            required
-            placeholder="Digite sua senha"
-          />
+          <div className="mb-3">
+            <label className="form-label" htmlFor="senha">Senha</label>
+            <input
+              className="form-control"
+              type="password"
+              id="senha"
+              value={senha}
+              onChange={e => setSenha(e.target.value)}
+              required
+              placeholder="Digite sua senha"
+            />
+          </div>
 
-          <button type="submit" className="btn">Entrar</button>
+          <button type="submit" className="btn btn-primary w-100">Entrar</button>
+          {erro && <p className="text-danger mt-3">{erro}</p>}
         </form>
 
-        <div className="auth-links">
-          <button onClick={() => navigate('/criar-conta')} className="link-btn">Criar conta</button>
-          <button onClick={() => navigate('/esqueci-senha')} className="link-btn">Esqueci a senha</button>
+        <div className="d-flex justify-content-between mt-4">
+          <button onClick={() => navigate('/criar-conta')} className="btn btn-link">Criar conta</button>
+          <button onClick={() => navigate('/esqueci-senha')} className="btn btn-link">Esqueci a senha</button>
         </div>
       </div>
     </div>

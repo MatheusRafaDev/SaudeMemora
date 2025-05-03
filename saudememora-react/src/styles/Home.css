@@ -1,3 +1,4 @@
+/* Container principal */
 .home-container {
   display: flex;
   flex-direction: column;
@@ -14,26 +15,26 @@
   background-color: #3498db;  /* Cor de fundo do cabeçalho */
   display: flex;
   align-items: center;
-  justify-content: center;
-  box-shadow: 0px 2px 5px rgba(0,0,0,0.1);
+  justify-content: space-between;
+  padding: 0 15px; /* Espaçamento nas laterais */
+  box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
   z-index: 100;
 }
-.header .nav-button {
-  position: absolute;
-  left: 15px;
-  background: none;
-  border: none;
-  cursor: pointer;
-}
-.header .nav-button img {
-  width: 30px;
-  height: 30px;
-}
 .header .title {
-  margin: 0;
   font-size: 20px;
   font-weight: bold;
   color: white; /* Texto branco no cabeçalho */
+}
+.header .logout-button {
+  background-color: #ff4d4f;
+  border: none;
+  color: white;
+  padding: 8px 12px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+.header .logout-button:hover {
+  background-color: #d9363e;
 }
 
 /* Conteúdo principal */
@@ -44,23 +45,28 @@
   display: flex;
   justify-content: center;
   align-items: center;
+  padding: 0 15px;
+  box-sizing: border-box;
 }
 
-/* Grade de cards 2x2 */
+/* Grade de cards */
 .cards-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
   gap: 20px;
   text-align: center;
-  width: 80%;
+  width: 100%;
+  max-width: 500px;
+  margin: 0 auto; /* Centraliza os cards */
 }
 .card {
   background-color: #f5f5f5;
-  padding: 20px;
+  padding: 15px;
   border-radius: 10px;
   display: flex;
   flex-direction: column;
   align-items: center;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Adiciona sombra para profundidade */
 }
 .card img {
   width: 50px;
@@ -70,6 +76,7 @@
 .card span {
   font-size: 14px;
   color: #333333;
+  font-weight: 500; /* Mais destaque no texto */
 }
 
 /* Footer fixo */
@@ -83,7 +90,7 @@
   display: flex;
   justify-content: space-around;
   align-items: center;
-  box-shadow: 0px -2px 5px rgba(0,0,0,0.1);
+  box-shadow: 0px -2px 5px rgba(0, 0, 0, 0.1);
 }
 .footer-button {
   background: none;
@@ -94,6 +101,10 @@
   font-size: 12px;
   color: #ffffff;  /* Texto branco no rodapé */
   cursor: pointer;
+  transition: color 0.3s ease;
+}
+.footer-button:hover {
+  color: #ff4d4f; /* Cor de hover para dar feedback ao usuário */
 }
 .footer-button img {
   width: 24px;
@@ -101,10 +112,46 @@
   margin-bottom: 4px;
 }
 
-/* Responsividade */
+/* Responsividade para dispositivos pequenos */
 @media (max-width: 600px) {
+  .header {
+    padding: 0 10px; /* Menos padding para telas menores */
+  }
+
   .cards-grid {
     grid-template-columns: 1fr;
-    width: 90%;
+    gap: 10px;
+    width: 100%;
   }
+
+  .card {
+    padding: 10px; /* Reduzimos o padding para dispositivos menores */
+  }
+
+  .card img {
+    width: 40px;
+    height: 40px;
+  }
+
+  .footer {
+    flex-direction: row;
+    justify-content: space-evenly; /* Alinha os botões no rodapé de forma mais equilibrada */
+  }
+
+  .footer-button {
+    font-size: 10px;
+  }
+
+  .header .title {
+    font-size: 18px; /* Reduz o tamanho da fonte do título */
+  }
+
+  .main-content {
+    margin-top: 70px; /* Ajuste para o header fixo */
+    margin-bottom: 70px; /* Ajuste para o footer fixo */
+  
+  
+  }
+
+  
 }

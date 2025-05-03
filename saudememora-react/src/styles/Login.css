@@ -1,71 +1,121 @@
+/* Ajustes globais */
 body {
-    margin: 0;
-    font-family: Arial, sans-serif;
-    background: #f0f2f5;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    height: 100vh;
-  }
-  
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background: #f0f2f5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  padding: 0 10px;
+  box-sizing: border-box;
+}
+
+/* Container do Formulário */
+.box {
+  background: #fff;
+  padding: 20px; /* Menos padding para dispositivos pequenos */
+  border-radius: 12px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
+  max-width: 350px; /* Reduzimos o tamanho máximo */
+  width: 100%;
+  box-sizing: border-box;
+}
+
+/* Título */
+.title {
+  text-align: center;
+  margin-bottom: 15px; /* Diminuímos o espaço */
+  color: #2c3e50;
+  font-size: 20px; /* Tamanho menor para tela pequena */
+}
+
+/* Rótulo dos campos */
+.label {
+  display: block;
+  margin-bottom: 4px; /* Menos margem */
+  margin-top: 10px; /* Menos espaço no topo */
+  color: #333;
+  font-size: 12px; /* Fonte menor */
+}
+
+/* Campos de entrada */
+.input {
+  width: 100%;
+  padding: 6px; /* Diminuímos o padding para deixar os inputs mais finos */
+  border: 1px solid #ccc;
+  border-radius: 6px; /* Menos arredondado */
+  font-size: 12px; /* Fonte menor nos campos */
+  margin-bottom: 10px; /* Menos espaço entre os campos */
+}
+
+/* Botão de Submissão */
+.btn {
+  margin-top: 15px;
+  background-color: #3498db;
+  color: white;
+  border: none;
+  padding: 8px;
+  font-size: 14px; /* Tamanho menor para dispositivos pequenos */
+  border-radius: 8px;
+  width: 100%;
+  cursor: pointer;
+  transition: background-color 0.3s ease;
+}
+
+.btn:hover {
+  background-color: #2980b9;
+}
+
+/* Links de Autenticação (Criar conta / Esqueci a senha) */
+.auth-links {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 8px;
+  font-size: 12px; /* Fonte menor */
+}
+
+.link-btn {
+  background: none;
+  border: none;
+  color: #3498db;
+  font-size: 12px; /* Fonte menor */
+  cursor: pointer;
+}
+
+.link-btn:hover {
+  text-decoration: underline;
+}
+
+/* Responsividade para telas menores */
+@media (max-width: 480px) {
   .box {
-    background: #fff;
-    padding: 30px;
-    border-radius: 12px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
-    max-width: 400px;
-    width: 100%;
+      padding: 15px; /* Menos padding */
+      width: 100%;
   }
-  
+
   .title {
-    text-align: center;
-    margin-bottom: 20px;
-    color: #2c3e50;
+      font-size: 18px; /* Tamanho da fonte reduzido */
   }
-  
-  .label {
-    display: block;
-    margin-bottom: 6px;
-    margin-top: 15px;
-    color: #333;
-  }
-  
+
   .input {
-    width: 100%;
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    font-size: 16px;
+      font-size: 12px; /* Reduzimos ainda mais o tamanho da fonte */
+      padding: 5px; /* Menos padding nos inputs */
+      border-radius: 4px; /* Inputs mais finos */
   }
-  
+
   .btn {
-    margin-top: 20px;
-    background-color: #3498db;
-    color: white;
-    border: none;
-    padding: 12px;
-    font-size: 16px;
-    border-radius: 8px;
-    width: 100%;
-    cursor: pointer;
+      padding: 8px;
+      font-size: 12px; /* Menor botão */
   }
-  
 
   .auth-links {
-    display: flex;
-    justify-content: space-between;
-    margin-top: 10px;
+      flex-direction: column; /* Empilhar os links */
+      align-items: center;
+      font-size: 12px; /* Menor fonte */
   }
-  
+
   .link-btn {
-    background: none;
-    border: none;
-    color: #3498db;
-    font-size: 14px;
-    cursor: pointer;
+      margin-top: 6px; /* Espaço reduzido entre os links */
   }
-  
-  .link-btn:hover {
-    text-decoration: underline;
-  }
-  
+}
