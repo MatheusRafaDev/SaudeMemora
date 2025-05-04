@@ -7,6 +7,10 @@ import { useLocation } from 'react-router-dom';
 import {  cadastrarFichaMedica } from '../services/FichaMedicaService';
 import { useNavigate } from 'react-router-dom';
 
+import Nav from '../components/Nav';
+import Footer from '../components/Footer'; 
+
+
 const perguntas = [
   { chave: 'tratamento medico', pergunta: 'Está em tratamento médico?' },
   { chave: 'gravida', pergunta: 'Está grávida?' },
@@ -35,8 +39,8 @@ const FormularioMedico = () => {
   const [ocrExecutado, setOcrExecutado] = useState(false);
   const [mensagem, setMensagem] = useState('');
   const location = useLocation();
-  const result = location.state || {};
   const navigate = useNavigate();
+  const paciente = JSON.parse(localStorage.getItem("paciente")) || {};
 
   const handleFileChange = e => {
     setImagem(e.target.files[0]);
@@ -79,28 +83,32 @@ const FormularioMedico = () => {
     if (!todosCamposPreenchidos()) {
       setMensagem('Preencha todos os campos antes de continuar.');
     } else {
-
       const formData = {
-        respostas,    
-        imagem,       
-        textoOCR,  
-        result,
+        respostas,
+        imagem,
+        textoOCR,
+        paciente,
       };
 
-      const response = await cadastrarFichaMedica(formData); 
+      const response = await cadastrarFichaMedica(formData);
       if (response.success) {
-        setMensagem(response.message); 
-        navigate('/home', { state: result.dados });
-
+        setMensagem(response.message);
+        navigate('/home', { state: paciente.dados });
       } else {
-        setMensagem(response.message); 
+        setMensagem(response.message);
       }
     }
   };
   
 
   return (
-    <div className="container mt-4">
+
+    
+    <div>
+      <Nav />
+
+      <div className="container mt-4"></div>
+
       <div className="saude-card shadow-sm p-4 rounded bg-white">
         <h4 className="mb-4 text-center">Informações de Saúde</h4>
         <form>
@@ -167,7 +175,9 @@ const FormularioMedico = () => {
 
         </form>
       </div>
+      <Footer />
     </div>
+    
   );
 };
 
