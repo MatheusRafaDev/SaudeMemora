@@ -1,0 +1,108 @@
+package com.pi.saudememora.controller;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.pi.saudememora.model.Paciente;
+import com.pi.saudememora.service.PacienteService;
+import com.pi.saudememora.model.FichaMedica;
+import com.pi.saudememora.service.FichaMedicaService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.Date;
+import java.util.List;
+import java.util.Optional;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+
+@RestController
+@RequestMapping("/api/ficha-medica")
+@CrossOrigin(origins = "*")
+public class FichaMedicaController {
+
+    @Autowired
+    private FichaMedicaService fichaMedicaService;
+
+    @Autowired
+    private PacienteService pacienteService;
+
+
+    @CrossOrigin(origins = "http://localhost:3000")
+    @PostMapping("/cadastrar")
+    public Object cadastrarFichaMedica(@RequestBody FichaMedica fichaMedica) throws JsonProcessingException {
+
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.enable(SerializationFeature.INDENT_OUTPUT);
+
+
+        String json = mapper.writeValueAsString(fichaMedica);
+        System.out.println("FichaMedica completa:\n" + json);
+
+        if (fichaMedica.getPaciente() == null || fichaMedica.getPaciente().getId() == null) {
+            return ResponseEntity.badRequest().body("Paciente é obrigatório" + fichaMedica);
+        }
+
+
+
+        Logger logger = LoggerFactory.getLogger(FichaMedicaController.class);
+        logger.info("Corpo da requisição: {}", fichaMedica);
+
+
+        Paciente paciente = pacienteService.buscarPorId(fichaMedica.getPacienteId());
+        fichaMedica.setPaciente(paciente);
+
+        fichaMedica.setDataCriacao(new Date());
+
+        FichaMedica novaFicha = fichaMedicaService.salvarFichaMedica(fichaMedica);
+
+        return new ResponseEntity<>(novaFicha, HttpStatus.CREATED);
+    }
+
+
+    // Obter todas as fichas médicas
+    @GetMapping
+    public ResponseEntity<List<FichaMedica>> obterTodasFichasMedicas() {
+        List<FichaMedica> fichasMedicas = fichaMedicaService.obterTodasFichasMedicas();
+        return new ResponseEntity<>(fichasMedicas, HttpStatus.OK);
+    }
+
+    // Obter uma ficha médica por ID
+    @GetMapping("/{id}")
+    public ResponseEntity<FichaMedica> obterFichaMedicaPorId(@PathVariable Long id) {
+        Optional<FichaMedica> fichaMedica = fichaMedicaService.obterFichaMedicaPorId(id);
+        if (fichaMedica.isPresent()) {
+            return new ResponseEntity<>(fichaMedica.get(), HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+
+    // Atualizar uma ficha médica existente
+    @PutMapping("/{id}")
+    public ResponseEntity<FichaMedica> atualizarFichaMedica(@PathVariable Long id, @RequestBody FichaMedica fichaMedica) {
+        Optional<FichaMedica> fichaExistente = fichaMedicaService.obterFichaMedicaPorId(id);
+        if (fichaExistente.isPresent()) {
+            fichaMedica.setId(id);
+
+            FichaMedica fichaAtualizada = fichaMedicaService.salvarFichaMedica(fichaMedica);
+            return new ResponseEntity<>(fichaAtualizada, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+
+    // Deletar uma ficha médica
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deletarFichaMedica(@PathVariable Long id) {
+        Optional<FichaMedica> fichaExistente = fichaMedicaService.obterFichaMedicaPorId(id);
+        if (fichaExistente.isPresent()) {
+            fichaMedicaService.deletarFichaMedica(id);
+            return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+}

@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
+import React, { useState} from 'react';
 import { IMaskInput } from 'react-imask';
 import { cadastrarPaciente } from '../services/pacienteService';
 import { useNavigate } from 'react-router-dom';
 
-import 'bootstrap/dist/css/bootstrap.min.css'; 
+import 'bootstrap/dist/css/bootstrap.min.css';
 
 const CadastroPaciente = () => {
   const navigate = useNavigate();
@@ -49,12 +49,13 @@ const CadastroPaciente = () => {
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!validateForm()) return;
+    const isValid = validateForm();
+    if (!isValid) return;
 
     const result = await cadastrarPaciente(formData);
-
+    
     if (result.success) {
-      navigate('/formulario-medico');
+      navigate('/formulario-medico', { state: result.dados });
     } else {
       setError(result.message || 'Erro desconhecido');
     }
@@ -62,7 +63,7 @@ const CadastroPaciente = () => {
 
   return (
     <div className="container mt-5">
-      <div className="card shadow">
+      <div className="saude-card shadow-sm p-4 rounded bg-white">
         <div className="card-body">
           <h2 className="text-center mb-4">Cadastro de Paciente</h2>
           <form onSubmit={handleSubmit}>
@@ -106,12 +107,13 @@ const CadastroPaciente = () => {
               <label className="form-label">
                 Data de nascimento <span className="text-danger">*</span>
               </label>
-              <input
-                type="date"
+              <IMaskInput
+                mask="00/00/0000"
                 name="dataNascimento"
                 value={formData.dataNascimento}
                 onChange={handleChange}
                 className="form-control"
+                placeholder="DD/MM/AAAA"
                 required
               />
             </div>
@@ -200,9 +202,14 @@ const CadastroPaciente = () => {
               />
             </div>
 
-            <button type="submit" className="btn btn-primary w-100">
-              Cadastrar
-            </button>
+            <div className="text-end mt-4">
+              <button 
+                type="submit" 
+                className="btn btn-outline-primary px-4"
+              >
+                Próximo
+              </button>
+            </div>
           </form>
         </div>
       </div>

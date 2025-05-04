@@ -1,7 +1,9 @@
 import axios from 'axios';
+import { corrigirTexto } from './utils/corretor';
 
 const API_KEY = 'K87295381088957';
 const URL = 'https://api.ocr.space/parse/image';
+
 
 /**
  * Faz OCR após pré-processar a imagem (grayscale + resize + binarização).
@@ -9,6 +11,8 @@ const URL = 'https://api.ocr.space/parse/image';
  * @returns {Promise<string>} Texto extraído.
  */
 export async function ocrSpace(file) {
+
+
   try {
     const processedBlob = await preprocessImage(file);
     const formData = new FormData();
@@ -32,9 +36,11 @@ export async function ocrSpace(file) {
       throw new Error(res.data.ErrorMessage || 'Erro ao processar imagem no OCR.space');
     }
 
-    let parsedText = getParsedText(res.data);
-    parsedText = processarTexto(parsedText);
 
+
+    let parsedText = getParsedText(res.data); 
+    parsedText = processarTexto(parsedText);
+    parsedText = corrigirTexto(parsedText);
   
     return parsedText;
 
@@ -67,7 +73,7 @@ function processarTexto(texto) {
     let sim = " ";
     let nao = " ";
 
-    if (/SIM.*[^\(\)\s]+.*NÃO/.test(resposta)) {
+    if (/SIM.*[^()\s]+.*NÃO/.test(resposta)) {
       sim = "X";
     } else if (/SIMPS/.test(resposta)) {
       sim = "X";
@@ -86,15 +92,12 @@ function processarTexto(texto) {
 }
 
 
-
-// Extrai e concatena todo texto OCR
 function getParsedText(data) {
   const results = data?.ParsedResults;
   if (!results) return '';
   return results.map(r => r?.ParsedText).join('\n').trim();
 }
 
-// Tratamento centralizado de erros
 function handleError(err) {
   if (axios.isAxiosError(err)) {
     console.error('Erro de rede:', err.message);

@@ -49,6 +49,11 @@ public class PacienteController {
     }
 
 
+
+    public void setPacienteRepository(PacienteRepository pacienteRepository) {
+        this.pacienteRepository = pacienteRepository;
+    }
+
     @PostMapping("/cadastrar")
     public ResponseEntity<?> adicionarPaciente(@RequestBody Paciente paciente) {
 
@@ -74,7 +79,15 @@ public class PacienteController {
         }
 
         Paciente pacienteSalvo = pacienteRepository.save(paciente);
-        return ResponseEntity.status(HttpStatus.CREATED).body(pacienteSalvo);
+
+        pacienteSalvo.setSenha("");
+
+        return ResponseEntity.status(HttpStatus.CREATED)
+                .body(new HashMap<String, Object>() {{
+                    put("success", true);
+                    put("message", "Paciente cadastrado com sucesso!");
+                    put("dados", pacienteSalvo);
+                }});
     }
 
 

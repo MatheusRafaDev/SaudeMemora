@@ -13,6 +13,7 @@
     "form-data": "^4.0.2",
     "http-proxy-middleware": "^3.0.5",
     "languagetool-api": "^1.1.2",
+    "nodehun": "^3.0.2",
     "openai": "^4.97.0",
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
@@ -22,6 +23,7 @@
     "react-scripts": "5.0.1",
     "saudememora-client": "file:",
     "tesseract.js": "^6.0.1",
+    "typo-js": "^1.2.5",
     "web-vitals": "^2.1.4"
   },
   "scripts": {
