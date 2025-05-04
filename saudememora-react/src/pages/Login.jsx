@@ -38,8 +38,7 @@ export default function Login() {
 
   return (
     <div className="d-flex justify-content-center align-items-center min-vh-100 bg-light">
-      <div className="card shadow-lg p-4 w-100" style={{ maxWidth: '400px' }}>
-        <h2 className="text-center mb-4">SaúdeMemora</h2>
+      <div className="card shadow-sm p-4 rounded bg-white w-100" style={{ maxWidth: '400px' }}>
         <h3 className="text-center mb-3">Login</h3>
         <form onSubmit={handleLogin}>
           <div className="mb-3">

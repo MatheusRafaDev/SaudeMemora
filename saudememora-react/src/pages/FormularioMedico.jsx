@@ -3,7 +3,6 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import { ocrSpace } from '../ocr/ocrSpace';
 import { aplicarCamposComOCR } from '../ocr/aplicarCamposComOCR';
 import '../styles/FormularioMedico.css';
-import { useLocation } from 'react-router-dom';
 import {  cadastrarFichaMedica } from '../services/FichaMedicaService';
 import { useNavigate } from 'react-router-dom';
 
@@ -38,7 +37,6 @@ const FormularioMedico = () => {
   const [textoOCR, setTextoOCR] = useState('');
   const [ocrExecutado, setOcrExecutado] = useState(false);
   const [mensagem, setMensagem] = useState('');
-  const location = useLocation();
   const navigate = useNavigate();
   const paciente = JSON.parse(localStorage.getItem("paciente")) || {};
 
