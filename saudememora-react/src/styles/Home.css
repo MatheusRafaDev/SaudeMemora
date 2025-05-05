@@ -1,157 +1,72 @@
-/* Container principal */
 .home-container {
   display: flex;
   flex-direction: column;
-  height: 100vh;
+  min-height: 100vh;
+  background-color: #f4f7fa;
 }
 
-/* Cabeçalho fixo */
-.header {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 60px;
-  background-color: #3498db;  /* Cor de fundo do cabeçalho */
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  padding: 0 15px; /* Espaçamento nas laterais */
-  box-shadow: 0px 2px 5px rgba(0, 0, 0, 0.1);
-  z-index: 100;
-}
-.header .title {
-  font-size: 20px;
-  font-weight: bold;
-  color: white; /* Texto branco no cabeçalho */
-}
-.header .logout-button {
-  background-color: #ff4d4f;
-  border: none;
-  color: white;
-  padding: 8px 12px;
-  border-radius: 5px;
-  cursor: pointer;
-}
-.header .logout-button:hover {
-  background-color: #d9363e;
-}
-
-/* Conteúdo principal */
 .main-content {
   flex: 1;
-  margin-top: 60px;    /* espaço para não ficar atrás do header */
-  margin-bottom: 60px; /* espaço para não ficar atrás do footer */
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 0 15px;
-  box-sizing: border-box;
+  padding: 20px;
 }
 
-/* Grade de cards */
+.home-header {
+  text-align: center;
+  margin-bottom: 40px;
+}
+
+.home-header h1 {
+  font-size: 2rem;
+  color: #3b3b3b;
+}
+
+.home-header p {
+  font-size: 1rem;
+  color: #6c6c6c;
+}
+
 .cards-grid {
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
   gap: 20px;
-  text-align: center;
-  width: 100%;
-  max-width: 500px;
-  margin: 0 auto; /* Centraliza os cards */
 }
+
 .card {
-  background-color: #f5f5f5;
-  padding: 15px;
-  border-radius: 10px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1); /* Adiciona sombra para profundidade */
+  background-color: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s ease;
 }
-.card img {
+
+.card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+}
+
+.card-icon img {
   width: 50px;
   height: 50px;
-  margin-bottom: 10px;
+  margin-bottom: 15px;
 }
+
 .card span {
-  font-size: 14px;
-  color: #333333;
-  font-weight: 500; /* Mais destaque no texto */
+  font-size: 1rem;
+  font-weight: 500;
+  color: #333;
 }
 
-/* Footer fixo */
-.footer {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  height: 60px;
-  background-color: #3498db;  /* Cor de fundo do rodapé */
-  display: flex;
-  justify-content: space-around;
-  align-items: center;
-  box-shadow: 0px -2px 5px rgba(0, 0, 0, 0.1);
-}
-.footer-button {
-  background: none;
-  border: none;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  font-size: 12px;
-  color: #ffffff;  /* Texto branco no rodapé */
-  cursor: pointer;
-  transition: color 0.3s ease;
-}
-.footer-button:hover {
-  color: #ff4d4f; /* Cor de hover para dar feedback ao usuário */
-}
-.footer-button img {
-  width: 24px;
-  height: 24px;
-  margin-bottom: 4px;
+.card:active {
+  transform: translateY(2px);
 }
 
-/* Responsividade para dispositivos pequenos */
-@media (max-width: 600px) {
-  .header {
-    padding: 0 10px; /* Menos padding para telas menores */
-  }
-
-  .cards-grid {
-    grid-template-columns: 1fr;
-    gap: 10px;
-    width: 100%;
-  }
-
-  .card {
-    padding: 10px; /* Reduzimos o padding para dispositivos menores */
-  }
-
-  .card img {
-    width: 40px;
-    height: 40px;
-  }
-
-  .footer {
-    flex-direction: row;
-    justify-content: space-evenly; /* Alinha os botões no rodapé de forma mais equilibrada */
-  }
-
-  .footer-button {
-    font-size: 10px;
-  }
-
-  .header .title {
-    font-size: 18px; /* Reduz o tamanho da fonte do título */
-  }
-
-  .main-content {
-    margin-top: 70px; /* Ajuste para o header fixo */
-    margin-bottom: 70px; /* Ajuste para o footer fixo */
-  
-  
-  }
-
-  
+footer {
+  margin-top: 20px;
+  padding: 10px;
+  background-color: #003366;
+  color: white;
+  text-align: center;
+  font-size: 0.9rem;
 }

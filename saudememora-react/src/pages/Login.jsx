@@ -1,8 +1,8 @@
 import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { loginPaciente } from '../services/pacienteService';
-import 'bootstrap/dist/css/bootstrap.min.css'; 
-
+import { loginPaciente } from "../services/pacienteService";
+import "bootstrap/dist/css/bootstrap.min.css";
+import Footer from "../components/Footer";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -17,7 +17,6 @@ export default function Login() {
     try {
       const result = await loginPaciente(email, senha);
       if (result.success) {
-
         localStorage.setItem("paciente", JSON.stringify(result.data));
         navigate("/home");
       } else {
@@ -37,45 +36,62 @@ export default function Login() {
   };
 
   return (
-    <div className="d-flex justify-content-center align-items-center min-vh-100 bg-light">
-      <div className="card shadow-sm p-4 rounded bg-white w-100" style={{ maxWidth: '400px' }}>
-        <h3 className="text-center mb-3">Login</h3>
-        <form onSubmit={handleLogin}>
-          <div className="mb-3">
-            <label className="form-label" htmlFor="email">Email</label>
-            <input
-              className="form-control"
-              type="email"
-              id="email"
-              value={email}
-              onChange={e => setEmail(e.target.value)}
-              required
-              placeholder="Digite seu email"
-            />
+    <div className="d-flex flex-column min-vh-100 bg-white">
+      <main className="d-flex justify-content-center align-items-center flex-grow-1">
+        <div
+          className="p-3 rounded border w-100"
+          style={{ maxWidth: "360px" }}
+        >
+          <h4 className="text-center mb-3">Login</h4>
+          <form onSubmit={handleLogin}>
+            <div className="mb-2">
+              <label className="form-label" htmlFor="email">Email</label>
+              <input
+                className="form-control"
+                type="email"
+                id="email"
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                required
+              />
+            </div>
+
+            <div className="mb-2">
+              <label className="form-label" htmlFor="senha">Senha</label>
+              <input
+                className="form-control"
+                type="password"
+                id="senha"
+                value={senha}
+                onChange={(e) => setSenha(e.target.value)}
+                required
+              />
+            </div>
+
+            <button type="submit" className="btn btn-primary w-100 mt-2">
+              Entrar
+            </button>
+
+            {erro && <p className="text-danger mt-2 small">{erro}</p>}
+          </form>
+
+          <div className="d-flex justify-content-between mt-3">
+            <button
+              onClick={() => navigate("/criar-conta")}
+              className="btn btn-link p-0"
+            >
+              Criar conta
+            </button>
+            <button
+              onClick={() => navigate("/esqueci-senha")}
+              className="btn btn-link p-0"
+            >
+              Esqueci a senha
+            </button>
           </div>
-
-          <div className="mb-3">
-            <label className="form-label" htmlFor="senha">Senha</label>
-            <input
-              className="form-control"
-              type="password"
-              id="senha"
-              value={senha}
-              onChange={e => setSenha(e.target.value)}
-              required
-              placeholder="Digite sua senha"
-            />
-          </div>
-
-          <button type="submit" className="btn btn-primary w-100">Entrar</button>
-          {erro && <p className="text-danger mt-3">{erro}</p>}
-        </form>
-
-        <div className="d-flex justify-content-between mt-4">
-          <button onClick={() => navigate('/criar-conta')} className="btn btn-link">Criar conta</button>
-          <button onClick={() => navigate('/esqueci-senha')} className="btn btn-link">Esqueci a senha</button>
         </div>
-      </div>
+      </main>
+      <Footer />
     </div>
   );
 }

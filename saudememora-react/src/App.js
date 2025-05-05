@@ -5,11 +5,12 @@ import Home from "./pages/Home";
 import CadastroPaciente from "./pages/CadastroPaciente";
 import FormularioMedico from "./pages/FormularioMedico";
 import OCRLeituraCursiva from "./pages/OCRLeituraCursiva";
+import Perfil from "./pages/Perfil";
 
-// Função para verificar se o paciente está logado
+
 const isPacienteLoggedIn = () => {
   const paciente = JSON.parse(localStorage.getItem("paciente")) || {};
-  return Object.keys(paciente).length > 0;  // Verifica se o objeto paciente não está vazio
+  return Object.keys(paciente).length > 0;  
 };
 
 function App() {
@@ -27,6 +28,7 @@ function App() {
 
 
         <Route path="/criar-conta" element={<CadastroPaciente />} />
+        <Route path="/perfil" element={<Perfil />} />
 
         <Route path="/formulario-medico" element={<FormularioMedico />} />
 

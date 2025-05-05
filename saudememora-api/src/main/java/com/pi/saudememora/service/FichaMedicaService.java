@@ -16,10 +16,13 @@ public class FichaMedicaService {
     private FichaMedicaRepository fichaMedicaRepository;
 
     public FichaMedica salvarFichaMedica(FichaMedica fichaMedica) {
-
         return fichaMedicaRepository.save(fichaMedica);
     }
 
+    public FichaMedica obterFichaMedicaPorUsuarioId(Long idPaciente) {
+        FichaMedica fichaMedica = fichaMedicaRepository.findByPaciente_Id(idPaciente);
+        return fichaMedica;
+    }
 
     public List<FichaMedica> obterTodasFichasMedicas() {
         return fichaMedicaRepository.findAll();

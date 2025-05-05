@@ -15,7 +15,7 @@ public class Paciente {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_paciente")  // Coluna id, tipo Long
+    @Column(name = "id_paciente")
     private Long id;
 
     @Column(name = "ds_nome", length = 100, nullable = false)  // Tipo String, com tamanho máximo de 100 caracteres

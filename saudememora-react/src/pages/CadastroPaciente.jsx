@@ -48,19 +48,22 @@ const CadastroPaciente = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-
+  
     const isValid = validateForm();
     if (!isValid) return;
-
+  
     const result = await cadastrarPaciente(formData);
-    
+  
     if (result.success) {
-      navigate('/formulario-medico', { state: result.dados });
+      localStorage.setItem('paciente', JSON.stringify(result.dados));
+  
+      navigate('/formulario-medico');
     } else {
       setError(result.message || 'Erro desconhecido');
     }
   };
-
+  
+  
   return (
     <div className="container mt-5">
       <div className="saude-card shadow-sm p-4 rounded bg-white">

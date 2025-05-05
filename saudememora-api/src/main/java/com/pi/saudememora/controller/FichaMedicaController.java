@@ -7,11 +7,17 @@ import com.pi.saudememora.model.FichaMedica;
 import com.pi.saudememora.service.FichaMedicaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.Base64;
 import java.util.Date;
 import java.util.List;
 import java.util.Optional;
@@ -39,7 +45,7 @@ public class FichaMedicaController {
 
 
         String json = mapper.writeValueAsString(fichaMedica);
-        System.out.println("FichaMedica completa:\n" + json);
+        //System.out.println("FichaMedica completa:\n" + json);
 
         if (fichaMedica.getPaciente() == null || fichaMedica.getPaciente().getId() == null) {
             return ResponseEntity.badRequest().body("Paciente é obrigatório" + fichaMedica);
@@ -47,8 +53,8 @@ public class FichaMedicaController {
 
 
 
-        Logger logger = LoggerFactory.getLogger(FichaMedicaController.class);
-        logger.info("Corpo da requisição: {}", fichaMedica);
+        //Logger logger = LoggerFactory.getLogger(FichaMedicaController.class);
+        //logger.info("Corpo da requisição: {}", fichaMedica);
 
 
         Paciente paciente = pacienteService.buscarPorId(fichaMedica.getPacienteId());
@@ -61,15 +67,12 @@ public class FichaMedicaController {
         return new ResponseEntity<>(novaFicha, HttpStatus.CREATED);
     }
 
-
-    // Obter todas as fichas médicas
     @GetMapping
     public ResponseEntity<List<FichaMedica>> obterTodasFichasMedicas() {
         List<FichaMedica> fichasMedicas = fichaMedicaService.obterTodasFichasMedicas();
         return new ResponseEntity<>(fichasMedicas, HttpStatus.OK);
     }
 
-    // Obter uma ficha médica por ID
     @GetMapping("/{id}")
     public ResponseEntity<FichaMedica> obterFichaMedicaPorId(@PathVariable Long id) {
         Optional<FichaMedica> fichaMedica = fichaMedicaService.obterFichaMedicaPorId(id);
@@ -80,7 +83,6 @@ public class FichaMedicaController {
         }
     }
 
-    // Atualizar uma ficha médica existente
     @PutMapping("/{id}")
     public ResponseEntity<FichaMedica> atualizarFichaMedica(@PathVariable Long id, @RequestBody FichaMedica fichaMedica) {
         Optional<FichaMedica> fichaExistente = fichaMedicaService.obterFichaMedicaPorId(id);
@@ -94,7 +96,86 @@ public class FichaMedicaController {
         }
     }
 
-    // Deletar uma ficha médica
+    @GetMapping("/paciente/{id}")
+    public ResponseEntity<FichaMedica> obterFichaMedicaPorUsuarioId(@PathVariable Long id) {
+
+        FichaMedica fichaMedica = fichaMedicaService.obterFichaMedicaPorUsuarioId(id);
+
+        fichaMedica.setImagem(new byte[0]);
+
+        if (fichaMedica != null) {
+            return new ResponseEntity<>(fichaMedica, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        }
+    }
+
+    /*
+        @CrossOrigin(origins = "http://localhost:3000")
+        @GetMapping("/paciente/{id}/imagem")
+        public ResponseEntity<byte[]> obterImagemFichaMedica(@PathVariable Long id) {
+            FichaMedica ficha = fichaMedicaService.obterFichaMedicaPorUsuarioId(id);
+
+            if (ficha != null && ficha.getImagem() != null && ficha.getImagem().length > 0) {
+                return ResponseEntity
+                        .ok()
+                        .contentType(MediaType.IMAGE_JPEG)
+                        .body(ficha.getImagem());
+            } else {
+                return ResponseEntity.noContent().build();
+            }
+        }
+    */
+
+
+    @CrossOrigin(origins = "http://localhost:3000")
+    @GetMapping("/paciente/{id}/imagem")
+    public ResponseEntity<byte[]> obterImagemFichaMedica(@PathVariable Long id) {
+        FichaMedica ficha = fichaMedicaService.obterFichaMedicaPorUsuarioId(id);
+
+        // Verifica se a ficha médica ou a imagem são nulas ou vazias
+        if (ficha == null || ficha.getImagem() == null || ficha.getImagem().length == 0) {
+            return ResponseEntity.noContent().build(); // Retorna "No Content" caso não haja imagem
+        }
+
+        // Retorna a imagem diretamente na resposta
+        return ResponseEntity
+                .ok()
+                .contentType(MediaType.IMAGE_JPEG)
+                .body(ficha.getImagem());
+    }
+
+    /*
+    @CrossOrigin(origins = "http://localhost:3000")
+    @GetMapping("/paciente/{id}/imagem")
+    public ResponseEntity<byte[]> obterImagemFichaMedica(@PathVariable Long id) {
+        FichaMedica ficha = fichaMedicaService.obterFichaMedicaPorUsuarioId(id);
+
+        if (ficha == null || ficha.getImagem() == null || ficha.getImagem().length == 0) {
+            return ResponseEntity.noContent().build();
+        }
+
+        try {
+            String pastaDestino = "uploads/imagens/";
+            Files.createDirectories(Paths.get(pastaDestino));
+
+            String nomeArquivo = "ficha_paciente_" + id + ".jpg";
+            Path caminhoCompleto = Paths.get(pastaDestino, nomeArquivo);
+
+            Files.write(caminhoCompleto, ficha.getImagem());
+
+        } catch (IOException e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+
+        return ResponseEntity
+                .ok()
+                .contentType(MediaType.IMAGE_JPEG)
+                .body(ficha.getImagem());
+    }
+    */
+
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletarFichaMedica(@PathVariable Long id) {
         Optional<FichaMedica> fichaExistente = fichaMedicaService.obterFichaMedicaPorId(id);

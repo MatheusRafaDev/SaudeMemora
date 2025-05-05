@@ -1,31 +1,30 @@
-import axiosInstance from "../axiosConfig"; // Supondo que axiosInstance esteja configurado corretamente
+import axiosInstance from "../axiosConfig"; 
 
-// Função para cadastrar uma nova ficha médica
 export const cadastrarFichaMedica = async (formData) => {
   try {
-    const file = formData.imagem;  // A imagem é extraída de formData
+    const file = formData.get("imagem");
 
-    // Função para ler a imagem em base64
-    const reader = new FileReader();
-
-    // Promessa que irá retornar o base64 da imagem
     const getImageBase64 = () => {
       return new Promise((resolve, reject) => {
-        reader.onloadend = () => resolve(reader.result); // Retorna o resultado após ler
-        reader.onerror = reject; // Caso haja erro na leitura
-        reader.readAsDataURL(file); // Lê a imagem como base64
+        if (!file) return resolve("");
+        const reader = new FileReader();
+        reader.onloadend = () => resolve(reader.result);
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
       });
     };
 
-    // Processando a imagem, se existir
-    const imagemBase64 = file ? await getImageBase64() : "";
+    const imagemBase64 = await getImageBase64();
 
-    // Remover o prefixo "image/jpeg;base64," do base64, caso esteja presente
-    const imagemBase64SemPrefixo = imagemBase64.split(',')[1] || "";
+    const imagemBase64SemPrefixo = imagemBase64?.includes(',')
+      ? imagemBase64.split(',')[1]
+      : "";
 
-    const paciente = formData.result.dados;
-    const respostas = formData.respostas;
-    
+    const paciente = JSON.parse(formData.get("paciente") || "{}").dados;
+    const respostas = JSON.parse(formData.get("respostas") || "{}");
+    const ocrTexto = formData.get("textoOCR") || "";
+
+
     const FichaMedica = {
       paciente: {
         id: paciente.id,
@@ -34,10 +33,10 @@ export const cadastrarFichaMedica = async (formData) => {
         email: paciente.email,
         telefone: paciente.telefone
       },
-      imagem: imagemBase64SemPrefixo,  // Agora com a imagem sem o prefixo
-      ocrTexto: formData.textoOCR || "",  // Se o texto OCR não for fornecido, será uma string vazia
+      imagem: imagemBase64SemPrefixo,
+      ocrTexto,
 
-      pressao: respostas.pressao,
+      pressao: respostas.pressao || "",
       tratamentoMedico: respostas.tratamentoMedico === 'SIM',
       gravidez: respostas.gravidez === 'SIM',
       regime: respostas.regime === 'SIM',
@@ -64,78 +63,236 @@ export const cadastrarFichaMedica = async (formData) => {
       { headers: { 'Content-Type': 'application/json' } }
     );
 
+
     if (response.status === 200 || response.status === 201) {
       return { success: true, message: "Ficha médica cadastrada com sucesso!" };
     } else {
       return { success: false, message: "Erro ao cadastrar ficha médica. Verifique os dados." };
     }
+
   } catch (error) {
-    console.error("Erro ao cadastrar ficha médica:", error);
-    if (error.response && error.response.data) {
-      const mensagem =
-        typeof error.response.data === "string"
-          ? error.response.data
-          : error.response.data.message || "Erro inesperado no cadastro.";
-      return { success: false, message: mensagem };
-    }
-    return { success: false, message: "Erro desconhecido ao cadastrar ficha médica!" };
+    const mensagem =
+      error.response?.data?.message || "Erro desconhecido ao cadastrar ficha médica!";
+    return { success: false, message: mensagem };
   }
 };
 
 
+export const obterImagemBase64 = async (imagemFile) => {
+  try {
+
+    if (!(imagemFile instanceof File)) {
+      throw new Error("O argumento não é um arquivo válido.");
+    }
+
+    const getImageBase64 = () => {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onloadend = () => resolve(reader.result);
+        reader.onerror = reject;
+        reader.readAsDataURL(imagemFile);
+      });
+    };
+
+    const imagemBase64 = await getImageBase64();
+
+    const imagemBase64SemPrefixo = imagemBase64?.includes(',')
+      ? imagemBase64.split(',')[1]
+      : "";
+
+    return imagemBase64SemPrefixo;
+
+  } catch (error) {
+    console.error("Erro ao obter a imagem em Base64:", error);
+    throw new Error("Erro ao converter a imagem em Base64.");
+  }
+};
 
 
-// Função para atualizar os dados de uma ficha médica
 export const atualizarFichaMedica = async (id, formData) => {
   try {
+    const file = formData.get("imagem");
+
+    const getImageBase64 = () => {
+      return new Promise((resolve, reject) => {
+        if (!file) return resolve("");
+        const reader = new FileReader();
+        reader.onloadend = () => resolve(reader.result);
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+    };
+
+    const imagemBase64 = await getImageBase64();
+    const imagemBase64SemPrefixo = imagemBase64?.split(",")[1] || "";
+
+    const paciente = JSON.parse(formData.get("paciente") || "{}");
+    const respostas = JSON.parse(formData.get("respostas") || "{}");
+    const ocrTexto = formData.get("textoOCR") || "";
+
+    const FichaMedica = {
+      paciente: {
+        id: paciente.id,
+        nome: paciente.nome,
+        cpf: paciente.cpf,
+        email: paciente.email,
+        telefone: paciente.telefone,
+      },
+      imagem: imagemBase64SemPrefixo,
+      ocrTexto,
+
+      pressao: respostas.pressao || "",
+      tratamentoMedico: respostas["tratamento medico"] === "SIM",
+      gravidez: respostas.gravida === "SIM",
+      regime: respostas.regime === "SIM",
+      diabetes: respostas.diabetes === "SIM",
+      alergias: respostas.alergias === "SIM",
+      febreReumatica: respostas.reumatica === "SIM",
+      coagulacao: respostas.coagulacao === "SIM",
+      doencaCardioVascular: respostas.cardio === "SIM",
+      hemorragicos: respostas.hemorragicos === "SIM",
+      problemasAnestesia: respostas.anestesia === "SIM",
+      alergiaMedicamentos: respostas["alergia a medicamento"] === "SIM",
+      hepatite: respostas.hepatite === "SIM",
+      hiv: respostas.hiv === "SIM",
+      drogas: respostas.drogas === "SIM",
+      fumante: respostas.fumante === "SIM",
+      fumou: respostas.fumou === "SIM",
+      respiratorios: respostas.respiratorio === "SIM",
+    };
+
     const response = await axiosInstance.put(
-      `/api/ficha-medica/${id}`,  // Rota para atualizar a ficha médica com o ID fornecido
-      formData
+      `/api/ficha-medica/${id}`,
+      FichaMedica,
+      { headers: { "Content-Type": "application/json" } }
     );
+
     if (response.status === 200) {
       return { success: true, message: "Ficha médica atualizada com sucesso!" };
+    } else {
+      return { success: false, message: "Erro ao atualizar ficha médica. Verifique os dados." };
     }
   } catch (error) {
-    console.error("Erro ao atualizar ficha médica:", error); // Log do erro para debug
-    return { success: false, message: "Erro ao atualizar ficha médica!" };
+    console.error("Erro ao atualizar ficha médica:", error);
+    const mensagem =
+      error.response?.data?.message || "Erro desconhecido ao atualizar ficha médica!";
+    return { success: false, message: mensagem };
   }
 };
 
-// Função para deletar uma ficha médica
+
 export const deletarFichaMedica = async (id) => {
   try {
-    const response = await axiosInstance.delete(`/api/ficha-medica/${id}`);  // Rota para deletar a ficha médica com o ID fornecido
+    const response = await axiosInstance.delete(`/api/ficha-medica/${id}`);  
     if (response.status === 200) {
       return { success: true, message: "Ficha médica deletada com sucesso!" };
     }
   } catch (error) {
-    console.error("Erro ao deletar ficha médica:", error); // Log do erro para debug
+    console.error("Erro ao deletar ficha médica:", error); 
     return { success: false, message: "Erro ao deletar ficha médica!" };
   }
 };
 
-// Função para listar todas as fichas médicas
-export const listarFichasMedicas = async () => {
+
+
+export const buscarFichaMedica = async (id) => {
   try {
-    const response = await axiosInstance.get("/api/ficha-medica");  // Rota para listar todas as fichas médicas
+
+
+    const response = await axiosInstance.get(`/api/ficha-medica/paciente/${id}`);
+
     if (response.status === 200) {
       return { success: true, data: response.data };
+    } else {
+
+      return { success: false, message: `Erro: Status de resposta ${response.status}` };
     }
   } catch (error) {
-    console.error("Erro ao listar fichas médicas:", error); // Log do erro para debug
-    return { success: false, message: "Erro ao listar fichas médicas!" };
+
+
+    if (error.response) {
+    
+      return { success: false, message: `Erro ao buscar ficha médica: ${error.response.data.message || error.response.statusText}` };
+    } else if (error.request) {
+
+      return { success: false, message: 'Erro de rede: Nenhuma resposta do servidor.' };
+    } else {
+
+      return { success: false, message: `Erro desconhecido: ${error.message}` };
+    }
   }
 };
 
-// Função para buscar uma ficha médica específica pelo ID
-export const buscarFichaMedica = async (id) => {
+
+export const buscarImagemFichaMedica = async (id) => {
   try {
-    const response = await axiosInstance.get(`/api/ficha-medica/${id}`);  // Rota para buscar uma ficha médica específica
+    // Realiza a requisição para obter a imagem
+    const response = await axiosInstance.get(`api/ficha-medica/paciente/${id}/imagem`, { responseType: 'arraybuffer' });
+
     if (response.status === 200) {
-      return { success: true, data: response.data };
+
+      return { success: true };
+    } else {
+      return { success: false, message: "Erro ao buscar imagem da ficha médica." };
     }
   } catch (error) {
-    console.error("Erro ao buscar ficha médica:", error); // Log do erro para debug
-    return { success: false, message: "Erro ao buscar ficha médica!" };
+    // Em caso de erro, loga o erro no console e extrai a mensagem de erro
+    console.error("Erro ao buscar imagem da ficha médica:", error);
+    const mensagem = error?.response?.data?.message || "Erro inesperado ao buscar imagem da ficha médica.";
+    return { success: false, message: mensagem };
   }
 };
+
+
+
+export const buscarImagemFichaMedica2 = async (id) => {
+  try {
+    const response = await axiosInstance.get(`/ficha-medica/paciente/${id}/imagem`, { responseType: 'arraybuffer' });
+
+
+    if (response.status === 200) {
+
+      const arrayBufferView = new Uint8Array(response.data);
+      const imageBase64 = btoa(String.fromCharCode(...arrayBufferView));
+
+      return { success: true, image: `data:image/jpeg;base64,${imageBase64}` }; 
+    } else {
+      return { success: false, message: "Erro ao buscar imagem da ficha médica." };
+    }
+  } catch (error) {
+    console.error("Erro ao buscar imagem da ficha médica:", error);
+    if (error.response && error.response.data) {
+      const mensagem =
+        typeof error.response.data === "string"
+          ? error.response.data
+          : error.response.data.message || "Erro inesperado ao buscar imagem da ficha médica.";
+      return { success: false, message: mensagem };
+    }
+    return { success: false, message: "Erro desconhecido ao buscar imagem da ficha médica!" };
+  }
+};
+
+export const buscarImagemFichaMedica3 = async (id) => {
+  try {
+    const response = await fetch(`http://localhost:7070/ficha-medica/paciente/${id}/imagem`, {
+      method: 'GET',
+      headers: {
+        'Accept': 'image/png'
+      }
+    });
+
+    if (!response.ok) {
+      throw new Error('Erro ao buscar a imagem');
+    }
+
+    const blob = await response.blob();
+    const url = URL.createObjectURL(blob);
+    return url;
+
+  } catch (error) {
+    console.error('Erro ao carregar imagem da ficha médica:', error);
+    return null;
+  }
+}
+
+
