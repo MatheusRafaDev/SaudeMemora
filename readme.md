@@ -1,34 +1,37 @@
 # Sistema de Gestão de Documentos e OCR
 
+## Tarefas dos Integrantes
 
-# Tarefas e Responsabilidades da Equipe
-
-### Matheus
+### Matheus 
 - **Tela de Cadastro de Paciente**  
-  Responsável por criar o fluxo de cadastro, estrutura de campos e validações visuais.
+  Criar o fluxo de cadastro, estrutura de campos e validações visuais.
 
 - **Tela de Formulário Médico com OCR de ANAMNESE**  
   Coletar e registrar informações médicas do paciente, com campos para condições de saúde, histórico médico e perguntas sobre tratamentos, doenças e alergias.
 
+- **Tela de Login**  
+  Criar e implementar a tela de login, com validações de credenciais e redirecionamento para o sistema após login bem-sucedido.
+
 ### Gui
 - **Tela de Editar Paciente**  
-  Foco na exibição do paciente, visualização e edição das informações.
+  Exibição do paciente, visualização e edição das informações.
 
 ### Murilo
-- **Tela de Cadastro de Documento**  
-  Prototipar a interface de upload de documentos, seleção de tipo de documento e status de processamento.
+- **Tela de Cadastro de Documento e Processamento OCR**  
+  Interface para upload de documentos, seleção de tipo de documento e status de processamento.  
+  Exibição do texto extraído pelo OCR, com a opção de reprocessar documentos que falharam.
 
 ### Lucas
 - **Tela de Lista de Documentos**  
-  Desenvolver o protótipo para exibição de documentos cadastrados, filtros e ações de visualização e exclusão.
+  Exibição de documentos cadastrados, com filtros e ações de visualização e exclusão.
 
 ### Ryan
-- **Tela de Processamento OCR**  
-  Foco no protótipo para exibição do processamento OCR, com texto extraído e interface para reprocessar documentos com falhas.
+- **Processamento OCR e Reprocessamento de Documentos**  
+  Processamento de documentos com OCR, exibindo as informações extraídas e permitindo reprocessar documentos falhos.
 
 ### Wilson
 - **Tela de Relatório de Documentos**  
-  Desenvolver o protótipo para relatórios detalhados sobre documentos, com filtros e opções de exportação (Excel/PDF).
+  Relatórios detalhados sobre documentos, com filtros e opções de exportação (Excel/PDF).
 
 
 ## Visão Geral
