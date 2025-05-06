@@ -4,6 +4,7 @@ export const cadastrarFichaMedica = async (formData) => {
   try {
     const file = formData.get("imagem");
 
+
     const getImageBase64 = () => {
       return new Promise((resolve, reject) => {
         if (!file) return resolve("");
@@ -20,11 +21,11 @@ export const cadastrarFichaMedica = async (formData) => {
       ? imagemBase64.split(',')[1]
       : "";
 
-    const paciente = JSON.parse(formData.get("paciente") || "{}");
-    const respostas = JSON.parse(formData.get("respostas") || "{}");
-    const ocrTexto = formData.get("textoOCR") || "";
+    const paciente = JSON.parse(localStorage.getItem("paciente")) || {};
+    const respostas = formData.has("respostas") ? JSON.parse(formData.get("respostas")) : {};
+    const ocrTexto = formData.has("textoOCR") ? formData.get("textoOCR") : "";
 
-
+          
     const FichaMedica = {
       paciente: {
         id: paciente.id,
@@ -63,6 +64,8 @@ export const cadastrarFichaMedica = async (formData) => {
       { headers: { 'Content-Type': 'application/json' } }
     );
 
+    
+    console.log(response)
 
     if (response.status === 200 || response.status === 201) {
     

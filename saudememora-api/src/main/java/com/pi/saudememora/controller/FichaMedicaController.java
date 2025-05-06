@@ -44,7 +44,6 @@ public class FichaMedicaController {
 
 
         String json = mapper.writeValueAsString(fichaMedica);
-        //System.out.println("FichaMedica completa:\n" + json);
 
         if (fichaMedica.getPaciente() == null || fichaMedica.getPaciente().getId() == null) {
             return ResponseEntity.badRequest().body("Paciente é obrigatório" + fichaMedica);
@@ -52,7 +51,7 @@ public class FichaMedicaController {
 
 
 
-        //Logger logger = LoggerFactory.getLogger(FichaMedicaController.class);
+        Logger logger = LoggerFactory.getLogger(FichaMedicaController.class);
         //logger.info("Corpo da requisição: {}", fichaMedica);
 
 
@@ -78,10 +77,8 @@ public class FichaMedicaController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Ficha médica não encontrada");
         }
 
-        // Recupera a ficha existente
         FichaMedica fichaExistente = optionalFicha.get();
 
-        // Atualiza os dados com base no que foi enviado do front
         fichaExistente.setImagem(fichaRecebida.getImagem());
         fichaExistente.setOcrTexto(fichaRecebida.getOcrTexto());
 
@@ -104,7 +101,6 @@ public class FichaMedicaController {
         fichaExistente.setFumou(fichaRecebida.isFumou());
         fichaExistente.setRespiratorios(fichaRecebida.isRespiratorios());
 
-        // Atualiza paciente (caso necessário buscar novamente pelo ID)
         Paciente paciente = pacienteService.buscarPorId(fichaRecebida.getPaciente().getId());
         fichaExistente.setPaciente(paciente);
 

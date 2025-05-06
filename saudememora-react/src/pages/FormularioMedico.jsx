@@ -146,7 +146,6 @@ const FormularioMedico = () => {
       const formData = new FormData();
       
       formData.append("respostas", JSON.stringify(respostas));
-
       formData.append("textoOCR", textoOCR);
       formData.append("paciente", JSON.stringify());
       if (imagem instanceof File) {
