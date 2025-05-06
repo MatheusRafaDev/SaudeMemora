@@ -32,7 +32,7 @@ export const cadastrarPaciente = async (formData) => {
     const response = await axiosInstance.post("/api/paciente/cadastrar", formData);
 
     if (response.status === 200 || response.status === 201) {
-      return { success: true, message: "Paciente cadastrado com sucesso!",dados: response.data };
+      return { success: true, message: "Paciente cadastrado com sucesso!",dados: response.data.dados };
     } else {
       return { success: false, message: "Erro ao cadastrar paciente. Verifique os dados." };
     }

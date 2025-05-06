@@ -36,7 +36,6 @@ public class FichaMedicaController {
     private PacienteService pacienteService;
 
 
-    @CrossOrigin(origins = "http://localhost:3000")
     @PostMapping("/cadastrar")
     public Object cadastrarFichaMedica(@RequestBody FichaMedica fichaMedica) throws JsonProcessingException {
 
@@ -67,6 +66,54 @@ public class FichaMedicaController {
         return new ResponseEntity<>(novaFicha, HttpStatus.CREATED);
     }
 
+    @PutMapping("/atualizar/{id}")
+    public Object atualizarFichaMedica(@PathVariable Long id, @RequestBody FichaMedica fichaRecebida) {
+
+        if (fichaRecebida.getPaciente() == null || fichaRecebida.getPaciente().getId() == null) {
+            return ResponseEntity.badRequest().body("Paciente é obrigatório");
+        }
+
+        Optional<FichaMedica> optionalFicha = fichaMedicaService.obterFichaMedicaPorId(id);
+        if (!optionalFicha.isPresent()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Ficha médica não encontrada");
+        }
+
+        // Recupera a ficha existente
+        FichaMedica fichaExistente = optionalFicha.get();
+
+        // Atualiza os dados com base no que foi enviado do front
+        fichaExistente.setImagem(fichaRecebida.getImagem());
+        fichaExistente.setOcrTexto(fichaRecebida.getOcrTexto());
+
+        fichaExistente.setPressao(fichaRecebida.getPressao());
+        fichaExistente.setTratamentoMedico(fichaRecebida.isTratamentoMedico());
+        fichaExistente.setGravidez(fichaRecebida.isGravidez());
+        fichaExistente.setRegime(fichaRecebida.isRegime());
+        fichaExistente.setDiabetes(fichaRecebida.isDiabetes());
+        fichaExistente.setAlergias(fichaRecebida.isAlergias());
+        fichaExistente.setFebreReumatica(fichaRecebida.isFebreReumatica());
+        fichaExistente.setCoagulacao(fichaRecebida.isCoagulacao());
+        fichaExistente.setDoencaCardioVascular(fichaRecebida.isDoencaCardioVascular());
+        fichaExistente.setHemorragicos(fichaRecebida.isHemorragicos());
+        fichaExistente.setProblemasAnestesia(fichaRecebida.isProblemasAnestesia());
+        fichaExistente.setAlergiaMedicamentos(fichaRecebida.isAlergiaMedicamentos());
+        fichaExistente.setHepatite(fichaRecebida.isHepatite());
+        fichaExistente.setHiv(fichaRecebida.isHiv());
+        fichaExistente.setDrogas(fichaRecebida.isDrogas());
+        fichaExistente.setFumante(fichaRecebida.isFumante());
+        fichaExistente.setFumou(fichaRecebida.isFumou());
+        fichaExistente.setRespiratorios(fichaRecebida.isRespiratorios());
+
+        // Atualiza paciente (caso necessário buscar novamente pelo ID)
+        Paciente paciente = pacienteService.buscarPorId(fichaRecebida.getPaciente().getId());
+        fichaExistente.setPaciente(paciente);
+
+        FichaMedica fichaAtualizada = fichaMedicaService.salvarFichaMedica(fichaExistente);
+
+        return new ResponseEntity<>(fichaAtualizada, HttpStatus.OK);
+    }
+
+
     @GetMapping
     public ResponseEntity<List<FichaMedica>> obterTodasFichasMedicas() {
         List<FichaMedica> fichasMedicas = fichaMedicaService.obterTodasFichasMedicas();
@@ -78,19 +125,6 @@ public class FichaMedicaController {
         Optional<FichaMedica> fichaMedica = fichaMedicaService.obterFichaMedicaPorId(id);
         if (fichaMedica.isPresent()) {
             return new ResponseEntity<>(fichaMedica.get(), HttpStatus.OK);
-        } else {
-            return new ResponseEntity<>(HttpStatus.NOT_FOUND);
-        }
-    }
-
-    @PutMapping("/{id}")
-    public ResponseEntity<FichaMedica> atualizarFichaMedica(@PathVariable Long id, @RequestBody FichaMedica fichaMedica) {
-        Optional<FichaMedica> fichaExistente = fichaMedicaService.obterFichaMedicaPorId(id);
-        if (fichaExistente.isPresent()) {
-            fichaMedica.setId(id);
-
-            FichaMedica fichaAtualizada = fichaMedicaService.salvarFichaMedica(fichaMedica);
-            return new ResponseEntity<>(fichaAtualizada, HttpStatus.OK);
         } else {
             return new ResponseEntity<>(HttpStatus.NOT_FOUND);
         }

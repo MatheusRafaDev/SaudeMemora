@@ -9,9 +9,18 @@ import Perfil from "./pages/Perfil";
 
 
 const isPacienteLoggedIn = () => {
-  const paciente = JSON.parse(localStorage.getItem("paciente")) || {};
-  return Object.keys(paciente).length > 0;  
+  const data = localStorage.getItem("paciente");
+  if (!data) return false;
+
+  try {
+    const paciente = JSON.parse(data);
+    return paciente && Object.keys(paciente).length > 0;
+  } catch (e) {
+    console.error("Erro ao fazer parse do paciente:", e);
+    return false;
+  }
 };
+
 
 function App() {
   return (

@@ -56,7 +56,8 @@ const CadastroPaciente = () => {
   
     if (result.success) {
       localStorage.setItem('paciente', JSON.stringify(result.dados));
-  
+
+      
       navigate('/formulario-medico');
     } else {
       setError(result.message || 'Erro desconhecido');

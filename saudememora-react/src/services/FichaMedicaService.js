@@ -20,7 +20,7 @@ export const cadastrarFichaMedica = async (formData) => {
       ? imagemBase64.split(',')[1]
       : "";
 
-    const paciente = JSON.parse(formData.get("paciente") || "{}").dados;
+    const paciente = JSON.parse(formData.get("paciente") || "{}");
     const respostas = JSON.parse(formData.get("respostas") || "{}");
     const ocrTexto = formData.get("textoOCR") || "";
 
@@ -65,6 +65,7 @@ export const cadastrarFichaMedica = async (formData) => {
 
 
     if (response.status === 200 || response.status === 201) {
+    
       return { success: true, message: "Ficha médica cadastrada com sucesso!" };
     } else {
       return { success: false, message: "Erro ao cadastrar ficha médica. Verifique os dados." };
@@ -111,24 +112,30 @@ export const obterImagemBase64 = async (imagemFile) => {
 
 export const atualizarFichaMedica = async (id, formData) => {
   try {
-    const file = formData.get("imagem");
+    const file = formData?.get("imagem") || null;
 
     const getImageBase64 = () => {
       return new Promise((resolve, reject) => {
-        if (!file) return resolve("");
+        if (!file) {
+          resolve(""); 
+          return;
+        }
         const reader = new FileReader();
         reader.onloadend = () => resolve(reader.result);
         reader.onerror = reject;
         reader.readAsDataURL(file);
       });
     };
+    
 
     const imagemBase64 = await getImageBase64();
     const imagemBase64SemPrefixo = imagemBase64?.split(",")[1] || "";
 
-    const paciente = JSON.parse(formData.get("paciente") || "{}");
-    const respostas = JSON.parse(formData.get("respostas") || "{}");
-    const ocrTexto = formData.get("textoOCR") || "";
+    const paciente = JSON.parse(localStorage.getItem("paciente")) || {};
+    const respostas = formData.has("respostas") ? JSON.parse(formData.get("respostas")) : {};
+    const ocrTexto = formData.has("textoOCR") ? formData.get("textoOCR") : "";
+
+
 
     const FichaMedica = {
       paciente: {
@@ -162,7 +169,7 @@ export const atualizarFichaMedica = async (id, formData) => {
     };
 
     const response = await axiosInstance.put(
-      `/api/ficha-medica/${id}`,
+      `/api/ficha-medica/atualizar/${id}`,
       FichaMedica,
       { headers: { "Content-Type": "application/json" } }
     );

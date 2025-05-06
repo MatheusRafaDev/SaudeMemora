@@ -96,10 +96,8 @@ const FormularioMedico = () => {
 
   useEffect(() => {
     if (paciente && paciente.id) {
-      localStorage.setItem("paciente", JSON.stringify(paciente));
-      let a = obterFicha();
 
-      console.log(a);
+      let a = obterFicha();
     }
   }, [paciente.id]);
 
@@ -146,13 +144,15 @@ const FormularioMedico = () => {
       setMensagem("Preencha todos os campos antes de continuar.");
     } else {
       const formData = new FormData();
+      
       formData.append("respostas", JSON.stringify(respostas));
+
       formData.append("textoOCR", textoOCR);
-      formData.append("paciente", JSON.stringify(paciente));
+      formData.append("paciente", JSON.stringify());
       if (imagem instanceof File) {
         formData.append("imagem", imagem);
       }
-  
+
       if (!isAtualizar) {
         const response = await cadastrarFichaMedica(formData);
         if (response.success) {
@@ -163,7 +163,7 @@ const FormularioMedico = () => {
         }
       } else {
       
-        const response = await atualizarFichaMedica(formData); 
+        const response = await atualizarFichaMedica(paciente.id,formData); 
         if (response.success) {
           setMensagem("Ficha atualizada com sucesso!");
           navigate("/home");
@@ -334,7 +334,7 @@ const FormularioMedico = () => {
               className="btn btn-outline-primary px-4"
               onClick={handleFinalizar}
             >
-              Finalizar
+               {isAtualizar ? "Atualizar" : "Finalizar"}
             </button>
           </div>
         </form>
