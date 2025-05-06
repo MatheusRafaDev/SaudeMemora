@@ -1,5 +1,36 @@
 # Sistema de Gestão de Documentos e OCR
 
+
+# Tarefas e Responsabilidades da Equipe
+
+## Matheus
+- **Tela de Cadastro de Paciente**  
+  Descrição: Responsável por criar o fluxo de cadastro, estrutura de campos e validações visuais.
+
+- **Tela de Formulário Médico com OCR de ANAMNESE**  
+  Descrição: Tela para coletar e registrar informações médicas do paciente, com campos para condições de saúde, histórico médico e perguntas sobre tratamentos, doenças e alergias.
+
+## Gui
+- **Tela de Editar Paciente**  
+  Descrição: Foco na exibição do paciente, visualização e edição das informações.
+
+## Murilo
+- **Tela de Cadastro de Documento**  
+  Descrição: Prototipar a interface de upload de documentos, seleção de tipo de documento e status de processamento.
+
+## Lucas
+- **Tela de Lista de Documentos**  
+  Descrição: Desenvolver o protótipo para exibição de documentos cadastrados, filtros e ações de visualização e exclusão.
+
+## Ryan
+- **Tela de Processamento OCR**  
+  Descrição: Foco no protótipo para exibição do processamento OCR, com texto extraído e interface para reprocessar documentos com falhas.
+
+## Wilson
+- **Tela de Relatório de Documentos**  
+  Descrição: Desenvolver o protótipo para relatórios detalhados sobre documentos, com filtros e opções de exportação (Excel/PDF).
+
+
 ## Visão Geral
 
 O **Sistema de Gestão de Documentos e OCR** tem como objetivo automatizar o processo de captura, processamento e armazenamento de documentos através de OCR (Reconhecimento Óptico de Caracteres). O sistema permite a digitalização de documentos médicos (como receitas, exames e prontuários), extração de informações relevantes e armazenamento seguro no banco de dados, facilitando a gestão e o acesso a esses documentos.
