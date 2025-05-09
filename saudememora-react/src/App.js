@@ -7,6 +7,7 @@ import FormularioMedico from "./pages/FormularioMedico";
 import OCRLeituraCursiva from "./pages/OCRLeituraCursiva";
 import Perfil from "./pages/Perfil";
 import EditarPaciente from "./pages/EditarPaciente";
+import RelatorioDocumentos from "./pages/RelatorioDocumentos";
 
 
 const isPacienteLoggedIn = () => {
@@ -46,6 +47,7 @@ function App() {
 
         <Route path="/alterar-perfil" element={<EditarPaciente />}/>
 
+        <Route path="/relatorio-documentos" element={<RelatorioDocumentos />}/>
         
       </Routes>
     </Router>
