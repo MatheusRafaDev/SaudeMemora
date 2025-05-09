@@ -1,0 +1,91 @@
+.upload-container {
+    padding: 20px;
+    font-family: Arial, sans-serif;
+    max-width: 500px;
+    margin: 0 auto;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    background-color: #f9f9f9;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+  }
+  
+  .upload-container h2 {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: #333;
+  }
+  
+  .upload-container label {
+    font-weight: bold;
+    margin-top: 10px;
+    display: block;
+    margin-bottom: 5px;
+  }
+  
+  .upload-container input[type="file"] {
+    margin-bottom: 10px;
+  }
+  
+  .upload-container select {
+    width: 100%;
+    padding: 8px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    margin-bottom: 15px;
+  }
+  
+  .upload-container button {
+    background-color: #007bff;
+    color: white;
+    padding: 10px 15px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-weight: bold;
+  }
+  
+  .upload-container button:disabled {
+    background-color: #aaa;
+    cursor: not-allowed;
+  }
+  
+  .upload-file-info {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin: 10px 0;
+  }
+  
+  .upload-status {
+    margin-top: 20px;
+  }
+  
+  .upload-status h3 {
+    margin-bottom: 5px;
+  }
+  
+  .upload-progress {
+    margin-top: 20px;
+  }
+  
+  .progress-bar {
+    height: 10px;
+    background: #eee;
+    border-radius: 5px;
+    overflow: hidden;
+  }
+  
+  .progress-fill {
+    height: 100%;
+    background-color: #28a745;
+    transition: width 0.2s ease-in-out;
+  }
+  
+  .status-success {
+    color: #28a745;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  
