@@ -1,92 +1,143 @@
 import React, { useState } from "react";
-import { FiUpload, FiFileText, FiCheckCircle } from "react-icons/fi";
-// import "../../src/styles/UploadDocumentos.css"; // Importar o CSS para estilização
+import { FiUpload, FiCamera, FiFileText, FiCheckCircle } from "react-icons/fi";
+import "bootstrap/dist/css/bootstrap.min.css";
+import "../styles/UploadDocumento.css";
+import Nav from "../components/Nav";
+import Footer from "../components/Footer";
 
 const UploadDocumentos = () => {
   const [documento, setDocumento] = useState(null);
-  const [tipoDocumento, setTipoDocumento] = useState("");
-  const [statusProcessamento, setStatusProcessamento] = useState("Aguardando envio...");
-  const [nomeArquivo, setNomeArquivo] = useState("");
+  const [preview, setPreview] = useState(null);
+  const [status, setStatus] = useState("Aguardando envio...");
   const [progresso, setProgresso] = useState(0);
+  const [resultadoProcessamento, setResultadoProcessamento] = useState("");
+  const [botaoHabilitado, setBotaoHabilitado] = useState(false); // Estado para habilitar/ desabilitar o botão
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (file) {
       setDocumento(file);
-      setNomeArquivo(file.name);
-      setStatusProcessamento("Arquivo selecionado. Pronto para envio.");
+      setPreview(URL.createObjectURL(file));
+      setStatus("Arquivo selecionado. Pronto para envio.");
       setProgresso(0);
+      setResultadoProcessamento("");
     }
   };
 
-  const handleTipoChange = (e) => {
-    setTipoDocumento(e.target.value);
+  const handleCameraClick = () => {
+    document.getElementById("cameraInput").click();
   };
 
   const handleUpload = () => {
-    if (!documento || !tipoDocumento) {
-      alert("Selecione um arquivo e um tipo de documento.");
+    if (!documento) {
+      alert("Selecione ou tire uma foto do documento.");
       return;
     }
 
-    setStatusProcessamento("Enviando...");
+    setStatus("Enviando...");
     setProgresso(0);
 
     const intervalo = setInterval(() => {
       setProgresso((prev) => {
         if (prev >= 100) {
           clearInterval(intervalo);
-          setStatusProcessamento("Documento enviado e em processamento.");
+          setStatus("Documento enviado e em processamento.");
+          setResultadoProcessamento("O documento foi processado com sucesso!");
+          setBotaoHabilitado(true); // Habilita o botão após o processamento
         }
         return Math.min(prev + 10, 100);
       });
     }, 200);
   };
 
+  const handleAddDocument = () => {
+    setDocumento(null);
+    setPreview(null);
+    setStatus("Aguardando envio...");
+    setProgresso(0);
+    setResultadoProcessamento("");
+    setBotaoHabilitado(false); // Desabilita o botão quando um novo documento for adicionado
+  };
+
   return (
-    <div className="upload-container">
-      <h2><FiUpload /> Upload de Documentos</h2>
+    <div>
+      <Nav />
+      <div className="container upload-container mt-4">
+        <h4 className="text-center mb-3">
+          <FiUpload /> Processamento de Documento
+        </h4>
 
-      <label>Selecione o documento:</label>
-      <input type="file" accept=".pdf,.doc,.docx,.png,.jpg,.jpeg" onChange={handleFileChange} />
-      {nomeArquivo && (
-        <p className="upload-file-info">
-          <FiFileText />
-          <strong>Arquivo:</strong> {nomeArquivo}
-        </p>
-      )}
-
-      <label>Tipo de documento:</label>
-      <select value={tipoDocumento} onChange={handleTipoChange}>
-        <option value="">-- Selecione --</option>
-        <option value="exames">Exames</option>
-        <option value="consultas">Consultas</option>
-        <option value="receitas">Receitas</option>
-      </select>
-
-      <button onClick={handleUpload} disabled={!documento || !tipoDocumento}>
-        Enviar Documento
-      </button>
-
-      {progresso > 0 && (
-        <div className="upload-progress">
-          <label>Progresso:</label>
-          <div className="progress-bar">
-            <div className="progress-fill" style={{ width: `${progresso}%` }} />
+        {preview && (
+          <div className="preview-container mb-3 text-center">
+            <img
+              src={preview}
+              alt="Pré-visualização"
+              className="img-fluid rounded shadow"
+            />
           </div>
-        </div>
-      )}
+        )}
 
-      <div className="upload-status">
-        <h3>Status de Processamento:</h3>
-        <p>
-          {statusProcessamento === "Documento enviado e em processamento." ? (
-            <span className="status-success">
-              <FiCheckCircle />
-              {statusProcessamento}
+        <div className="button-group">
+          <button className="btn btn-secondary" onClick={handleCameraClick}>
+            <FiCamera /> Tirar Foto
+          </button>
+
+          <label className="btn btn-secondary">
+            <FiFileText /> Escolher Arquivo
+            <input
+              id="cameraInput"
+              type="file"
+              accept="image/*"
+              capture="environment"
+              onChange={handleFileChange}
+              hidden
+            />
+          </label>
+
+          <button className="btn btn-primary" onClick={handleUpload}>
+            🚀 Processar Documento
+          </button>
+        </div>
+
+        {progresso > 0 && (
+          <div className="progress mt-3">
+            <div
+              className="progress-bar progress-bar-striped bg-success"
+              style={{ width: `${progresso}%` }}
+            />
+          </div>
+        )}
+
+        <div className="mt-3">
+          <strong>Status:</strong>{" "}
+          {status === "Documento enviado e em processamento." ? (
+            <span className="text-success">
+              <FiCheckCircle /> {status}
             </span>
-          ) : statusProcessamento}
-        </p>
+          ) : (
+            status
+          )}
+        </div>
+
+        <div className="mt-4">
+          <strong>Resultado do Processamento:</strong>
+          <textarea
+            className="form-control"
+            rows="4"
+            value={resultadoProcessamento}
+            readOnly
+          />
+        </div>
+
+        <div className="mt-3">
+          <button
+            className="btn btn-secondary w-100"
+            onClick={handleAddDocument}
+            disabled={!botaoHabilitado} // O botão só estará habilitado após o processamento
+          >
+            📄 Adicionar Novo Documento
+          </button>
+        </div>
       </div>
     </div>
   );

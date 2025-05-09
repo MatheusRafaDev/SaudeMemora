@@ -1,29 +1,39 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
-
+import { FaUser, FaFileAlt, FaUpload, FaChartBar, FaPlusCircle } from 'react-icons/fa';
 
 const Nav = () => {
   return (
     <nav className="navbar navbar-expand-lg navbar-dark bg-primary">
       <div className="container-fluid">
-        <Link className="navbar-brand" to="/home">SaúdeMemora</Link>
-        <button className="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-          <span className="navbar-toggler-icon"></span>
-        </button>
+        <Link className="navbar-brand d-flex align-items-center font-weight-bold" to="/home">
+
+          <span style={{ fontWeight: 'bold' }}>SaúdeMemora</span> {/* Texto em negrito */}
+        </Link>
+        
+
         <div className="collapse navbar-collapse" id="navbarNav">
           <ul className="navbar-nav ms-auto">
-            <li className="nav-item">
-              <Link className="nav-link" to="/perfil">Perfil</Link>
+            <li className="nav-item me-3">
+              <Link className="nav-link" to="/perfil">
+                <FaUser /> <span className="d-none d-lg-inline">Perfil</span>
+              </Link>
             </li>
-            <li className="nav-item">
-              <Link className="nav-link" to="/meus-documentos">Documentos</Link>
+            <li className="nav-item me-3">
+              <Link className="nav-link" to="/meus-documentos">
+                <FaFileAlt /> <span className="d-none d-lg-inline">Documentos</span>
+              </Link>
             </li>
-            <li className="nav-item">
-              <Link className="nav-link" to="/ocr">OCR</Link>
+            <li className="nav-item me-3">
+              <Link className="nav-link" to="/upload-documentos">
+                <FaUpload /> <span className="d-none d-lg-inline">Processamento de doc</span>
+              </Link>
             </li>
-            <li className="nav-item">
-              <Link className="nav-link" to="/relatorios">Relatórios</Link>
+            <li className="nav-item me-3">
+              <Link className="nav-link" to="/relatorios">
+                <FaChartBar /> <span className="d-none d-lg-inline">Relatórios</span>
+              </Link>
             </li>
           </ul>
         </div>
