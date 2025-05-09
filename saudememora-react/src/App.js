@@ -6,7 +6,7 @@ import CadastroPaciente from "./pages/CadastroPaciente";
 import FormularioMedico from "./pages/FormularioMedico";
 import OCRLeituraCursiva from "./pages/OCRLeituraCursiva";
 import Perfil from "./pages/Perfil";
-import EditarPaciente from "./pages/EditarPaciente";
+import EditarPerfil from "./pages/EditarPerfil";
 
 
 const isPacienteLoggedIn = () => {
@@ -35,7 +35,7 @@ function App() {
 
         <Route path="/ocr" element={<OCRLeituraCursiva />} />
 
-        <Route path="/alterar-perfil" element={<EditarPaciente />}/>
+        <Route path="/editar-perfil" element={<EditarPerfil />}/>
 
         
       </Routes>
