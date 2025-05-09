@@ -1,3 +1,4 @@
+
 import axiosInstance from "../axiosConfig"; 
 
 
@@ -54,7 +55,7 @@ export const cadastrarPaciente = async (formData) => {
 export const atualizarPaciente = async (id, formData) => {
   try {
     const response = await axiosInstance.put(
-      `/api/paciente/atualizar/${id}`,
+      `/api/paciente/${id}`,
       formData
     );
     if (response.status === 200) {
@@ -75,6 +76,18 @@ export const deletarPaciente = async (id) => {
   } catch (error) {
     console.error("Erro ao deletar paciente:", error); // Log do erro para debug
     return { success: false, message: "Erro ao deletar paciente!" };
+  }
+};
+
+export const obterPaciente = async (id) => {
+  try {
+    const response = await axiosInstance.get(`/api/paciente/${id}`);
+    if (response.status === 200) {
+      return { success: true, data: response.data };
+    }
+  } catch (error) {
+    console.error("Erro ao obter paciente:", error);
+    return { success: false, message: "Erro ao obter paciente." };
   }
 };
 

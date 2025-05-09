@@ -17,6 +17,9 @@ const Nav = () => {
               <Link className="nav-link" to="/perfil">Perfil</Link>
             </li>
             <li className="nav-item">
+              <Link className="nav-link" to="/alterar-perfil">Alterar Perfil</Link>
+            </li>
+            <li className="nav-item">
               <Link className="nav-link" to="/meus-documentos">Documentos</Link>
             </li>
             <li className="nav-item">
