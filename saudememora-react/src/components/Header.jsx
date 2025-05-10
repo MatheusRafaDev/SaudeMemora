@@ -1,6 +1,7 @@
 import React from 'react';
 import { Navbar, Nav } from 'react-bootstrap';
 import { useNavigate } from 'react-router-dom';
+import { FaHeartbeat } from 'react-icons/fa'; // Importando o ícone
 import '../styles/Header.css';
 
 function Header({ nome }) {
@@ -10,7 +11,9 @@ function Header({ nome }) {
     <Navbar bg="light" expand="lg" className="mb-4">
       <div className="container">
         <Navbar.Brand onClick={() => navigate('/')} style={{ cursor: 'pointer' }}>
-          Saúde Digital
+           <h1 className="text-primary mb-0">
+              <i className="fas fa-heartbeat me-2"></i>Saúde Memora
+            </h1>
         </Navbar.Brand>
         <Navbar.Toggle />
         <Navbar.Collapse>

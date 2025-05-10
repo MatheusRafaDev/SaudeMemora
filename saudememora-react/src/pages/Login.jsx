@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { loginPaciente } from "../services/pacienteService";
 import "bootstrap/dist/css/bootstrap.min.css";
-import Footer from "../components/Footer";
+import "@fortawesome/fontawesome-free/css/all.min.css";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -36,15 +36,25 @@ export default function Login() {
   };
 
   return (
-    <div className="d-flex flex-column min-vh-100 bg-white">
+    <div
+      className="d-flex flex-column min-vh-100"
+      style={{ background: "#e9f7fc" }}
+    >
+      <header className="text-center py-4 bg-white shadow-sm">
+        <h1 className="text-primary mb-0">
+          <i className="fas fa-heartbeat me-2"></i>Saúde Memora
+        </h1>
+        <small className="text-muted">Cuidando de você com tecnologia</small>
+      </header>
+
       <main className="d-flex justify-content-center align-items-center flex-grow-1">
         <div
-          className="p-3 rounded border w-100"
-          style={{ maxWidth: "360px" }}
+          className="p-4 rounded shadow border w-100 bg-white"
+          style={{ maxWidth: "380px" }}
         >
-          <h4 className="text-center mb-3">Login</h4>
+          <h4 className="text-center mb-4 text-primary">Login do Paciente</h4>
           <form onSubmit={handleLogin}>
-            <div className="mb-2">
+            <div className="mb-3">
               <label className="form-label" htmlFor="email">Email</label>
               <input
                 className="form-control"
@@ -56,7 +66,7 @@ export default function Login() {
               />
             </div>
 
-            <div className="mb-2">
+            <div className="mb-3">
               <label className="form-label" htmlFor="senha">Senha</label>
               <input
                 className="form-control"
@@ -68,8 +78,8 @@ export default function Login() {
               />
             </div>
 
-            <button type="submit" className="btn btn-primary w-100 mt-2">
-              Entrar
+            <button type="submit" className="btn btn-primary w-100">
+              <i className="fas fa-sign-in-alt me-2"></i>Entrar
             </button>
 
             {erro && <p className="text-danger mt-2 small">{erro}</p>}
@@ -91,7 +101,6 @@ export default function Login() {
           </div>
         </div>
       </main>
-      <Footer />
     </div>
   );
 }

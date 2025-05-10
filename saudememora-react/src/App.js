@@ -8,6 +8,7 @@ import OCRLeituraCursiva from "./pages/OCRLeituraCursiva";
 import UploadDocumentos from "./pages/UploadDocumentos";
 import Perfil from "./pages/Perfil";
 import EditarPaciente from "./pages/EditarPaciente";
+import ListarDocumentos from "./pages/ListarDocumentos";
 
 
 const isPacienteLoggedIn = () => {
@@ -48,7 +49,8 @@ function App() {
 
         <Route path="/alterar-perfil" element={<EditarPaciente />}/>
 
-        
+         <Route path="/meus-documentos" element={<ListarDocumentos />}/>
+
       </Routes>
     </Router>
   );
