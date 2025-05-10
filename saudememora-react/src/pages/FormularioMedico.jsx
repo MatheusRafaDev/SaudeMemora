@@ -174,7 +174,7 @@ const FormularioMedico = () => {
 
       <div className="container mt-4">
         <div className="saude-card shadow-sm p-4 rounded bg-white">
-          <h4 className="mb-4 text-center">Informações de Saúde (Anamnese)</h4>
+          <h4 className="mb-4 text-center">Formulário Médico (Anamnese)</h4>
           <form>
             <div className="mb-3">
               <input
