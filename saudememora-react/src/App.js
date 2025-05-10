@@ -7,7 +7,7 @@ import FormularioMedico from "./pages/FormularioMedico";
 import OCRLeituraCursiva from "./pages/OCRLeituraCursiva";
 import UploadDocumentos from "./pages/UploadDocumentos";
 import Perfil from "./pages/Perfil";
-import EditarPaciente from "./pages/EditarPaciente";
+//import EditarPaciente from "./pages/EditarPaciente";
 import ListarDocumentos from "./pages/ListarDocumentos";
 import EditarPerfil from "./pages/EditarPerfil";
 
@@ -48,7 +48,7 @@ function App() {
 
         <Route path="/upload-documentos" element={<UploadDocumentos />} />
 
-        <Route path="/alterar-perfil" element={<EditarPaciente />}/>
+        <Route path="/alterar-perfil" element={<EditarPerfil />}/>
 
          <Route path="/meus-documentos" element={<ListarDocumentos />}/>
 

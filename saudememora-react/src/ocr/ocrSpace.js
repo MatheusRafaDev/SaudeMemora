@@ -37,9 +37,10 @@ export async function ocrSpace(file) {
     }
 
 
-
+    
     let parsedText = getParsedText(res.data); 
     parsedText = processarTexto(parsedText);
+    console.log(parsedText)
     parsedText = corrigirTexto(parsedText);
   
     return parsedText;
