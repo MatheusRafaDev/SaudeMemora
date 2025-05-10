@@ -30,7 +30,7 @@ const Nav = () => {
             <li className="nav-item me-3">
               <Link className="nav-link" to="/upload-documentos">
                 <i className="fas fa-upload"></i>{" "}
-                <span className="d-none d-lg-inline">Processamento de doc</span>
+                <span className="d-none d-lg-inline">Processamento </span>
               </Link>
             </li>
             <li className="nav-item me-3">

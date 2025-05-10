@@ -14,7 +14,6 @@ import {
 import { useNavigate } from "react-router-dom";
 
 import Nav from "../components/Nav";
-import Footer from "../components/Footer";
 
 const perguntas = [
   { chave: "tratamento medico", pergunta: "Está em tratamento médico?" },
@@ -94,7 +93,7 @@ const FormularioMedico = () => {
 
   useEffect(() => {
     if (paciente && paciente.id) {
-      let a = obterFicha();
+      obterFicha();
     }
   }, [paciente.id]);
 
@@ -174,7 +173,7 @@ const FormularioMedico = () => {
 
       <div className="container mt-4">
         <div className="saude-card shadow-sm p-4 rounded bg-white">
-          <h4 className="mb-4 text-center">Informações de Saúde</h4>
+          <h4 className="mb-4 text-center">Informações de Saúde (Anamnese)</h4>
           <form>
             <div className="mb-3">
               <input

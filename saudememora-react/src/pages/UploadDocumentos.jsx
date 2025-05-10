@@ -3,7 +3,7 @@ import { FiUpload, FiCamera, FiFileText, FiCheckCircle } from "react-icons/fi";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "../styles/UploadDocumento.css";
 import Nav from "../components/Nav";
-import Footer from "../components/Footer";
+
 
 const UploadDocumentos = () => {
   const [documento, setDocumento] = useState(null);

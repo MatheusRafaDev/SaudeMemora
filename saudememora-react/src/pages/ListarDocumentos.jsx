@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { FaFileAlt, FaFlask, FaPrescriptionBottle } from "react-icons/fa";
+
 import DocumentoService from "../services/DocumentoService";
 import Nav from "../components/Nav";
 
