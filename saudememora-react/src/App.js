@@ -5,7 +5,10 @@ import Home from "./pages/Home";
 import CadastroPaciente from "./pages/CadastroPaciente";
 import FormularioMedico from "./pages/FormularioMedico";
 import OCRLeituraCursiva from "./pages/OCRLeituraCursiva";
+import UploadDocumentos from "./pages/UploadDocumentos";
 import Perfil from "./pages/Perfil";
+import EditarPaciente from "./pages/EditarPaciente";
+import ListarDocumentos from "./pages/ListarDocumentos";
 import EditarPerfil from "./pages/EditarPerfil";
 
 
@@ -36,7 +39,6 @@ function App() {
           element={isPacienteLoggedIn() ? <Home /> : <Navigate to="/login" />} 
         />
 
-
         <Route path="/criar-conta" element={<CadastroPaciente />} />
         <Route path="/perfil" element={<Perfil />} />
 
@@ -44,9 +46,12 @@ function App() {
 
         <Route path="/ocr" element={<OCRLeituraCursiva />} />
 
-        <Route path="/editar-perfil" element={<EditarPerfil />}/>
+        <Route path="/upload-documentos" element={<UploadDocumentos />} />
 
-        
+        <Route path="/alterar-perfil" element={<EditarPaciente />}/>
+
+         <Route path="/meus-documentos" element={<ListarDocumentos />}/>
+
       </Routes>
     </Router>
   );

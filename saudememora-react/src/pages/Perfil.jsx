@@ -1,65 +1,83 @@
-import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
-import "../styles/Perfil.css";
-import Nav from "../components/Nav";
-import Footer from "../components/Footer";
+import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import { FaEdit, FaUserAlt, FaEnvelope, FaPhoneAlt, FaCalendarAlt, FaMapMarkerAlt } from 'react-icons/fa';
+import Nav from '../components/Nav';
 
-function Perfil() {
-  const [nome, setNome] = useState("");
-  const [email, setEmail] = useState("");
+import '../styles/Perfil.css';
+
+const Perfil = () => {
+  const [paciente, setPaciente] = useState(null);
   const navigate = useNavigate();
-  const paciente = JSON.parse(localStorage.getItem("paciente")) || {};
 
   useEffect(() => {
-    if (paciente) {
-      setNome(paciente.nome);
-      setEmail(paciente.email);
-    }
+    const storedPaciente = localStorage.getItem('paciente');
+    setPaciente(storedPaciente ? JSON.parse(storedPaciente) : null);
   }, []);
 
-  const handleEditar = (id) => {
-    sessionStorage.setItem("pacienteId", id); // Armazena o ID no sessionStorage
-    navigate("/editar-perfil"); // Navega para a página de edição
-  };
+  const handleNavigate = (path) => navigate(path);
 
-  return (
-    <div className="profile-container">
-      <Nav />
-      <main className="profile-main">
-        <div className="profile-header">
-          <h1>Perfil de {nome}</h1>
-        </div>
-
-        <div className="profile-details">
-          <p>
-            <strong>Nome:</strong> {nome}
-          </p>
-          <p>
-            <strong>Email:</strong> {email}
-          </p>
-        </div>
-        <div className="profile-actions">
-          <button
-            className="profile-button"
-            onClick={() => handleEditar(paciente.id)}
-          >
-            Editar Perfil
-          </button>
-        </div>
-        <br />
-        <div className="profile-actions">
-          <button
-            className="profile-button"
-            onClick={() => navigate("/formulario-medico")}
-          >
-            Ir para o Formulário Médico
-          </button>
-        </div>
-      </main>
-
-      <Footer />
+  const renderInfo = (icon, label, value) => (
+    <div className="profile-info">
+      <div className="profile-icon">{icon}</div>
+      <div className="profile-text">
+        <strong>{label}:</strong> {value || 'N/A'}
+      </div>
     </div>
   );
-}
+
+  if (!paciente) {
+    return (
+      <div>
+        <Nav />
+        <div className="profile-container">
+          <h2 className="profile-header">Perfil</h2>
+          <p className="profile-message">Nenhum dado encontrado. Por favor, cadastre ou atualize suas informações.</p>
+          <button
+            className="btn profile-button"
+            onClick={() => handleNavigate('/alterar-perfil')}
+          >
+            <FaEdit /> Cadastrar Perfil
+          </button>
+        </div>
+      </div>
+    );
+  }
+
+  return (
+    <div>
+      <Nav />
+      <div className="profile-container">
+        <h2 className="profile-header">Perfil do Paciente</h2>
+
+        <div className="profile-card">
+          <div className="profile-details">
+            {renderInfo(<FaUserAlt />, 'Nome', paciente.nome)}
+            {renderInfo(<FaEnvelope />, 'Email', paciente.email)}
+            {renderInfo(<FaPhoneAlt />, 'Telefone', paciente.telefone)}
+            {renderInfo(<FaCalendarAlt />, 'Data de Nascimento', paciente.dataNascimento)}
+            {renderInfo(<FaMapMarkerAlt />, 'Endereço', paciente.endereco)}
+            {renderInfo(null, 'CPF', paciente.cpf)}
+            {renderInfo(null, 'Sexo', paciente.sexo === 'M' ? 'Masculino' : paciente.sexo === 'F' ? 'Feminino' : 'Outro')}
+          </div>
+
+          <div className="profile-actions">
+            <button
+              className="btn profile-button"
+              onClick={() => handleNavigate('/alterar-perfil')}
+            >
+              <FaEdit /> Alterar Perfil
+            </button>
+            <button
+              className="btn profile-button"
+              onClick={() => handleNavigate('/formulario-medico')}
+            >
+              Formulário Médico
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
 
 export default Perfil;

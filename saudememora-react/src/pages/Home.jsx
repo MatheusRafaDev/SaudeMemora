@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import '../styles/Home.css';
 import Nav from '../components/Nav'; 
-import Footer from '../components/Footer'; 
+
 
 function Home() {
   const [nome, setNome] = useState('');
@@ -40,11 +40,11 @@ function Home() {
             <span>Meus Documentos</span>
           </div>
 
-          <div className="card" onClick={() => navigate('/ocr')}>
+          <div className="card" onClick={() => navigate('/upload-documentos')}>
             <div className="card-icon">
               <img src="https://img.icons8.com/ios-filled/50/555555/camera.png" alt="Processar Texto" />
             </div>
-            <span>Processar Texto (OCR)</span> 
+            <span>Processar Documento</span> 
           </div>
 
           <div className="card" onClick={() => navigate('/relatorios')}>
@@ -56,7 +56,6 @@ function Home() {
         </div>
       </main>
 
-      <Footer />
     </div>
   );
 }

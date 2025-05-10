@@ -1,41 +1,112 @@
+/* Global styles */
+body {
+  font-family: 'Roboto', sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: #f0f2f5;
+  color: #333;
+}
+
+/* Profile container */
 .profile-container {
-    display: flex;
-    flex-direction: column;
-    min-height: 100vh;
+  max-width: 800px;
+  margin: 40px auto;
+  padding: 20px;
+  background-color: #ffffff;
+  border-radius: 12px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.profile-header {
+  text-align: center;
+  font-size: 2.2rem;
+  font-weight: bold;
+  margin-bottom: 20px;
+  color: #2c3e50;
+}
+
+/* Profile card */
+.profile-card {
+  display: flex;
+  flex-direction: column;
+  gap: 30px;
+}
+
+.profile-details {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.profile-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  background-color: #f9f9f9;
+  padding: 15px;
+  border-radius: 8px;
+  border: 1px solid #e0e0e0;
+}
+
+.profile-icon {
+  color: #3498db;
+  font-size: 1.5rem;
+}
+
+.profile-text {
+  font-size: 1rem;
+  color: #555;
+}
+
+.profile-text strong {
+  color: #333;
+}
+
+/* Profile actions */
+.profile-actions {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+}
+
+.profile-button {
+  background-color: #3498db;
+  color: #ffffff;
+  border: none;
+  padding: 12px 20px;
+  font-size: 1rem;
+  font-weight: bold;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: background-color 0.3s ease, transform 0.2s ease;
+  text-align: center;
+}
+
+.profile-button:hover {
+  background-color: #2980b9;
+  transform: scale(1.05);
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .profile-container {
+    padding: 15px;
   }
-  
-  .profile-main {
-    flex-grow: 1;
-    padding: 20px;
-    background-color: #f4f4f4;
-  }
-  
+
   .profile-header {
-    text-align: center;
-    margin-bottom: 20px;
+    font-size: 1.8rem;
   }
-  
-  .profile-details {
-    margin-bottom: 30px;
+
+  .profile-info {
+    flex-direction: column;
+    align-items: flex-start;
   }
-  
-  .profile-actions {
-    display: flex;
-    justify-content: center;
-  }
-  
+
   .profile-button {
-    padding: 10px 20px;
-    background-color: #007bff;
-    color: white;
-    border: none;
-    border-radius: 5px;
-    cursor: pointer;
-    font-size: 16px;
-    transition: background-color 0.3s ease;
+    width: 100%;
   }
-  
-  .profile-button:hover {
-    background-color: #0056b3;
+
+  .profile-actions {
+    flex-direction: column;
   }
-  
+}
