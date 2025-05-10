@@ -3,17 +3,14 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import { ocrSpace } from "../ocr/ocrSpace";
 import { aplicarCamposComOCR } from "../ocr/aplicarCamposComOCR";
 import "../styles/FormularioMedico.css";
-
+import Nav from "../components/Nav";
+import { useNavigate } from "react-router-dom";
 import {
   cadastrarFichaMedica,
   buscarFichaMedica,
   buscarImagemFichaMedica,
   atualizarFichaMedica,
 } from "../services/FichaMedicaService";
-
-import { useNavigate } from "react-router-dom";
-
-import Nav from "../components/Nav";
 
 const perguntas = [
   { chave: "tratamento medico", pergunta: "Está em tratamento médico?" },
@@ -82,7 +79,6 @@ const FormularioMedico = () => {
         };
 
         setRespostas(novasRespostas);
-
         setTextoOCR(ficha.ocrTexto || "");
         setIsAtualizar(true);
       }
@@ -106,6 +102,10 @@ const FormularioMedico = () => {
   const executarOCR = async () => {
     if (!imagem) {
       setMensagem("Carregue uma imagem primeiro.");
+      return;
+    }
+    if (!imagem.type.startsWith("image/")) {
+      setMensagem("Por favor, selecione uma imagem válida.");
       return;
     }
     const texto = await ocrSpace(imagem);
@@ -143,7 +143,7 @@ const FormularioMedico = () => {
 
       formData.append("respostas", JSON.stringify(respostas));
       formData.append("textoOCR", textoOCR);
-      formData.append("paciente", JSON.stringify());
+      formData.append("paciente", JSON.stringify(paciente));
       if (imagem instanceof File) {
         formData.append("imagem", imagem);
       }
@@ -167,6 +167,7 @@ const FormularioMedico = () => {
       }
     }
   };
+
   return (
     <div>
       <Nav />
@@ -211,6 +212,7 @@ const FormularioMedico = () => {
                 type="button"
                 className="btn btn-outline-secondary mt-3 profile-button w-100"
                 onClick={handleAplicarOCR}
+                disabled={!ocrExecutado}
               >
                 Aplicar OCR
               </button>
@@ -258,11 +260,9 @@ const FormularioMedico = () => {
                         }
                       >
                         <option value="">Selecione</option>
-                        {/* Aqui você pode preencher dinamicamente as opções de data */}
                         {item.opcoes?.map((opcao, index) => (
                           <option key={index} value={opcao.value}>
-                            {new Date(opcao.value).toLocaleDateString()}{" "}
-                            {/* Formatando a data */}
+                            {new Date(opcao.value).toLocaleDateString()} 
                           </option>
                         ))}
                       </select>

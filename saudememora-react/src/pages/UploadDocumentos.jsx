@@ -5,7 +5,7 @@ import "../styles/UploadDocumento.css";
 import Nav from "../components/Nav";
 
 
-const UploadDocumentos = () => {
+export default function UploadDocumentos(){
   const [documento, setDocumento] = useState(null);
   const [preview, setPreview] = useState(null);
   const [status, setStatus] = useState("Aguardando envio...");
@@ -143,4 +143,3 @@ const UploadDocumentos = () => {
   );
 };
 
-export default UploadDocumentos;
