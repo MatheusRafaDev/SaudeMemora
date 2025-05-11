@@ -43,7 +43,7 @@ export const cadastrarFichaMedica = async (formData) => {
       regime: respostas.regime === 'SIM',
       diabetes: respostas.diabetes === 'SIM',
       alergias: respostas.alergias === 'SIM',
-      febreReumatica: respostas.febreReumatica === 'SIM',
+      reumatica: respostas.febreReumatica === 'SIM',
       coagulacao: respostas.coagulacao === 'SIM',
       doencaCardioVascular: respostas.doencaCardioVascular === 'SIM',
       hemorragicos: respostas.hemorragicos === 'SIM',
@@ -64,8 +64,6 @@ export const cadastrarFichaMedica = async (formData) => {
       { headers: { 'Content-Type': 'application/json' } }
     );
 
-    
-    console.log(response)
 
     if (response.status === 200 || response.status === 201) {
     
@@ -152,12 +150,12 @@ export const atualizarFichaMedica = async (id, formData) => {
       ocrTexto,
 
       pressao: respostas.pressao || "",
-      tratamentoMedico: respostas["tratamento medico"] === "SIM",
+      tratamentoMedico: respostas["tratamento_medico"] === "SIM",
       gravidez: respostas.gravida === "SIM",
       regime: respostas.regime === "SIM",
       diabetes: respostas.diabetes === "SIM",
       alergias: respostas.alergias === "SIM",
-      febreReumatica: respostas.reumatica === "SIM",
+      reumatica: respostas.reumatica === "SIM",
       coagulacao: respostas.coagulacao === "SIM",
       doencaCardioVascular: respostas.cardio === "SIM",
       hemorragicos: respostas.hemorragicos === "SIM",

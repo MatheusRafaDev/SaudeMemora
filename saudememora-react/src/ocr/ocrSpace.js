@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { corrigirTexto } from './utils/corretor';
-import { ajustarTextoFormulario } from "../services/OpenRouter";
+
 import  ProcessarImagem  from './utils/ProcessarImagem';
 import  getParsedText  from './utils/ProcessarTexto';
 
@@ -43,11 +43,6 @@ export async function ocrSpace(file) {
 
   
     let parsedText = getParsedText(res.data); 
-
-    console.log(parsedText)
-    const resultado = await ajustarTextoFormulario(parsedText);
-    console.log(resultado)
-
 
     return parsedText;
 

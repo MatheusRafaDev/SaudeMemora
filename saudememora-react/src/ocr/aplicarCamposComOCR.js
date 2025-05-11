@@ -1,4 +1,6 @@
-export function aplicarCamposComOCR(
+import { ajustarTextoFormulario, ajustarDadosMedicos, ajustarJSON } from "../services/OpenRouter";
+
+export async function aplicarCamposComOCR(
   textoOCR,
   perguntas,
   setRespostas,
@@ -6,44 +8,60 @@ export function aplicarCamposComOCR(
 ) {
   if (!ocrExecutado || !textoOCR) return;
 
-  const novasRespostas = {};
-  const linhas = textoOCR.split("\n");
+  try {
 
-  for (const linha of linhas) {
-    const normalizar = (texto) =>
-      texto
-        .normalize("NFD")
-        .replace(/[\u0300-\u036f]/g, "")
-        .toLowerCase();
+    //const dados_medicos = await ajustarDadosMedicos(textoOCR);
+    //const resultado = await ajustarTextoFormulario(dados_medicos);
+    //const json = await ajustarJSON(resultado);
 
-    for (const { chave, tipo } of perguntas) {
 
-      const linhaNormalizada = normalizar(linha);
-      const chaveNormalizada = normalizar(chave);
+    var json = {
+      tratamento_medico: "não",
+      gravida: "não",
+      regime: "não",
+      diabetes: "não",
+      alergias: "não",
+      reumatica: "não",
+      coagulacao: "não",
+      anestesia: "não",
+      hepatite: "não",
+      hiv: "não",
+      drogas: "não",
+      fumante: "não",
+      pressao: "normal",
+      respiratorio: "sim"
+    };
 
-      if (!linhaNormalizada.includes(chaveNormalizada)) continue;
+    const novasRespostas = {};
 
-      if (tipo === "pressao") {
-        if (linha.includes("NORMAL: (X)")) {
-          novasRespostas[chave] = "NORMAL";
-        } else if (linha.includes("ALTA: (X)")) {
-          novasRespostas[chave] = "ALTA";
-        } else if (linha.includes("BAIXA: (X)")) {
-          novasRespostas[chave] = "BAIXA";
+    perguntas.forEach((pergunta) => {
+      const chave = pergunta.chave;
+      let valor = json[chave];
+
+      if (valor !== undefined && valor !== null) {
+        valor = valor.toString().trim().toUpperCase().replace("NÃO", "NAO");
+
+        if (pergunta.tipo === "pressao") {
+          if (["NORMAL", "ALTA", "BAIXA"].includes(valor)) {
+            novasRespostas[chave] = valor;
+          } else {
+            novasRespostas[chave] = "";
+          }
+        } else {
+          novasRespostas[chave] = valor;
         }
       } else {
-        const marcouSim = linha.includes("SIM: (X)");
-        const marcouNao =
-          linha.includes("NÃO: (X)") || linha.includes("NAO: (X)");
 
-        if (marcouSim) {
-          novasRespostas[chave] = "SIM";
-        } else if (marcouNao) {
-          novasRespostas[chave] = "NAO";
-        }
+        novasRespostas[chave] = pergunta.tipo === "pressao" ? "" : "NAO";
       }
-    }
-  }
+    });
 
-  setRespostas(novasRespostas);
+    setRespostas((prevRespostas) => ({
+      ...prevRespostas,
+      ...novasRespostas,
+    }));
+
+  } catch (error) {
+    console.error("Erro ao aplicar campos com OCR:", error);
+  }
 }

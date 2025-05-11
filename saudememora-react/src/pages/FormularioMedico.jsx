@@ -13,7 +13,7 @@ import {
 } from "../services/FichaMedicaService";
 
 const perguntas = [
-  { chave: "tratamento medico", pergunta: "Está em tratamento médico?" },
+  { chave: "tratamento_medico", pergunta: "Está em tratamento médico?" },
   { chave: "gravida", pergunta: "Está grávida?" },
   { chave: "regime", pergunta: "Está fazendo algum regime?" },
   { chave: "diabetes", pergunta: "Possui diabetes?" },
@@ -23,7 +23,7 @@ const perguntas = [
   { chave: "cardio", pergunta: "Possui doença cárdio vascular?" },
   { chave: "hemorragicos", pergunta: "Tem problemas hemorrágicos?" },
   { chave: "anestesia", pergunta: "Já teve problemas com anestesia?" },
-  { chave: "alergia a medicamento", pergunta: "Tem alergia a medicamentos?" },
+  { chave: "alergia_medicamento", pergunta: "Tem alergia a medicamentos?" },
   { chave: "hepatite", pergunta: "Já teve hepatite?" },
   { chave: "hiv", pergunta: "É portador do vírus HIV?" },
   { chave: "drogas", pergunta: "Usa ou já usou drogas?" },
@@ -58,7 +58,7 @@ const FormularioMedico = () => {
 
       if (ficha) {
         const novasRespostas = {
-          "tratamento medico": ficha.tratamentoMedico ? "SIM" : "NAO",
+          tratamento_medico: ficha.tratamentoMedico ? "SIM" : "NAO",
           gravida: ficha.gravidez ? "SIM" : "NAO",
           regime: ficha.regime ? "SIM" : "NAO",
           diabetes: ficha.diabetes ? "SIM" : "NAO",
@@ -68,7 +68,7 @@ const FormularioMedico = () => {
           cardio: ficha.doencaCardioVascular ? "SIM" : "NAO",
           hemorragicos: ficha.hemorragicos ? "SIM" : "NAO",
           anestesia: ficha.problemasAnestesia ? "SIM" : "NAO",
-          "alergia a medicamento": ficha.alergiaMedicamentos ? "SIM" : "NAO",
+          alergia_medicamentos: ficha.alergiaMedicamentos ? "SIM" : "NAO",
           hepatite: ficha.hepatite ? "SIM" : "NAO",
           hiv: ficha.hiv ? "SIM" : "NAO",
           drogas: ficha.drogas ? "SIM" : "NAO",
