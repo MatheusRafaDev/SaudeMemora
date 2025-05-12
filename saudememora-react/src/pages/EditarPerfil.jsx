@@ -1,19 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { obterPaciente, atualizarPaciente } from '../services/pacienteService';
 import { IMaskInput } from 'react-imask';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 function EditarPerfil() {
   const navigate = useNavigate();
-  const pacienteId = sessionStorage.getItem('pacienteId');
-
-  if (!pacienteId) {
-    console.warn("ID do paciente não encontrado no sessionStorage.");
-  }
-
+  const [paciente, setPaciente] = useState(null);
   const [dadosForm, setDadosForm] = useState({
-    id: pacienteId || '',
+    id: '',
     nome: '',
     cpf: '',
     dataNascimento: '',
@@ -28,34 +22,28 @@ function EditarPerfil() {
   const [error, setError] = useState('');
 
   useEffect(() => {
-    const carregarPaciente = async () => {
-      if (!pacienteId) {
-        setError('Paciente não encontrado.');
-        return;
-      }
+    const storedPaciente = localStorage.getItem('paciente');
 
-      try {
-        const response = await obterPaciente(pacienteId);
-
-        if (response.success) {
-          setDadosForm(response.data);
-        } else {
-          setError(response.message || 'Erro ao carregar os dados do paciente.');
-        }
-      } catch (error) {
-        setError('Erro ao carregar os dados do paciente.');
-      }
-    };
-
-    carregarPaciente();
-  }, [pacienteId]);
+    if (storedPaciente) {
+      const pacienteData = JSON.parse(storedPaciente);
+      setPaciente(pacienteData);
+      setDadosForm({
+        ...pacienteData,
+        senha: '',
+        confirmarSenha: ''
+      });
+    } else {
+      console.warn("Paciente não encontrado no localStorage.");
+      navigate('/perfil');
+    }
+  }, [navigate]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setDadosForm({
-      ...dadosForm,
+    setDadosForm((prev) => ({
+      ...prev,
       [name]: value,
-    });
+    }));
   };
 
   const validateForm = () => {
@@ -75,22 +63,22 @@ function EditarPerfil() {
     return true;
   };
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
     if (!validateForm()) return;
 
     try {
-      const response = await atualizarPaciente(pacienteId, dadosForm);
-
-      if (response.success) {
-        navigate('/lista-pacientes');
-      } else {
-        setError(response.message || 'Erro ao atualizar o paciente.');
-      }
+      localStorage.setItem('paciente', JSON.stringify(dadosForm));
+      console.log("Paciente atualizado com sucesso!");
+      navigate('/perfil');
     } catch (error) {
       setError('Erro ao atualizar o paciente.');
     }
   };
+
+  if (!paciente) {
+    return null; // Aguarda o useEffect terminar de verificar o localStorage
+  }
 
   return (
     <div className="container mt-5">
