@@ -22,6 +22,9 @@ public class Documentos {
     @Column(name = "ds_tipo_documento", length = 1, nullable = false)
     private String tipoDocimento;
 
+    @Column(name = "fk_tipodocumento", length = 1, nullable = false)
+    private String FktipoDocimento;
+
     @Column(name = "ds_url_arquivo ", length = 2000)
     private String urlArquivo;
 

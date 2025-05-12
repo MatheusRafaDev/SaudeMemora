@@ -45,6 +45,8 @@ public class FichaMedicaController {
 
         String json = mapper.writeValueAsString(fichaMedica);
 
+        System.out.println(json);
+
         if (fichaMedica.getPaciente() == null || fichaMedica.getPaciente().getId() == null) {
             return ResponseEntity.badRequest().body("Paciente é obrigatório" + fichaMedica);
         }
@@ -52,7 +54,7 @@ public class FichaMedicaController {
 
 
         Logger logger = LoggerFactory.getLogger(FichaMedicaController.class);
-        //logger.info("Corpo da requisição: {}", fichaMedica);
+        logger.info("Corpo da requisição: {}", fichaMedica);
 
 
         Paciente paciente = pacienteService.buscarPorId(fichaMedica.getPacienteId());
@@ -77,6 +79,11 @@ public class FichaMedicaController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Ficha médica não encontrada");
         }
 
+        Logger logger = LoggerFactory.getLogger(FichaMedicaController.class);
+        logger.info("Corpo da requisição: {}", fichaRecebida);
+
+        System.out.println("teste");
+        System.out.println(fichaRecebida.isFebre());
         FichaMedica fichaExistente = optionalFicha.get();
 
         fichaExistente.setImagem(fichaRecebida.getImagem());
@@ -88,7 +95,7 @@ public class FichaMedicaController {
         fichaExistente.setRegime(fichaRecebida.isRegime());
         fichaExistente.setDiabetes(fichaRecebida.isDiabetes());
         fichaExistente.setAlergias(fichaRecebida.isAlergias());
-        fichaExistente.setFebreReumatica(fichaRecebida.isFebreReumatica());
+        fichaExistente.setFebre(fichaRecebida.isFebre());
         fichaExistente.setCoagulacao(fichaRecebida.isCoagulacao());
         fichaExistente.setDoencaCardioVascular(fichaRecebida.isDoencaCardioVascular());
         fichaExistente.setHemorragicos(fichaRecebida.isHemorragicos());
@@ -99,7 +106,9 @@ public class FichaMedicaController {
         fichaExistente.setDrogas(fichaRecebida.isDrogas());
         fichaExistente.setFumante(fichaRecebida.isFumante());
         fichaExistente.setFumou(fichaRecebida.isFumou());
-        fichaExistente.setRespiratorios(fichaRecebida.isRespiratorios());
+        fichaExistente.setRespiratorio(fichaRecebida.isRespiratorio());
+
+
 
         Paciente paciente = pacienteService.buscarPorId(fichaRecebida.getPaciente().getId());
         fichaExistente.setPaciente(paciente);

@@ -46,46 +46,46 @@ const FormularioMedico = () => {
   const [isAtualizar, setIsAtualizar] = useState(false);
   const navigate = useNavigate();
   const paciente = JSON.parse(localStorage.getItem("paciente")) || {};
+  const [ficha, setFicha] = useState(null);
 
   const obterFicha = async () => {
-    if (!paciente.id) return;
+  if (!paciente.id) return;
 
-    try {
-      let ficha = await buscarFichaMedica(paciente.id);
-      let response = await buscarImagemFichaMedica(paciente.id);
+  try {
+    let fichaResponse = await buscarFichaMedica(paciente.id); 
+    fichaResponse = fichaResponse.data;
 
-      ficha = ficha.data;
+    if (fichaResponse) {
+      setFicha(fichaResponse); 
+      const novasRespostas = {
+        tratamento_medico: fichaResponse.tratamentoMedico ? "SIM" : "NAO",
+        gravida: fichaResponse.gravidez ? "SIM" : "NAO",
+        regime: fichaResponse.regime ? "SIM" : "NAO",
+        diabetes: fichaResponse.diabetes ? "SIM" : "NAO",
+        alergias: fichaResponse.alergias ? "SIM" : "NAO",
+        reumatica: fichaResponse.febreReumatica ? "SIM" : "NAO",
+        coagulacao: fichaResponse.coagulacao ? "SIM" : "NAO",
+        cardio: fichaResponse.doencaCardioVascular ? "SIM" : "NAO",
+        hemorragicos: fichaResponse.hemorragicos ? "SIM" : "NAO",
+        anestesia: fichaResponse.problemasAnestesia ? "SIM" : "NAO",
+        alergia_medicamento: fichaResponse.alergiaMedicamentos ? "SIM" : "NAO",
+        hepatite: fichaResponse.hepatite ? "SIM" : "NAO",
+        hiv: fichaResponse.hiv ? "SIM" : "NAO",
+        drogas: fichaResponse.drogas ? "SIM" : "NAO",
+        fumante: fichaResponse.fumante ? "SIM" : "NAO",
+        fumou: fichaResponse.fumou ? "SIM" : "NAO",
+        pressao: fichaResponse.pressao,
+        respiratorio: fichaResponse.respiratorio ? "SIM" : "NAO",
+      };
 
-      if (ficha) {
-        const novasRespostas = {
-          tratamento_medico: ficha.tratamentoMedico ? "SIM" : "NAO",
-          gravida: ficha.gravidez ? "SIM" : "NAO",
-          regime: ficha.regime ? "SIM" : "NAO",
-          diabetes: ficha.diabetes ? "SIM" : "NAO",
-          alergias: ficha.alergias ? "SIM" : "NAO",
-          reumatica: ficha.febreReumatica ? "SIM" : "NAO",
-          coagulacao: ficha.coagulacao ? "SIM" : "NAO",
-          cardio: ficha.doencaCardioVascular ? "SIM" : "NAO",
-          hemorragicos: ficha.hemorragicos ? "SIM" : "NAO",
-          anestesia: ficha.problemasAnestesia ? "SIM" : "NAO",
-          alergia_medicamentos: ficha.alergiaMedicamentos ? "SIM" : "NAO",
-          hepatite: ficha.hepatite ? "SIM" : "NAO",
-          hiv: ficha.hiv ? "SIM" : "NAO",
-          drogas: ficha.drogas ? "SIM" : "NAO",
-          fumante: ficha.fumante ? "SIM" : "NAO",
-          fumou: ficha.fumou ? "SIM" : "NAO",
-          pressao: ficha.pressao,
-          respiratorio: ficha.respiratorios ? "SIM" : "NAO",
-        };
-
-        setRespostas(novasRespostas);
-        setTextoOCR(ficha.ocrTexto || "");
-        setIsAtualizar(true);
-      }
-    } catch (error) {
-      console.error("Erro ao buscar ficha:", error);
+      setRespostas(novasRespostas);
+      setTextoOCR(fichaResponse.ocrTexto || "");
+      setIsAtualizar(true);
     }
-  };
+  } catch (error) {
+    console.error("Erro ao buscar ficha:", error);
+  }
+};
 
   useEffect(() => {
     if (paciente && paciente.id) {
@@ -157,10 +157,11 @@ const FormularioMedico = () => {
           setMensagem(response.message);
         }
       } else {
-        const response = await atualizarFichaMedica(paciente.id, formData);
+
+        const response = await atualizarFichaMedica(ficha.id, formData);
         if (response.success) {
           setMensagem("Ficha atualizada com sucesso!");
-          navigate("/home");
+           navigate("/formulario-medico");
         } else {
           setMensagem("Erro ao atualizar a ficha!");
         }

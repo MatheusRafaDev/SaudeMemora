@@ -81,8 +81,8 @@ public class FichaMedica {
     @Column(name = "tg_alergias")
     private boolean alergias;
 
-    @Column(name = "tg_febre_reumatica")
-    private boolean febreReumatica;
+    @Column(name = "tg_reumatica")
+    private boolean reumatica;
 
     @Column(name = "tg_coagulacao")
     private boolean coagulacao;
@@ -118,7 +118,7 @@ public class FichaMedica {
     private String pressao;
 
     @Column(name = "tg_respiratorios")
-    private boolean Respiratorios;
+    private boolean respiratorio;
 
     // Getters e setters
     public boolean isTratamentoMedico() {
@@ -161,12 +161,12 @@ public class FichaMedica {
         this.alergias = alergias;
     }
 
-    public boolean isFebreReumatica() {
-        return febreReumatica;
+    public boolean isFebre() {
+        return reumatica;
     }
 
-    public void setFebreReumatica(boolean febreReumatica) {
-        this.febreReumatica = febreReumatica;
+    public void setFebre(boolean reumatica) {
+        this.reumatica = this.reumatica;
     }
 
     public Long getPacienteId() {
@@ -265,12 +265,12 @@ public class FichaMedica {
         this.pressao = pressao;
     }
 
-    public boolean isRespiratorios() {
-        return Respiratorios;
+    public boolean isRespiratorio() {
+        return respiratorio;
     }
 
-    public void setRespiratorios(boolean problemasRespiratorios) {
-        this.Respiratorios = problemasRespiratorios;
+    public void setRespiratorio(boolean problemasRespiratorios) {
+        this.respiratorio = problemasRespiratorios;
     }
 
 

@@ -25,7 +25,7 @@ export const cadastrarFichaMedica = async (formData) => {
     const respostas = formData.has("respostas") ? JSON.parse(formData.get("respostas")) : {};
     const ocrTexto = formData.has("textoOCR") ? formData.get("textoOCR") : "";
 
-          
+
     const FichaMedica = {
       paciente: {
         id: paciente.id,
@@ -54,10 +54,8 @@ export const cadastrarFichaMedica = async (formData) => {
       drogas: respostas.drogas === 'SIM',
       fumante: respostas.fumante === 'SIM',
       fumou: respostas.fumou === 'SIM',
-      respiratorios: respostas.respiratorios === 'SIM'
+      respiratorio: respostas.respiratorio === 'SIM'
     };
-
-
     const response = await axiosInstance.post(
       '/api/ficha-medica/cadastrar',
       FichaMedica,
@@ -112,6 +110,7 @@ export const obterImagemBase64 = async (imagemFile) => {
 
 
 export const atualizarFichaMedica = async (id, formData) => {
+
   try {
     const file = formData?.get("imagem") || null;
 
@@ -137,7 +136,6 @@ export const atualizarFichaMedica = async (id, formData) => {
     const ocrTexto = formData.has("textoOCR") ? formData.get("textoOCR") : "";
 
 
-
     const FichaMedica = {
       paciente: {
         id: paciente.id,
@@ -150,7 +148,7 @@ export const atualizarFichaMedica = async (id, formData) => {
       ocrTexto,
 
       pressao: respostas.pressao || "",
-      tratamentoMedico: respostas["tratamento_medico"] === "SIM",
+      tratamentoMedico: respostas.tratamento_medico=== "SIM",
       gravidez: respostas.gravida === "SIM",
       regime: respostas.regime === "SIM",
       diabetes: respostas.diabetes === "SIM",
@@ -160,14 +158,15 @@ export const atualizarFichaMedica = async (id, formData) => {
       doencaCardioVascular: respostas.cardio === "SIM",
       hemorragicos: respostas.hemorragicos === "SIM",
       problemasAnestesia: respostas.anestesia === "SIM",
-      alergiaMedicamentos: respostas["alergia a medicamento"] === "SIM",
+      alergiaMedicamentos: respostas.alergia_medicamento === "SIM",
       hepatite: respostas.hepatite === "SIM",
       hiv: respostas.hiv === "SIM",
       drogas: respostas.drogas === "SIM",
       fumante: respostas.fumante === "SIM",
       fumou: respostas.fumou === "SIM",
-      respiratorios: respostas.respiratorio === "SIM",
+      respiratorio: respostas.respiratorio === "SIM",
     };
+
 
     const response = await axiosInstance.put(
       `/api/ficha-medica/atualizar/${id}`,
