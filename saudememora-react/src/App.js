@@ -10,7 +10,7 @@ import Perfil from "./pages/Perfil";
 //import EditarPaciente from "./pages/EditarPaciente";
 import ListarDocumentos from "./pages/ListarDocumentos";
 import EditarPerfil from "./pages/EditarPerfil";
-
+import RelatorioDocumentos from "./pages/RelatorioDocumentos";
 
 const isPacienteLoggedIn = () => {
   const data = localStorage.getItem("paciente");
@@ -43,7 +43,7 @@ function App() {
         <Route path="/perfil" element={<Perfil />} />
 
         <Route path="/formulario-medico" element={<FormularioMedico />} />
-
+        <Route path="/relatorios" element={<RelatorioDocumentos />}/>
         <Route path="/ocr" element={<OCRLeituraCursiva />} />
 
         <Route path="/upload-documentos" element={<UploadDocumentos />} />
