@@ -10,7 +10,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @RestController
-@RequestMapping("/documentos")
+@RequestMapping(".../api/documentos")
 @CrossOrigin(origins = "*") // Libera para testes locais
 public class DocumentosController {
 

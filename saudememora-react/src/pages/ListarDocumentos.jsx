@@ -1,30 +1,29 @@
 import React, { useEffect, useState } from "react";
-
 import DocumentoService from "../services/DocumentoService";
 import Nav from "../components/Nav";
 
 export default function ListarDocumentosCategorias() {
-  const [documentos, setDocumentos] = useState([]);
+  const [documentos, setDocumentos] = useState({ P: [], R: [], E: [] });
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+
+  // ⚠️ Use um ID de paciente real
+  const idPaciente = 1;
 
   useEffect(() => {
     async function fetchDocumentos() {
       try {
         setLoading(true);
-        const data = await DocumentoService.getAll();
+        const data = await DocumentoService.getPorPacienteAgrupado(idPaciente);
         setDocumentos(data);
-      } catch {
+      } catch (err) {
         setError("Erro ao carregar documentos.");
       } finally {
         setLoading(false);
       }
     }
     fetchDocumentos();
-  }, []);
-
-  const filtrarPorCategoria = (categoria) =>
-    documentos.filter((doc) => doc.categoria === categoria);
+  }, [idPaciente]);
 
   const renderizarProntuarios = () => (
     <div className="category-section">
@@ -34,26 +33,23 @@ export default function ListarDocumentosCategorias() {
           <thead>
             <tr>
               <th>ID</th>
-              <th>Médico</th>
               <th>Data</th>
+              <th>Médico</th>
               <th>Especialidade</th>
-
             </tr>
           </thead>
           <tbody>
-            {filtrarPorCategoria("Prontuário").map((doc) => (
+            {documentos.P.map((doc) => (
               <tr key={doc.id}>
                 <td>{doc.id}</td>
-                <td>{doc.medico}</td>
-                <td>{new Date(doc.data).toLocaleDateString()}</td>
-                <td>{doc.especialidade}</td>
+                <td>{new Date(doc.dataUpload).toLocaleDateString()}</td>
+                <td>{doc.medico || "—"}</td>
+                <td>{doc.especialidade || "—"}</td>
               </tr>
             ))}
-            {filtrarPorCategoria("Prontuário").length === 0 && (
+            {documentos.P.length === 0 && (
               <tr>
-                <td colSpan="6" className="text-center">
-                  Nenhum prontuário encontrado.
-                </td>
+                <td colSpan="4" className="text-center">Nenhum prontuário encontrado.</td>
               </tr>
             )}
           </tbody>
@@ -74,25 +70,21 @@ export default function ListarDocumentosCategorias() {
               <th>Médico</th>
               <th>Medicamentos</th>
               <th>Posologia</th>
-
             </tr>
           </thead>
           <tbody>
-            {filtrarPorCategoria("Receita").map((doc) => (
+            {documentos.R.map((doc) => (
               <tr key={doc.id}>
                 <td>{doc.id}</td>
-                <td>{new Date(doc.data).toLocaleDateString()}</td>
-                <td>{doc.medico}</td>
-                <td>{doc.medicamentos}</td>
-                <td>{doc.posologia}</td>
-
+                <td>{new Date(doc.dataUpload).toLocaleDateString()}</td>
+                <td>{doc.medico || "—"}</td>
+                <td>{doc.medicamentos || "—"}</td>
+                <td>{doc.posologia || "—"}</td>
               </tr>
             ))}
-            {filtrarPorCategoria("Receita").length === 0 && (
+            {documentos.R.length === 0 && (
               <tr>
-                <td colSpan="6" className="text-center">
-                  Nenhuma receita encontrada.
-                </td>
+                <td colSpan="5" className="text-center">Nenhuma receita encontrada.</td>
               </tr>
             )}
           </tbody>
@@ -112,25 +104,20 @@ export default function ListarDocumentosCategorias() {
               <th>Data</th>
               <th>Tipo</th>
               <th>Laboratório</th>
-
-
             </tr>
           </thead>
           <tbody>
-            {filtrarPorCategoria("Exame").map((doc) => (
+            {documentos.E.map((doc) => (
               <tr key={doc.id}>
                 <td>{doc.id}</td>
-                <td>{new Date(doc.data).toLocaleDateString()}</td>
-                <td>{doc.tipo}</td>
-                <td>{doc.laboratorio}</td>
-
+                <td>{new Date(doc.dataUpload).toLocaleDateString()}</td>
+                <td>{doc.tipo || "—"}</td>
+                <td>{doc.laboratorio || "—"}</td>
               </tr>
             ))}
-            {filtrarPorCategoria("Exame").length === 0 && (
+            {documentos.E.length === 0 && (
               <tr>
-                <td colSpan="6" className="text-center">
-                  Nenhum exame encontrado.
-                </td>
+                <td colSpan="4" className="text-center">Nenhum exame encontrado.</td>
               </tr>
             )}
           </tbody>
