@@ -28,6 +28,10 @@ public class Prontuario {
     @Column(name = "ds_conclusoes", length = 2000)
     private String conclusoes;
 
+    @OneToOne
+    @JoinColumn(name = "id_documento", nullable = false)
+    private Documentos documento;
+
     // Getters e Setters
     public Long getId() {
         return id;
@@ -75,5 +79,13 @@ public class Prontuario {
 
     public void setConclusoes(String conclusoes) {
         this.conclusoes = conclusoes;
+    }
+
+    public Documentos getDocumento() {
+        return documento;
+    }
+
+    public void setDocumento(Documentos documento) {
+        this.documento = documento;
     }
 }

@@ -12,4 +12,6 @@ public interface DocumentosRepository extends JpaRepository<Documentos, Long> {
     List<Documentos> findByTipoDocumento(String tipoDocumento);
 
     List<Documentos> findByPacienteId(Long id);
+
+    List<Documentos> findByStatus(String status);
 }

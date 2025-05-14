@@ -115,7 +115,7 @@ export default function UploadDocumentos() {
     setResultadoProcessamento("");
     setBotaoHabilitado(false);
     setMensagemErro("");
-    // ❌ NÃO zera o tipoDocumento aqui
+
   };
 
   return (
@@ -147,9 +147,9 @@ export default function UploadDocumentos() {
             onChange={(e) => setTipoDocumento(e.target.value)}
           >
             <option value="">Selecione o tipo</option>
-            <option value="Exame">Exame</option>
-            <option value="Prontuário">Prontuário</option>
-            <option value="Receitas">Receitas</option>
+            <option value="E">Exame</option>
+            <option value="P">Prontuário</option>
+            <option value="R">Receitas</option>
           </select>
         </div>
 
