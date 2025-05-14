@@ -15,8 +15,7 @@ export default function UploadDocumentos() {
   const [botaoHabilitado, setBotaoHabilitado] = useState(false);
   const [tipoDocumento, setTipoDocumento] = useState("");
   const [paciente, setPaciente] = useState(null);
-  const [mensagemErro, setMensagemErro] = useState(""); 
-
+  const [mensagemErro, setMensagemErro] = useState("");
 
   useEffect(() => {
     const pacienteData = JSON.parse(localStorage.getItem("paciente")) || {};
@@ -28,7 +27,11 @@ export default function UploadDocumentos() {
     if (file) {
       setDocumento(file);
       setPreview(URL.createObjectURL(file));
-      resetState("Arquivo selecionado. Pronto para envio.");
+      setStatus("Arquivo selecionado. Pronto para envio.");
+      setProgresso(0);
+      setResultadoProcessamento("");
+      setBotaoHabilitado(false);
+      setMensagemErro("");
     }
   };
 
@@ -39,11 +42,6 @@ export default function UploadDocumentos() {
   const handleUpload = async () => {
     if (!documento) {
       setMensagemErro("Selecione ou tire uma foto do documento.");
-      return;
-    }
-
-    if (!tipoDocumento) {
-      setMensagemErro("Selecione o tipo de documento.");
       return;
     }
 
@@ -58,14 +56,13 @@ export default function UploadDocumentos() {
     }, 200);
 
     try {
-
       const textoExtraido = await ocrSpace(documento);
       clearInterval(intervalo);
       setProgresso(100);
       setStatus("Documento enviado e em processamento.");
       setResultadoProcessamento(textoExtraido || "Nenhum texto reconhecido.");
       setBotaoHabilitado(true);
-      setMensagemErro(""); 
+      setMensagemErro("");
     } catch (erro) {
       clearInterval(intervalo);
       setProgresso(0);
@@ -83,6 +80,11 @@ export default function UploadDocumentos() {
         return;
       }
 
+      if (!tipoDocumento) {
+        setMensagemErro("Selecione o tipo de documento.");
+        return;
+      }
+
       if (!paciente || !paciente.id) {
         setMensagemErro("Nenhum paciente encontrado. Verifique o localStorage.");
         return;
@@ -95,7 +97,7 @@ export default function UploadDocumentos() {
       );
 
       if (response.success) {
-        setMensagemErro("");  // Limpar mensagem de erro após sucesso
+        setMensagemErro("");
         setDocumento(null);
         setPreview(null);
         resetState("Aguardando envio...");
@@ -112,8 +114,8 @@ export default function UploadDocumentos() {
     setProgresso(0);
     setResultadoProcessamento("");
     setBotaoHabilitado(false);
-    setTipoDocumento("");
-    setMensagemErro("");  // Limpar mensagem de erro ao resetar o estado
+    setMensagemErro("");
+    // ❌ NÃO zera o tipoDocumento aqui
   };
 
   return (
@@ -213,7 +215,6 @@ export default function UploadDocumentos() {
           </button>
         </div>
 
-        {/* Exibe a mensagem de erro, se houver */}
         {mensagemErro && (
           <div className="alert alert-danger mt-3" role="alert">
             {mensagemErro}

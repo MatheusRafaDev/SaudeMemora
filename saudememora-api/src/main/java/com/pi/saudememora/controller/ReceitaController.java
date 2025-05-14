@@ -39,7 +39,7 @@ public class ReceitaController {
             logger.info("JSON Recebido: {}", jsonReceita); // Passa o jsonReceita aqui
 
             // Verifica se os campos obrigatórios estão preenchidos
-            if (receita.getNomeMedico() == null || receita.getNomeMedico().isEmpty()) {
+            if (receita.getMedico() == null || receita.getMedico().isEmpty()) {
                 return ResponseEntity.badRequest().body("O campo 'nomeMedico' é obrigatório.");
             }
             if (receita.getNomeMedicamento() == null || receita.getNomeMedicamento().isEmpty()) {
@@ -102,7 +102,7 @@ public class ReceitaController {
                 .map(receita -> {
                     try {
                         // Atualiza os campos da receita
-                        receita.setNomeMedico(receitaDetails.getNomeMedico());
+                        receita.setMedico(receitaDetails.getMedico());
                         receita.setNomeMedicamento(receitaDetails.getNomeMedicamento());
                         receita.setPosologia(receitaDetails.getPosologia());
                         receita.setObservacoes(receitaDetails.getObservacoes());

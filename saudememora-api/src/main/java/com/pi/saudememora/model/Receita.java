@@ -12,7 +12,7 @@ public class Receita {
     private Long id;
 
     @Column(name = "nm_medico", nullable = false)
-    private String nomeMedico;
+    private String Medico;
 
     @Column(name = "nm_medicamento", nullable = false)
     private String nomeMedicamento;
@@ -46,12 +46,12 @@ public class Receita {
         this.id = id;
     }
 
-    public String getNomeMedico() {
-        return nomeMedico;
+    public String getMedico() {
+        return Medico;
     }
 
-    public void setNomeMedico(String nomeMedico) {
-        this.nomeMedico = nomeMedico;
+    public void setMedico(String nomeMedico) {
+        this.Medico = nomeMedico;
     }
 
     public String getNomeMedicamento() {

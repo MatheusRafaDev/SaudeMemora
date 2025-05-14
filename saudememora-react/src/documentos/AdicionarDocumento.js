@@ -31,7 +31,7 @@ export async function AdicionarDocumento(tipoDocumento, textoOCR, paciente) {
 
     const receitaJSON = await tratarOCRParaReceitas(textoOCR);
 
-    console.log(receitaJSON)
+
     // Verifica se houve erro no processamento do OCR
     if (receitaJSON.error) {
       throw new Error(`Erro no processamento do OCR: ${receitaJSON.error}`);
@@ -53,13 +53,12 @@ export async function AdicionarDocumento(tipoDocumento, textoOCR, paciente) {
       },
     };
 
-   // console.log("📋 Receita JSON gerada pelo OCR:", receitaData);
 
     const receitaResponse = await ReceitaService.create(receitaData);
 
     // Verifica se a criação da receita foi bem-sucedida
     if (receitaResponse?.success) {
-      console.log("✅ Documento e Receita incluídos com sucesso!");
+
       return { success: true, message: "Documento e Receita incluídos com sucesso!" };
     } else {
       throw new Error(receitaResponse?.message || "Erro ao incluir a receita.");

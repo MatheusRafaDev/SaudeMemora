@@ -209,8 +209,8 @@ Leia o texto abaixo e extraia os campos:
 - "medico" (nome do médico),
 - "nomeMedicamento": nome do medicamento,
 - "posologia": instruções de uso,
-- "observacoes": observações adicionais, se houver,
-- "resumo": um breve resumo da consulta.
+- "observacoes": observações adicionais,
+- "resumo": o mesmo texto abaixo, mas reescrito com ortografia corrigida, pontuação adequada e espaçamento correto. NÃO resuma nem interprete, apenas normalize.
 
 Retorne apenas o JSON com os dados extraídos, no seguinte formato:
 {
@@ -218,11 +218,11 @@ Retorne apenas o JSON com os dados extraídos, no seguinte formato:
   "medico": "Nome do médico",
   "nomeMedicamento": "Nome do medicamento",
   "posologia": "Texto da posologia",
-  "observacoes": "Texto das observações ou null",
-  "resumo": "Texto do resumo ou null"
+  "observacoes": "Texto das observações",
+  "resumo": "Texto do OCR reescrito e normalizado"
 }
 
-Não adicione comentários nem explicações. Caso algum campo esteja ausente, retorne como null.
+Não adicione comentários nem explicações.
 
 Texto do OCR:
 ${textoTratado}`;
@@ -261,22 +261,21 @@ ${textoTratado}`;
       throw new Error("Resposta da API não é um JSON válido.");
     }
 
-    if (
-      !jsonReceita ||
-      typeof jsonReceita !== "object" ||
-      !("data" in jsonReceita) ||
-      !("medico" in jsonReceita) ||
-      !("nomeMedicamento" in jsonReceita) ||
-      !("posologia" in jsonReceita) ||
-      !("observacoes" in jsonReceita) ||
-      !("resumo" in jsonReceita)
-    ) {
+    if (!jsonReceita || typeof jsonReceita !== "object") {
       throw new Error("A resposta da API está incompleta.");
     }
 
-    return jsonReceita;
+    return {
+      data: jsonReceita.data || "",
+      medico: jsonReceita.medico || "",
+      nomeMedicamento: jsonReceita.nomeMedicamento || "",
+      posologia: jsonReceita.posologia || "",
+      observacoes: jsonReceita.observacoes || "",
+      resumo: jsonReceita.resumo || ""
+    };
   } catch (error) {
     console.error("❌ Erro ao tratar OCR:", error.message);
     return { error: error.message };
   }
 }
+
