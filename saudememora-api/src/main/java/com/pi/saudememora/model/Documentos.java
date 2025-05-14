@@ -19,17 +19,14 @@ public class Documentos {
     @Column(name = "ds_tipo_documento", length = 1, nullable = false)
     private String tipoDocumento;
 
-    @Column(name = "ds_url_arquivo", length = 2000)
-    private String urlArquivo;
 
-    @Column(name = "ds_status", length = 1, nullable = false)
+    @Column(name = "ds_status", length = 20, nullable = false)
     private String status;
 
     @Column(name = "ds_data_upload", nullable = false)
-    @Temporal(TemporalType.DATE)  // Usando @Temporal para indicar que é uma data
-    private Date dataUpload;  // Alterado para Date para representar datas corretamente
+    @Temporal(TemporalType.DATE)
+    private Date dataUpload;
 
-    // Getters e setters
 
     public Long getId() {
         return id;
@@ -53,14 +50,6 @@ public class Documentos {
 
     public void setTipoDocumento(String tipoDocumento) {
         this.tipoDocumento = tipoDocumento;
-    }
-
-    public String getUrlArquivo() {
-        return urlArquivo;
-    }
-
-    public void setUrlArquivo(String urlArquivo) {
-        this.urlArquivo = urlArquivo;
     }
 
     public String getStatus() {

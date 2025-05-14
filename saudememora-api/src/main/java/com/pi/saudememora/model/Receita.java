@@ -1,10 +1,9 @@
 package com.pi.saudememora.model;
 
 import jakarta.persistence.*;
-import java.util.Date;
 
 @Entity
-@Table(name = "tb_receita")
+@Table(name = "tb_receitas")
 public class Receita {
 
     @Id
@@ -12,26 +11,31 @@ public class Receita {
     @Column(name = "id_receita")
     private Long id;
 
-    @Temporal(TemporalType.DATE)
-    @Column(name = "dt_data")
-    private Date data;
+    @Column(name = "nm_medico", nullable = false)
+    private String nomeMedico;
 
-    @Column(name = "ds_medico")
-    private String medico;
+    @Column(name = "nm_medicamento", nullable = false)
+    private String nomeMedicamento;
 
-    @Column(name = "ds_medicamentos", length = 1000)
-    private String medicamentos;
-
-    @Column(name = "ds_posologia", length = 1000)
+    @Column(name = "ds_posologia", nullable = false)
     private String posologia;
 
-    @Column(name = "ds_observacoes", length = 1000)
+    @Column(name = "ds_observacoes")
     private String observacoes;
 
-    // Relacionamento com o Documento
-    @ManyToOne
-    @JoinColumn(name = "fk_documento", referencedColumnName = "id_documentos", nullable = false)
+    @Column(name = "ds_resumo")
+    private String resumo;
+
+    @Column(name = "ds_imagem")
+    private String imagem;
+
+    @OneToOne
+    @JoinColumn(name = "id_documento", nullable = false)
     private Documentos documento;
+
+    @ManyToOne
+    @JoinColumn(name = "id_paciente", nullable = false)
+    private Paciente paciente;
 
     // Getters e Setters
     public Long getId() {
@@ -42,28 +46,20 @@ public class Receita {
         this.id = id;
     }
 
-    public Date getData() {
-        return data;
+    public String getNomeMedico() {
+        return nomeMedico;
     }
 
-    public void setData(Date data) {
-        this.data = data;
+    public void setNomeMedico(String nomeMedico) {
+        this.nomeMedico = nomeMedico;
     }
 
-    public String getMedico() {
-        return medico;
+    public String getNomeMedicamento() {
+        return nomeMedicamento;
     }
 
-    public void setMedico(String medico) {
-        this.medico = medico;
-    }
-
-    public String getMedicamentos() {
-        return medicamentos;
-    }
-
-    public void setMedicamentos(String medicamentos) {
-        this.medicamentos = medicamentos;
+    public void setNomeMedicamento(String nomeMedicamento) {
+        this.nomeMedicamento = nomeMedicamento;
     }
 
     public String getPosologia() {
@@ -82,11 +78,35 @@ public class Receita {
         this.observacoes = observacoes;
     }
 
+    public String getResumo() {
+        return resumo;
+    }
+
+    public void setResumo(String resumo) {
+        this.resumo = resumo;
+    }
+
+    public String getImagem() {
+        return imagem;
+    }
+
+    public void setImagem(String imagem) {
+        this.imagem = imagem;
+    }
+
     public Documentos getDocumento() {
         return documento;
     }
 
     public void setDocumento(Documentos documento) {
         this.documento = documento;
+    }
+
+    public Paciente getPaciente() {
+        return paciente;
+    }
+
+    public void setPaciente(Paciente paciente) {
+        this.paciente = paciente;
     }
 }

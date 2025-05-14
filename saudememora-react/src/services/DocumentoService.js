@@ -19,9 +19,6 @@ const DocumentoService = {
   getById: async (id) => {
     try {
       const response = await axiosInstance.get(`/api/documentos/${id}`);
-
-      console.log(response);
-
       return { success: true, data: response.data };
     } catch (error) {
       console.error("Erro ao buscar documento por ID:", error);
@@ -56,15 +53,42 @@ const DocumentoService = {
       const response = await axiosInstance.get(
         `/api/documentos/paciente/${idPaciente}/tipo/${tipoDocumento}`
       );
-      return response.data;
+      return { success: true, data: response.data };
     } catch (error) {
       console.error(
         `Erro ao buscar documentos para o paciente ${idPaciente} e tipo ${tipoDocumento}:`,
         error
       );
-      throw new Error("Erro ao buscar documentos por paciente e tipo.");
+      return {
+        success: false,
+        message: "Erro ao buscar documentos por paciente e tipo.",
+      };
     }
   },
+
+  // Criar um novo documento
+  create: async (documento) => {
+    try {
+
+      const response = await axiosInstance.post(
+        "/api/documentos",
+        JSON.stringify(documento), // Certifique-se de enviar o corpo como JSON
+        {
+          headers: {
+            "Content-Type": "application/json", // Define o cabeçalho corretamente
+          },
+        }
+      );
+      return { success: true, data: response.data };
+    } catch (error) {
+      console.error("Erro ao criar documento:", error);
+      return {
+        success: false,
+        message: error.response?.data?.message || "Erro ao criar documento!",
+      };
+    }
+  },
+  
 };
 
 export default DocumentoService;

@@ -75,7 +75,7 @@ const CadastroPaciente = () => {
     <div className="d-flex justify-content-center align-items-center min-vh-100">
       <div className="saude-card shadow-sm p-3 rounded bg-white">
         <div className="card-body">
-          <h2 className="text-center mb-3">Cadastro de Paciente</h2>
+          <h2 className="text-center mb-3">Criar conta</h2>
           <form onSubmit={handleSubmit}>
             {error && (
               <div className="alert alert-danger" role="alert">

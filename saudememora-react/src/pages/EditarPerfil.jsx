@@ -69,7 +69,6 @@ function EditarPerfil() {
 
     try {
       localStorage.setItem('paciente', JSON.stringify(dadosForm));
-      console.log("Paciente atualizado com sucesso!");
       navigate('/perfil');
     } catch (error) {
       setError('Erro ao atualizar o paciente.');

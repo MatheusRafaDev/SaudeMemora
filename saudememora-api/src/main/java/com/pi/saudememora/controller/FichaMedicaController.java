@@ -43,9 +43,8 @@ public class FichaMedicaController {
         mapper.enable(SerializationFeature.INDENT_OUTPUT);
 
 
-        String json = mapper.writeValueAsString(fichaMedica);
 
-        System.out.println(json);
+        String json = mapper.writeValueAsString(fichaMedica);
 
         if (fichaMedica.getPaciente() == null || fichaMedica.getPaciente().getId() == null) {
             return ResponseEntity.badRequest().body("Paciente é obrigatório" + fichaMedica);

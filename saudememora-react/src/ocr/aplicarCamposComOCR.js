@@ -10,28 +10,28 @@ export async function aplicarCamposComOCR(
 
   try {
 
-    //const dados_medicos = await ajustarDadosMedicos(textoOCR);
-    //const resultado = await ajustarTextoFormulario(dados_medicos);
-    //const json = await ajustarJSON(resultado);
+    const dados_medicos = await ajustarDadosMedicos(textoOCR);
+    const resultado = await ajustarTextoFormulario(dados_medicos);
+    const json = await ajustarJSON(resultado);
 
-
-    var json = {
-      tratamento_medico: "não",
-      gravida: "não",
-      regime: "não",
-      diabetes: "não",
-      alergias: "não",
-      reumatica: "não",
-      coagulacao: "não",
-      anestesia: "não",
-      hepatite: "não",
-      hiv: "não",
-      drogas: "não",
-      fumante: "não",
-      pressao: "normal",
-      respiratorio: "sim"
-    };
-
+      /*
+      var json = {
+        tratamento_medico: "não",
+        gravida: "não",
+        regime: "não",
+        diabetes: "não",
+        alergias: "não",
+        reumatica: "não",
+        coagulacao: "não",
+        anestesia: "não",
+        hepatite: "não",
+        hiv: "não",
+        drogas: "não",
+        fumante: "não",
+        pressao: "normal",
+        respiratorio: "sim"
+      };
+    */
     const novasRespostas = {};
 
     perguntas.forEach((pergunta) => {

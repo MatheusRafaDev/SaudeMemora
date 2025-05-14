@@ -190,3 +190,93 @@ Texto do formulário:
     return { error: error.message };
   }
 }
+
+
+export async function tratarOCRParaReceitas(textoOCR) {
+  try {
+    if (!textoOCR || typeof textoOCR !== "string" || textoOCR.trim().length < 10) {
+      throw new Error("Texto OCR inválido ou muito curto.");
+    }
+
+    const textoTratado = textoOCR
+      .replace(/[^a-zA-Z0-9.,\s]/g, "")
+      .trim();
+
+    const prompt = `Você é um assistente que interpreta textos médicos extraídos via OCR e transforma os dados em JSON estruturado para serem incluídos em um sistema de receitas médicas.
+
+Leia o texto abaixo e extraia os campos:
+- "data" (formato YYYY-MM-DD ou DD/MM/YYYY),
+- "medico" (nome do médico),
+- "nomeMedicamento": nome do medicamento,
+- "posologia": instruções de uso,
+- "observacoes": observações adicionais, se houver,
+- "resumo": um breve resumo da consulta.
+
+Retorne apenas o JSON com os dados extraídos, no seguinte formato:
+{
+  "data": "YYYY-MM-DD",
+  "medico": "Nome do médico",
+  "nomeMedicamento": "Nome do medicamento",
+  "posologia": "Texto da posologia",
+  "observacoes": "Texto das observações ou null",
+  "resumo": "Texto do resumo ou null"
+}
+
+Não adicione comentários nem explicações. Caso algum campo esteja ausente, retorne como null.
+
+Texto do OCR:
+${textoTratado}`;
+
+    const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${OPENROUTER_API_KEY}`,
+      },
+      body: JSON.stringify({
+        model: "openai/gpt-3.5-turbo",
+        messages: [
+          {
+            role: "system",
+            content:
+              "Você é um assistente que interpreta e organiza dados extraídos via OCR para inclusão em um sistema de receitas médicas.",
+          },
+          {
+            role: "user",
+            content: prompt,
+          },
+        ],
+        temperature: 0.0,
+      }),
+      timeout: 15000,
+    });
+
+    if (!res.ok) throw new Error(`Erro na API: ${res.statusText}`);
+    const data = await res.json();
+
+    let jsonReceita;
+    try {
+      jsonReceita = JSON.parse(data.choices[0].message.content);
+    } catch (e) {
+      throw new Error("Resposta da API não é um JSON válido.");
+    }
+
+    if (
+      !jsonReceita ||
+      typeof jsonReceita !== "object" ||
+      !("data" in jsonReceita) ||
+      !("medico" in jsonReceita) ||
+      !("nomeMedicamento" in jsonReceita) ||
+      !("posologia" in jsonReceita) ||
+      !("observacoes" in jsonReceita) ||
+      !("resumo" in jsonReceita)
+    ) {
+      throw new Error("A resposta da API está incompleta.");
+    }
+
+    return jsonReceita;
+  } catch (error) {
+    console.error("❌ Erro ao tratar OCR:", error.message);
+    return { error: error.message };
+  }
+}

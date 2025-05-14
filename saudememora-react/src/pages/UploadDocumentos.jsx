@@ -1,9 +1,10 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { FiUpload, FiCamera, FiFileText, FiCheckCircle } from "react-icons/fi";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "../styles/UploadDocumento.css";
 import Nav from "../components/Nav";
 import { ocrSpace } from "../ocr/ocrSpace";
+import { AdicionarDocumento } from "../documentos/AdicionarDocumento";
 
 export default function UploadDocumentos() {
   const [documento, setDocumento] = useState(null);
@@ -13,6 +14,14 @@ export default function UploadDocumentos() {
   const [resultadoProcessamento, setResultadoProcessamento] = useState("");
   const [botaoHabilitado, setBotaoHabilitado] = useState(false);
   const [tipoDocumento, setTipoDocumento] = useState("");
+  const [paciente, setPaciente] = useState(null);
+  const [mensagemErro, setMensagemErro] = useState(""); 
+
+
+  useEffect(() => {
+    const pacienteData = JSON.parse(localStorage.getItem("paciente")) || {};
+    setPaciente(pacienteData);
+  }, []);
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
@@ -29,12 +38,12 @@ export default function UploadDocumentos() {
 
   const handleUpload = async () => {
     if (!documento) {
-      alert("Selecione ou tire uma foto do documento.");
+      setMensagemErro("Selecione ou tire uma foto do documento.");
       return;
     }
 
     if (!tipoDocumento) {
-      alert("Selecione o tipo de documento.");
+      setMensagemErro("Selecione o tipo de documento.");
       return;
     }
 
@@ -49,25 +58,53 @@ export default function UploadDocumentos() {
     }, 200);
 
     try {
+
       const textoExtraido = await ocrSpace(documento);
       clearInterval(intervalo);
       setProgresso(100);
       setStatus("Documento enviado e em processamento.");
       setResultadoProcessamento(textoExtraido || "Nenhum texto reconhecido.");
       setBotaoHabilitado(true);
+      setMensagemErro(""); 
     } catch (erro) {
       clearInterval(intervalo);
       setProgresso(0);
       setStatus("Erro ao processar o documento.");
       setResultadoProcessamento("Erro: " + erro.message);
       setBotaoHabilitado(false);
+      setMensagemErro("Erro ao processar o documento: " + erro.message);
     }
   };
 
-  const handleAddDocument = () => {
-    setDocumento(null);
-    setPreview(null);
-    resetState("Aguardando envio...");
+  const handleAddDocument = async () => {
+    try {
+      if (!resultadoProcessamento) {
+        setMensagemErro("Nenhum texto processado para adicionar.");
+        return;
+      }
+
+      if (!paciente || !paciente.id) {
+        setMensagemErro("Nenhum paciente encontrado. Verifique o localStorage.");
+        return;
+      }
+
+      const response = await AdicionarDocumento(
+        tipoDocumento,
+        resultadoProcessamento,
+        paciente
+      );
+
+      if (response.success) {
+        setMensagemErro("");  // Limpar mensagem de erro após sucesso
+        setDocumento(null);
+        setPreview(null);
+        resetState("Aguardando envio...");
+      } else {
+        setMensagemErro(response.message);
+      }
+    } catch (error) {
+      setMensagemErro("Erro ao adicionar o documento: " + error.message);
+    }
   };
 
   const resetState = (initialStatus) => {
@@ -76,6 +113,7 @@ export default function UploadDocumentos() {
     setResultadoProcessamento("");
     setBotaoHabilitado(false);
     setTipoDocumento("");
+    setMensagemErro("");  // Limpar mensagem de erro ao resetar o estado
   };
 
   return (
@@ -171,9 +209,16 @@ export default function UploadDocumentos() {
             onClick={handleAddDocument}
             disabled={!botaoHabilitado}
           >
-            📄 Adicionar Novo Documento
+            📄 Adicionar Documento
           </button>
         </div>
+
+        {/* Exibe a mensagem de erro, se houver */}
+        {mensagemErro && (
+          <div className="alert alert-danger mt-3" role="alert">
+            {mensagemErro}
+          </div>
+        )}
       </div>
     </div>
   );
