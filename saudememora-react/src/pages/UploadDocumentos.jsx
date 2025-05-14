@@ -3,24 +3,23 @@ import { FiUpload, FiCamera, FiFileText, FiCheckCircle } from "react-icons/fi";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "../styles/UploadDocumento.css";
 import Nav from "../components/Nav";
+import { ocrSpace } from "../ocr/ocrSpace";
 
-
-export default function UploadDocumentos(){
+export default function UploadDocumentos() {
   const [documento, setDocumento] = useState(null);
   const [preview, setPreview] = useState(null);
   const [status, setStatus] = useState("Aguardando envio...");
   const [progresso, setProgresso] = useState(0);
   const [resultadoProcessamento, setResultadoProcessamento] = useState("");
-  const [botaoHabilitado, setBotaoHabilitado] = useState(false); // Estado para habilitar/ desabilitar o botão
+  const [botaoHabilitado, setBotaoHabilitado] = useState(false);
+  const [tipoDocumento, setTipoDocumento] = useState("");
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (file) {
       setDocumento(file);
       setPreview(URL.createObjectURL(file));
-      setStatus("Arquivo selecionado. Pronto para envio.");
-      setProgresso(0);
-      setResultadoProcessamento("");
+      resetState("Arquivo selecionado. Pronto para envio.");
     }
   };
 
@@ -28,9 +27,14 @@ export default function UploadDocumentos(){
     document.getElementById("cameraInput").click();
   };
 
-  const handleUpload = () => {
+  const handleUpload = async () => {
     if (!documento) {
       alert("Selecione ou tire uma foto do documento.");
+      return;
+    }
+
+    if (!tipoDocumento) {
+      alert("Selecione o tipo de documento.");
       return;
     }
 
@@ -39,24 +43,39 @@ export default function UploadDocumentos(){
 
     const intervalo = setInterval(() => {
       setProgresso((prev) => {
-        if (prev >= 100) {
-          clearInterval(intervalo);
-          setStatus("Documento enviado e em processamento.");
-          setResultadoProcessamento("O documento foi processado com sucesso!");
-          setBotaoHabilitado(true); // Habilita o botão após o processamento
-        }
-        return Math.min(prev + 10, 100);
+        if (prev >= 90) clearInterval(intervalo);
+        return Math.min(prev + 10, 90);
       });
     }, 200);
+
+    try {
+      const textoExtraido = await ocrSpace(documento);
+      clearInterval(intervalo);
+      setProgresso(100);
+      setStatus("Documento enviado e em processamento.");
+      setResultadoProcessamento(textoExtraido || "Nenhum texto reconhecido.");
+      setBotaoHabilitado(true);
+    } catch (erro) {
+      clearInterval(intervalo);
+      setProgresso(0);
+      setStatus("Erro ao processar o documento.");
+      setResultadoProcessamento("Erro: " + erro.message);
+      setBotaoHabilitado(false);
+    }
   };
 
   const handleAddDocument = () => {
     setDocumento(null);
     setPreview(null);
-    setStatus("Aguardando envio...");
+    resetState("Aguardando envio...");
+  };
+
+  const resetState = (initialStatus) => {
+    setStatus(initialStatus);
     setProgresso(0);
     setResultadoProcessamento("");
-    setBotaoHabilitado(false); // Desabilita o botão quando um novo documento for adicionado
+    setBotaoHabilitado(false);
+    setTipoDocumento("");
   };
 
   return (
@@ -77,7 +96,24 @@ export default function UploadDocumentos(){
           </div>
         )}
 
-        <div className="button-group">
+        <div className="form-group mt-3">
+          <label htmlFor="tipoDocumento">
+            <strong>Tipo de Documento:</strong>
+          </label>
+          <select
+            id="tipoDocumento"
+            className="form-control"
+            value={tipoDocumento}
+            onChange={(e) => setTipoDocumento(e.target.value)}
+          >
+            <option value="">Selecione o tipo</option>
+            <option value="Exame">Exame</option>
+            <option value="Prontuário">Prontuário</option>
+            <option value="Receitas">Receitas</option>
+          </select>
+        </div>
+
+        <div className="button-group mt-3">
           <button className="btn btn-secondary" onClick={handleCameraClick}>
             <FiCamera /> Tirar Foto
           </button>
@@ -133,7 +169,7 @@ export default function UploadDocumentos(){
           <button
             className="btn btn-secondary w-100"
             onClick={handleAddDocument}
-            disabled={!botaoHabilitado} // O botão só estará habilitado após o processamento
+            disabled={!botaoHabilitado}
           >
             📄 Adicionar Novo Documento
           </button>
@@ -141,5 +177,4 @@ export default function UploadDocumentos(){
       </div>
     </div>
   );
-};
-
+}

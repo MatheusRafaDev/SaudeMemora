@@ -1,8 +1,6 @@
 package com.pi.saudememora.model;
 
-
 import jakarta.persistence.*;
-
 import java.util.Date;
 
 @Entity
@@ -18,24 +16,27 @@ public class Documentos {
     @JoinColumn(name = "id_paciente", referencedColumnName = "id_paciente", nullable = false)
     private Paciente paciente;
 
-
     @Column(name = "ds_tipo_documento", length = 1, nullable = false)
-    private String tipoDocimento;
+    private String tipoDocumento;
 
-    @Column(name = "fk_tipodocumento", length = 1, nullable = false)
-    private String FktipoDocimento;
-
-    @Column(name = "ds_url_arquivo ", length = 2000)
+    @Column(name = "ds_url_arquivo", length = 2000)
     private String urlArquivo;
 
-    @Column(name = "ds_status  ", length = 1, nullable = false)
+    @Column(name = "ds_status", length = 1, nullable = false)
     private String status;
 
-    @Column(name = "ds_data_upload", nullable = false)  // Tipo String, você pode usar um tipo de dado de data se preferir
-    private String dataUpload;
+    @Column(name = "ds_data_upload", nullable = false)
+    @Temporal(TemporalType.DATE)  // Usando @Temporal para indicar que é uma data
+    private Date dataUpload;  // Alterado para Date para representar datas corretamente
+
+    // Getters e setters
 
     public Long getId() {
         return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
     }
 
     public Paciente getPaciente() {
@@ -46,16 +47,12 @@ public class Documentos {
         this.paciente = paciente;
     }
 
-    public void setId(Long id) {
-        this.id = id;
+    public String getTipoDocumento() {
+        return tipoDocumento;
     }
 
-    public String getTipoDocimento() {
-        return tipoDocimento;
-    }
-
-    public void setTipoDocimento(String tipoDocimento) {
-        this.tipoDocimento = tipoDocimento;
+    public void setTipoDocumento(String tipoDocumento) {
+        this.tipoDocumento = tipoDocumento;
     }
 
     public String getUrlArquivo() {
@@ -74,11 +71,11 @@ public class Documentos {
         this.status = status;
     }
 
-    public String getDataUpload() {
+    public Date getDataUpload() {
         return dataUpload;
     }
 
-    public void setDataUpload(String dataUpload) {
+    public void setDataUpload(Date dataUpload) {
         this.dataUpload = dataUpload;
     }
 }

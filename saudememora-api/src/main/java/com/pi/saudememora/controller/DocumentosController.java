@@ -6,11 +6,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.List;
 
 @RestController
-@RequestMapping(".../api/documentos")
+@RequestMapping("/api/documentos")
 @CrossOrigin(origins = "*") // Libera para testes locais
 public class DocumentosController {
 
@@ -25,21 +24,17 @@ public class DocumentosController {
                 .orElse(ResponseEntity.notFound().build());
     }
 
-    // GET por Tipo de Documento (Ex: R, E, P)
-    @GetMapping("/tipo/{tipo}")
-    public ResponseEntity<List<Documentos>> getDocumentosPorTipo(@PathVariable String tipo) {
-        List<Documentos> documentos = documentosRepository.findByTipoDocimento(tipo.toUpperCase());
+    // GET por ID do paciente
+    @GetMapping("/paciente/{id}")
+    public ResponseEntity<List<Documentos>> getDocumentosPorPaciente(@PathVariable Long id) {
+        List<Documentos> documentos = documentosRepository.findByPacienteId(id);
         return ResponseEntity.ok(documentos);
     }
 
-    // GET por Paciente, agrupando por tipo (R, E, P)
-    @GetMapping("/paciente/{id}")
-    public ResponseEntity<Map<String, List<Documentos>>> getDocumentosPorPacienteAgrupado(@PathVariable Long id) {
-        List<Documentos> documentos = documentosRepository.findByPacienteId(id);
-
-        Map<String, List<Documentos>> agrupados = documentos.stream()
-                .collect(Collectors.groupingBy(Documentos::getTipoDocimento));
-
-        return ResponseEntity.ok(agrupados);
+    // GET por Tipo de Documento (Ex: R, E, P)
+    @GetMapping("/tipo/{tipo}")
+    public ResponseEntity<List<Documentos>> getDocumentosPorTipo(@PathVariable String tipo) {
+        List<Documentos> documentos = documentosRepository.findByTipoDocumento(tipo.toUpperCase());
+        return ResponseEntity.ok(documentos);
     }
 }

@@ -9,7 +9,7 @@ import java.util.List;
 @Repository
 public interface DocumentosRepository extends JpaRepository<Documentos, Long> {
 
-    List<Documentos> findByTipoDocimento(String tipoDocimento);
+    List<Documentos> findByTipoDocumento(String tipoDocumento);
 
     List<Documentos> findByPacienteId(Long id);
 }

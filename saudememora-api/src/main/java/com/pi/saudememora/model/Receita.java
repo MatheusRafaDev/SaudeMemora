@@ -28,6 +28,11 @@ public class Receita {
     @Column(name = "ds_observacoes", length = 1000)
     private String observacoes;
 
+    // Relacionamento com o Documento
+    @ManyToOne
+    @JoinColumn(name = "fk_documento", referencedColumnName = "id_documentos", nullable = false)
+    private Documentos documento;
+
     // Getters e Setters
     public Long getId() {
         return id;
@@ -75,5 +80,13 @@ public class Receita {
 
     public void setObservacoes(String observacoes) {
         this.observacoes = observacoes;
+    }
+
+    public Documentos getDocumento() {
+        return documento;
+    }
+
+    public void setDocumento(Documentos documento) {
+        this.documento = documento;
     }
 }

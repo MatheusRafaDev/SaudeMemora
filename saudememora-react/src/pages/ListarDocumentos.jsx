@@ -2,122 +2,76 @@ import React, { useEffect, useState } from "react";
 import DocumentoService from "../services/DocumentoService";
 import Nav from "../components/Nav";
 
-export default function ListarDocumentosCategorias() {
-  const [documentos, setDocumentos] = useState({ P: [], R: [], E: [] });
+export default function ListarDocumentos() {
+  const [documentos, setDocumentos] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [paciente, setPaciente] = useState(null);
 
-  // ⚠️ Use um ID de paciente real
-  const idPaciente = 1;
+  useEffect(() => {
+    const storedPaciente = localStorage.getItem("paciente");
+    if (storedPaciente) {
+      setPaciente(JSON.parse(storedPaciente));
+    } else {
+      setError("Paciente não encontrado.");
+      setLoading(false);
+    }
+  }, []);
 
   useEffect(() => {
     async function fetchDocumentos() {
+      if (!paciente?.id) return;
+
       try {
         setLoading(true);
-        const data = await DocumentoService.getPorPacienteAgrupado(idPaciente);
-        setDocumentos(data);
+        const response = await DocumentoService.getPorPacienteAgrupado(paciente.id);
+        setDocumentos(response.data || []);
       } catch (err) {
         setError("Erro ao carregar documentos.");
       } finally {
         setLoading(false);
       }
     }
+
     fetchDocumentos();
-  }, [idPaciente]);
+  }, [paciente]);
 
-  const renderizarProntuarios = () => (
+  const renderizarDocumentos = () => (
     <div className="category-section">
-      <h2 className="category-title">Prontuários</h2>
       <div className="table-responsive">
         <table className="table table-striped table-bordered">
           <thead>
             <tr>
-              <th>ID</th>
-              <th>Data</th>
-              <th>Médico</th>
-              <th>Especialidade</th>
+              <th>Data de Upload</th>
+              <th>Status</th>
+              <th>Tipo do Documento</th>
+              <th>ID do Paciente</th>
+              <th>Visualizar</th>
             </tr>
           </thead>
           <tbody>
-            {documentos.P.map((doc) => (
-              <tr key={doc.id}>
-                <td>{doc.id}</td>
-                <td>{new Date(doc.dataUpload).toLocaleDateString()}</td>
-                <td>{doc.medico || "—"}</td>
-                <td>{doc.especialidade || "—"}</td>
-              </tr>
-            ))}
-            {documentos.P.length === 0 && (
+            {documentos.length > 0 ? (
+              documentos.map((doc) => (
+                <tr key={doc.id}>
+                  <td>{new Date(doc.dataUpload).toLocaleDateString()}</td>
+                  <td>{doc.status}</td>
+                  <td>{doc.tipoDocumento}</td>
+                  <td>{doc.paciente?.id || "—"}</td>
+                  <td>
+                    <button
+                      className="btn btn-sm btn-primary"
+                      onClick={() => (window.location.href = `/visualizar?id=${doc.id}`)}
+                    >
+                      Visualizar
+                    </button>
+                  </td>
+                </tr>
+              ))
+            ) : (
               <tr>
-                <td colSpan="4" className="text-center">Nenhum prontuário encontrado.</td>
-              </tr>
-            )}
-          </tbody>
-        </table>
-      </div>
-    </div>
-  );
-
-  const renderizarReceitas = () => (
-    <div className="category-section">
-      <h2 className="category-title">Receitas</h2>
-      <div className="table-responsive">
-        <table className="table table-striped table-bordered">
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Data</th>
-              <th>Médico</th>
-              <th>Medicamentos</th>
-              <th>Posologia</th>
-            </tr>
-          </thead>
-          <tbody>
-            {documentos.R.map((doc) => (
-              <tr key={doc.id}>
-                <td>{doc.id}</td>
-                <td>{new Date(doc.dataUpload).toLocaleDateString()}</td>
-                <td>{doc.medico || "—"}</td>
-                <td>{doc.medicamentos || "—"}</td>
-                <td>{doc.posologia || "—"}</td>
-              </tr>
-            ))}
-            {documentos.R.length === 0 && (
-              <tr>
-                <td colSpan="5" className="text-center">Nenhuma receita encontrada.</td>
-              </tr>
-            )}
-          </tbody>
-        </table>
-      </div>
-    </div>
-  );
-
-  const renderizarExames = () => (
-    <div className="category-section">
-      <h2 className="category-title">Exames</h2>
-      <div className="table-responsive">
-        <table className="table table-striped table-bordered">
-          <thead>
-            <tr>
-              <th>ID</th>
-              <th>Data</th>
-              <th>Tipo</th>
-              <th>Laboratório</th>
-            </tr>
-          </thead>
-          <tbody>
-            {documentos.E.map((doc) => (
-              <tr key={doc.id}>
-                <td>{doc.id}</td>
-                <td>{new Date(doc.dataUpload).toLocaleDateString()}</td>
-                <td>{doc.tipo || "—"}</td>
-                <td>{doc.laboratorio || "—"}</td>
-              </tr>
-            ))}
-            {documentos.E.length === 0 && (
-              <tr>
-                <td colSpan="4" className="text-center">Nenhum exame encontrado.</td>
+                <td colSpan="5" className="text-center">
+                  Nenhum documento encontrado.
+                </td>
               </tr>
             )}
           </tbody>
@@ -133,13 +87,7 @@ export default function ListarDocumentosCategorias() {
         <h1 className="title">Documentos</h1>
         {loading && <p className="loading-message">Carregando documentos...</p>}
         {error && <p className="error-message">{error}</p>}
-        {!loading && (
-          <>
-            {renderizarProntuarios()}
-            {renderizarReceitas()}
-            {renderizarExames()}
-          </>
-        )}
+        {!loading && paciente && renderizarDocumentos()}
       </div>
     </div>
   );
