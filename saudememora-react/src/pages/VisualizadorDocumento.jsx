@@ -1,45 +1,28 @@
 import React from "react";
-import { FiCalendar, FiUser, FiFileText, FiClipboard } from "react-icons/fi";
-import "../styles/VisualizadorDocumento.css";
+import { useLocation } from "react-router-dom"; // importa o hook
+import { FiCalendar, FiUser } from "react-icons/fi";
+import ReceitaComMedicamentos from "../components/ReceitaComMedicamentos";
 
-const VisualizadorDocumento = ({ documento }) => {
+import Nav from "../components/Nav";
+
+const VisualizadorDocumento = () => {
+  const location = useLocation();
+  const documentoArray = location.state?.documento;
+  const documento =
+    Array.isArray(documentoArray) && documentoArray.length > 0
+      ? documentoArray[0]
+      : null;
+
   if (!documento) return <p>Nenhum documento selecionado.</p>;
 
-  const {
-    data,
-    medico,
-    medicamento,
-    dosagem,
-    notas,
-    imagem,
-    textoExtraido
-  } = documento;
-
-  return (
-    <div className="visualizador-container">
-      <h2 className="titulo-sistema">SaúdeMemora</h2>
-      <h3 className="subtitulo">Visualizar documento</h3>
-
-      <div className="imagem-documento">
-        <img src={imagem} alt="Documento" />
+  if (documento.medicamentos) {
+    return (
+      <div>
+        <Nav />
+        <ReceitaComMedicamentos receita={documento} />
       </div>
-
-      <div className="dados-extraidos">
-        <div className="card-info">
-          <p><FiCalendar /> <strong>Data:</strong> {data}</p>
-          <p><FiUser /> <strong>Doutor:</strong> {medico}</p>
-          <p><FiFileText /> <strong>Medicamento:</strong> {medicamento}</p>
-          <p><FiClipboard /> <strong>Dosagem:</strong> {dosagem}</p>
-          <p><strong>Notas:</strong> {notas}</p>
-        </div>
-
-        <div className="texto-extraido">
-          <h4>Texto extraído</h4>
-          <p style={{ whiteSpace: "pre-line" }}>{textoExtraido}</p>
-        </div>
-      </div>
-    </div>
-  );
+    );
+  }
 };
 
 export default VisualizadorDocumento;

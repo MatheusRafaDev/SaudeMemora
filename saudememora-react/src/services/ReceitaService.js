@@ -29,6 +29,20 @@ const ReceitaService = {
     }
   },
 
+  // Buscar receita por ID do documento
+  getReceitaByDocumentoId: async (documentoId) => {
+    try {
+      const response = await axiosInstance.get(`/api/receitas/documento/${documentoId}`);
+      return { success: true, data: response.data };
+    } catch (error) {
+      console.error(`Erro ao buscar receita pelo ID do documento ${documentoId}:`, error);
+      return {
+        success: false,
+        message: error.response?.data?.message || "Erro ao buscar receita pelo ID do documento!",
+      };
+    }
+  },
+
   // Criar uma nova receita
   create: async (receita) => {
     try {
@@ -75,16 +89,10 @@ const ReceitaService = {
     }
   },
 
-  async createWithImage(formData) {
+  // Criar receita com imagem
+  createWithImage: async (formData) => {
     try {
-      // Não defina o Content-Type manualmente
-
-      console.log("FormData antes do envio:", formData);
       const response = await axiosInstance.post("/api/receitas", formData);
-
-      console.log(response
-
-      )
       return response.data;
     } catch (error) {
       throw new Error(

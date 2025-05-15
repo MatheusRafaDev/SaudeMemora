@@ -48,6 +48,7 @@ const FormularioMedico = () => {
   const paciente = JSON.parse(localStorage.getItem("paciente")) || {};
   const [ficha, setFicha] = useState(null);
 
+  console.log(paciente)
   const obterFicha = async () => {
   if (!paciente.id) return;
 
@@ -88,9 +89,15 @@ const FormularioMedico = () => {
 };
 
   useEffect(() => {
+     if (paciente.sexo && paciente.sexo.toLowerCase() === "m") {
+    setRespostas((prev) => ({ ...prev, gravida: "NAO" }));
+  }
+
     if (paciente && paciente.id) {
       obterFicha();
     }
+
+    
   }, [paciente.id]);
 
   const handleFileChange = (e) => {
@@ -233,6 +240,8 @@ const FormularioMedico = () => {
             </div>
 
             {perguntas.map((item) => (
+
+              
               <div key={item.chave} className="mb-4 border-bottom pb-3">
                 <div className="row">
                   <div className="col-12 col-md-6 mb-2 mb-md-0">

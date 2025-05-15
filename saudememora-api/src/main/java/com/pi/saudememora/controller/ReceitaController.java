@@ -1,10 +1,13 @@
 package com.pi.saudememora.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.pi.saudememora.model.Medicamento;
 import com.pi.saudememora.model.Receita;
 import com.pi.saudememora.repository.ReceitaRepository;
+import com.pi.saudememora.service.ReceitaService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -14,6 +17,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/receitas")
@@ -21,88 +25,96 @@ public class ReceitaController {
 
     private static final Logger logger = LoggerFactory.getLogger(ReceitaController.class);
 
-    private final ReceitaRepository receitaRepository;
+    private final ReceitaService receitaService;
     private final ObjectMapper objectMapper;
+    @Autowired
+    private ReceitaRepository receitaRepository;
 
-    public ReceitaController(ReceitaRepository receitaRepository, ObjectMapper objectMapper) {
-        this.receitaRepository = receitaRepository;
+    public ReceitaController(ReceitaService receitaService, ObjectMapper objectMapper) {
+        this.receitaService = receitaService;
         this.objectMapper = objectMapper;
     }
 
-    // 1) RECEBE multipart/form-data (com imagem + JSON em string)
+
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> createReceitaComImagem(
             @RequestParam("receitaData") String receitaData,
-            @RequestParam("imagem") MultipartFile imagem) {
+            @RequestParam(value = "imagem", required = false) MultipartFile imagem) {
         try {
-            // Desserializa o JSON recebido em um objeto Receita
+            // Desserializa JSON para objeto Receita (com lista de medicamentos dentro)
             Receita receita = objectMapper.readValue(receitaData, Receita.class);
-            logger.info("JSON Recebido: {}", receitaData);
 
-            // Validação da imagem
-            if (imagem == null || imagem.isEmpty()) {
-                return ResponseEntity.badRequest().body("O arquivo de imagem é obrigatório.");
-            }
-
-            // Validação do tipo de arquivo (opcional)
-            String contentType = imagem.getContentType();
-            if (contentType == null ||
-                    !(contentType.equals(MediaType.IMAGE_JPEG_VALUE) || contentType.equals(MediaType.IMAGE_PNG_VALUE))) {
-                return ResponseEntity.badRequest().body("O arquivo de imagem deve ser do tipo JPEG ou PNG.");
-            }
-
-            // Salvar imagem no disco ou em um serviço de armazenamento
-            String nomeArquivo = System.currentTimeMillis() + "_" + imagem.getOriginalFilename();
-            Path caminhoArquivo = Paths.get("uploads/receitas", nomeArquivo);
-            Files.createDirectories(caminhoArquivo.getParent()); // Cria diretórios, se não existirem
-            Files.write(caminhoArquivo, imagem.getBytes());
-
-            // Define o caminho da imagem na receita
-            receita.setImagem(caminhoArquivo.toString());
-
-            // Associa os medicamentos à receita
+            // Associa receita nos medicamentos para manter o relacionamento
             if (receita.getMedicamentos() != null) {
-                receita.getMedicamentos().forEach(medicamento -> medicamento.setReceita(receita));
+                for (Medicamento med : receita.getMedicamentos()) {
+                    med.setReceita(receita);
+                }
             }
 
-            // Salva a receita (e os medicamentos automaticamente pelo cascade)
-            Receita novaReceita = receitaRepository.save(receita);
+            // Se imagem existir e não estiver vazia, salva no disco
+            if (imagem != null && !imagem.isEmpty()) {
+                String contentType = imagem.getContentType();
+                if (contentType == null ||
+                        !(contentType.equals(MediaType.IMAGE_JPEG_VALUE) || contentType.equals(MediaType.IMAGE_PNG_VALUE))) {
+                    return ResponseEntity.badRequest().body("O arquivo de imagem deve ser JPEG ou PNG.");
+                }
 
-            // Retorna a resposta de sucesso
+                String nomeArquivo = System.currentTimeMillis() + "_" + imagem.getOriginalFilename();
+                Path caminhoArquivo = Paths.get("uploads/receitas", nomeArquivo);
+                Files.createDirectories(caminhoArquivo.getParent());
+                Files.write(caminhoArquivo, imagem.getBytes());
+
+                // Guarda o caminho relativo (ou absoluto) na receita
+                receita.setImagem(caminhoArquivo.toString());
+            }
+
+            // Salva receita (com cascade salva medicamentos)
+            Receita novaReceita = receitaService.createReceita(receita);
+
             return ResponseEntity.status(HttpStatus.CREATED).body(novaReceita);
 
         } catch (IOException e) {
-            logger.error("Erro ao salvar a imagem:", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("Erro ao salvar a imagem: " + e.getMessage());
         } catch (Exception e) {
-            logger.error("Erro ao criar receita (multipart):", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("Erro ao criar receita: " + e.getMessage());
         }
     }
 
 
+    @GetMapping("/imagem-receita/{id}")
+    public ResponseEntity<byte[]> getImagemPorId(@PathVariable Long id) {
+        try {
+            Optional<Receita> receitaOpt = receitaRepository.findById(id);
 
-    @GetMapping
-    public ResponseEntity<List<Receita>> getAllReceitas() {
-        List<Receita> receitas = receitaRepository.findAll();
-        if (receitas.isEmpty()) return ResponseEntity.noContent().build();
-        return ResponseEntity.ok(receitas);
+            if (receitaOpt.isEmpty() || receitaOpt.get().getImagem() == null) {
+                return ResponseEntity.notFound().build();
+            }
+
+            Receita receita = receitaOpt.get();
+            Path caminho = Paths.get(receita.getImagem());
+
+            if (!Files.exists(caminho)) {
+                return ResponseEntity.notFound().build();
+            }
+
+            byte[] imagemBytes = Files.readAllBytes(caminho);
+            String contentType = Files.probeContentType(caminho);
+
+            return ResponseEntity.ok()
+                    .contentType(MediaType.parseMediaType(contentType))
+                    .body(imagemBytes);
+
+        } catch (IOException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
 
 
-
-
-
-    @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteReceita(@PathVariable Long id) {
-        return receitaRepository.findById(id)
-                .map(r -> {
-                    receitaRepository.delete(r);
-                    return ResponseEntity.noContent().build();
-                })
-                .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND)
-                        .body("Receita não encontrada com o ID: " + id));
+    @GetMapping("/documento/{id}")
+    public List<Receita> listarPorDocumento(@PathVariable Long id) {
+        return receitaRepository.findByDocumentoId(id);
     }
+
 }

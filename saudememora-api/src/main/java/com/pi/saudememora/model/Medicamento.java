@@ -1,5 +1,6 @@
 package com.pi.saudememora.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 @Entity
@@ -8,23 +9,18 @@ public class Medicamento {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "id_medicamento")
     private Long id;
 
-    @Column(name = "nm_medicamento", nullable = false)
     private String nome;
-
-    @Column(name = "qt_medicamento", nullable = false)
     private String quantidade;
-
-    @Column(name = "forma_uso", nullable = false)
     private String formaDeUso;
 
-    @ManyToOne
-    @JoinColumn(name = "id_receita", nullable = false) // Chave estrangeira para Receita
+    @JsonIgnore
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "id_receita")
     private Receita receita;
 
-    // Getters e Setters
+    // Getters e setters
     public Long getId() {
         return id;
     }
@@ -56,7 +52,6 @@ public class Medicamento {
     public void setFormaDeUso(String formaDeUso) {
         this.formaDeUso = formaDeUso;
     }
-
 
     public Receita getReceita() {
         return receita;

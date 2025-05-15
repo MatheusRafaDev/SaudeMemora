@@ -1,5 +1,8 @@
 import React, { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
 import DocumentoService from "../services/DocumentoService";
+import ReceitaService from "../services/ReceitaService";
+import MedicamentoService from "../services/MedicamentoService";
 import Nav from "../components/Nav";
 
 export default function ListarDocumentos() {
@@ -7,6 +10,7 @@ export default function ListarDocumentos() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [paciente, setPaciente] = useState(null);
+  const navigate = useNavigate(); 
 
   useEffect(() => {
     const storedPaciente = localStorage.getItem("paciente");
@@ -24,7 +28,9 @@ export default function ListarDocumentos() {
 
       try {
         setLoading(true);
-        const response = await DocumentoService.getPorPacienteAgrupado(paciente.id);
+        const response = await DocumentoService.getPorPacienteAgrupado(
+          paciente.id
+        );
         setDocumentos(response.data || []);
       } catch (err) {
         setError("Erro ao carregar documentos.");
@@ -35,6 +41,29 @@ export default function ListarDocumentos() {
 
     fetchDocumentos();
   }, [paciente]);
+
+  const handleVisualizar = async (documentoId, tipoDocumento) => {
+  try {
+    let documentoDados;
+
+    if (tipoDocumento === "R") {
+      const receitaResponse = await ReceitaService.getReceitaByDocumentoId(documentoId);
+
+      documentoDados = receitaResponse.data;
+
+    } else {
+      const response = await DocumentoService.getDocumentoById(documentoId);
+      documentoDados = response.data;
+    }
+    
+    navigate("/visualizar-documento", { state: { documento: documentoDados } });
+
+  } catch (err) {
+    console.error("Erro ao buscar os dados do documento:", err);
+    alert("Não foi possível buscar os dados do documento.");
+  }
+};
+
 
   const renderizarDocumentos = () => (
     <div className="category-section">
@@ -60,7 +89,9 @@ export default function ListarDocumentos() {
                   <td>
                     <button
                       className="btn btn-sm btn-primary"
-                      onClick={() => (window.location.href = `/visualizar?id=${doc.id}`)}
+                      onClick={() =>
+                        handleVisualizar(doc.id, doc.tipoDocumento)
+                      } // Passa o tipo do documento
                     >
                       Visualizar
                     </button>

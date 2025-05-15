@@ -33,7 +33,7 @@ export async function processarReceita(textoOCR, paciente, documentoId) {
   }
 }
 
-export async function processarReceitaComImagem(textoOCR, paciente, documentoId, imagem) {
+export async function processarReceitaComImagem2(textoOCR, paciente, documentoId, imagem) {
   try {
     // Processa o OCR para receita
     const receitaJSON = await tratarOCRParaReceitas(textoOCR);
@@ -74,6 +74,60 @@ export async function processarReceitaComImagem(textoOCR, paciente, documentoId,
     return { success: true, message: "Receita incluída com sucesso!", data: response };
   } catch (error) {
     // Retorna erro caso algo dê errado no processo
+    return { success: false, message: error.message };
+  }
+}
+
+export async function processarReceitaComImagem(textoOCR, paciente, documentoId, imagem, navigate) {
+  try {
+    const receitaJSON = await tratarOCRParaReceitas(textoOCR);
+    if (receitaJSON.error) throw new Error(`Erro no OCR da receita: ${receitaJSON.error}`);
+
+    const medicamentos = receitaJSON.medicamentos || [];
+    if (!Array.isArray(medicamentos) || medicamentos.length === 0) {
+      throw new Error("Nenhum medicamento foi encontrado no OCR.");
+    }
+
+    const receitaData = {
+      medico: receitaJSON.medico || "Médico não informado",
+      crmMedico: receitaJSON.crm || "CRM não informado",
+      posologia: receitaJSON.posologia || "Posologia não informada",
+      observacoes: receitaJSON.observacoes || "Sem observações",
+      resumo: receitaJSON.resumo || textoOCR || "Sem resumo",
+      dataReceita: receitaJSON.dataReceita || null,
+      paciente: { id: paciente.id },
+      documento: { id: documentoId },
+      medicamentos: medicamentos.map((medicamento) => ({
+        nome: medicamento.nome || "Medicamento não informado",
+        quantidade: medicamento.quantidade || 0,
+        formaDeUso: medicamento.formaDeUso || "Uso não informado"
+      }))
+    };
+
+    console.log("Dados da receita:", receitaData);
+    const formData = new FormData();
+    formData.append("receitaData", JSON.stringify(receitaData));
+    formData.append("imagem", imagem);
+
+    // Faz o envio e recebe a resposta da API
+    const response = await ReceitaService.createWithImage(formData);
+    const receitaSalva = response.data;
+
+    // Monta objeto para tela de visualização
+    const documentoVisualizacao = {
+      data: receitaSalva.dataReceita || "-",
+      medico: receitaSalva.medico || "-",
+      medicamento: (receitaSalva.medicamentos || []).map(m => m.nome).join(", "),
+      dosagem: receitaSalva.posologia || "-",
+      notas: receitaSalva.observacoes || "-",
+      imagem: URL.createObjectURL(imagem),
+      textoExtraido: receitaSalva.resumo || "-"
+    };
+
+    navigate("/visualizar-documento", { state: { documento: documentoVisualizacao } });
+
+    return { success: true, message: "Receita incluída com sucesso!", data: receitaSalva };
+  } catch (error) {
     return { success: false, message: error.message };
   }
 }

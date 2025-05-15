@@ -3,6 +3,7 @@ package com.pi.saudememora.model;
 import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -19,9 +20,6 @@ public class Receita {
 
     @Column(name = "crm_medico", nullable = false)
     private String crmMedico;
-
-    @OneToMany(mappedBy = "receita", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<Medicamento> medicamentos; // Lista de medicamentos associados à receita
 
     @Column(name = "ds_posologia", nullable = false)
     private String posologia;
@@ -43,6 +41,9 @@ public class Receita {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     @Column(name = "dt_inclusao", nullable = false, updatable = false)
     private LocalDate dataInclusao;
+
+    @OneToMany(mappedBy = "receita", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Medicamento> medicamentos = new ArrayList<>();
 
     @OneToOne
     @JoinColumn(name = "id_documento", nullable = false)
@@ -80,20 +81,6 @@ public class Receita {
 
     public void setCrmMedico(String crmMedico) {
         this.crmMedico = crmMedico;
-    }
-
-    public List<Medicamento> getMedicamentos() {
-        return medicamentos;
-    }
-
-    public void setMedicamentos(List<Medicamento> medicamentos) {
-        this.medicamentos = medicamentos;
-        // Estabelece o relacionamento bidirecional
-        if (medicamentos != null) {
-            for (Medicamento medicamento : medicamentos) {
-                medicamento.setReceita(this);
-            }
-        }
     }
 
     public String getPosologia() {
@@ -158,5 +145,13 @@ public class Receita {
 
     public void setPaciente(Paciente paciente) {
         this.paciente = paciente;
+    }
+
+    public List<Medicamento> getMedicamentos() {
+        return medicamentos;
+    }
+
+    public void setMedicamentos(List<Medicamento> medicamentos) {
+        this.medicamentos = medicamentos;
     }
 }
