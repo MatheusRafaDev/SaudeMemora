@@ -1,6 +1,6 @@
 import { Link } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
-import "@fortawesome/fontawesome-free/css/all.min.css"; // Importando os ícones do FontAwesome
+// import "@fortawesome/fontawesome-free/css/all.min.css"; // Importando os ícones do FontAwesome
 
 const Nav = () => {
   return (

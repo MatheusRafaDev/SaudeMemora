@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-
 import DocumentoService from "../services/DocumentoService";
 import Nav from "../components/Nav";
 
@@ -37,7 +36,6 @@ export default function ListarDocumentosCategorias() {
               <th>Médico</th>
               <th>Data</th>
               <th>Especialidade</th>
-
             </tr>
           </thead>
           <tbody>
@@ -74,7 +72,6 @@ export default function ListarDocumentosCategorias() {
               <th>Médico</th>
               <th>Medicamentos</th>
               <th>Posologia</th>
-
             </tr>
           </thead>
           <tbody>
@@ -112,8 +109,6 @@ export default function ListarDocumentosCategorias() {
               <th>Data</th>
               <th>Tipo</th>
               <th>Laboratório</th>
-
-
             </tr>
           </thead>
           <tbody>

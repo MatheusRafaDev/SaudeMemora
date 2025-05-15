@@ -11,7 +11,7 @@ const UploadDocumentos = () => {
   const [status, setStatus] = useState("Aguardando envio...");
   const [progresso, setProgresso] = useState(0);
   const [resultadoProcessamento, setResultadoProcessamento] = useState("");
-  const [botaoHabilitado, setBotaoHabilitado] = useState(false); // Estado para habilitar/ desabilitar o botão
+  const [botaoHabilitado, setBotaoHabilitado] = useState(false);
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
@@ -43,7 +43,7 @@ const UploadDocumentos = () => {
           clearInterval(intervalo);
           setStatus("Documento enviado e em processamento.");
           setResultadoProcessamento("O documento foi processado com sucesso!");
-          setBotaoHabilitado(true); // Habilita o botão após o processamento
+          setBotaoHabilitado(true);
         }
         return Math.min(prev + 10, 100);
       });
@@ -56,7 +56,7 @@ const UploadDocumentos = () => {
     setStatus("Aguardando envio...");
     setProgresso(0);
     setResultadoProcessamento("");
-    setBotaoHabilitado(false); // Desabilita o botão quando um novo documento for adicionado
+    setBotaoHabilitado(false);
   };
 
   return (
@@ -133,7 +133,7 @@ const UploadDocumentos = () => {
           <button
             className="btn btn-secondary w-100"
             onClick={handleAddDocument}
-            disabled={!botaoHabilitado} // O botão só estará habilitado após o processamento
+            disabled={!botaoHabilitado}
           >
             📄 Adicionar Novo Documento
           </button>

@@ -9,6 +9,7 @@ import UploadDocumentos from "./pages/UploadDocumentos";
 import Perfil from "./pages/Perfil";
 import EditarPaciente from "./pages/EditarPaciente";
 import ListarDocumentos from "./pages/ListarDocumentos";
+import VisualizadorDocumento from "./pages/VisualizadorDocumento";
 
 
 const isPacienteLoggedIn = () => {
@@ -49,7 +50,9 @@ function App() {
 
         <Route path="/alterar-perfil" element={<EditarPaciente />}/>
 
-         <Route path="/meus-documentos" element={<ListarDocumentos />}/>
+        <Route path="/meus-documentos" element={<ListarDocumentos />}/>
+
+        <Route path="/visualizar-documento" element={<VisualizadorDocumento />}/>
 
       </Routes>
     </Router>
