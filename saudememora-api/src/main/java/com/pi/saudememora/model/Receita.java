@@ -1,6 +1,9 @@
 package com.pi.saudememora.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import jakarta.persistence.*;
+import java.time.LocalDate;
+import java.util.List;
 
 @Entity
 @Table(name = "tb_receitas")
@@ -14,8 +17,11 @@ public class Receita {
     @Column(name = "nm_medico", nullable = false)
     private String Medico;
 
-    @Column(name = "nm_medicamento", nullable = false)
-    private String nomeMedicamento;
+    @Column(name = "crm_medico", nullable = false)
+    private String crmMedico;
+
+    @OneToMany(mappedBy = "receita", cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Medicamento> medicamentos; // Lista de medicamentos associados à receita
 
     @Column(name = "ds_posologia", nullable = false)
     private String posologia;
@@ -23,11 +29,20 @@ public class Receita {
     @Column(name = "ds_observacoes")
     private String observacoes;
 
-    @Column(name = "ds_resumo")
+    @Lob
+    @Column(name = "ds_resumo", columnDefinition = "CLOB")
     private String resumo;
 
     @Column(name = "ds_imagem")
     private String imagem;
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+    @Column(name = "dt_receita", nullable = false)
+    private LocalDate dataReceita;
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+    @Column(name = "dt_inclusao", nullable = false, updatable = false)
+    private LocalDate dataInclusao;
 
     @OneToOne
     @JoinColumn(name = "id_documento", nullable = false)
@@ -36,6 +51,11 @@ public class Receita {
     @ManyToOne
     @JoinColumn(name = "id_paciente", nullable = false)
     private Paciente paciente;
+
+    @PrePersist
+    protected void onCreate() {
+        this.dataInclusao = LocalDate.now();
+    }
 
     // Getters e Setters
     public Long getId() {
@@ -50,16 +70,30 @@ public class Receita {
         return Medico;
     }
 
-    public void setMedico(String nomeMedico) {
-        this.Medico = nomeMedico;
+    public void setMedico(String Medico) {
+        this.Medico = Medico;
     }
 
-    public String getNomeMedicamento() {
-        return nomeMedicamento;
+    public String getCrmMedico() {
+        return crmMedico;
     }
 
-    public void setNomeMedicamento(String nomeMedicamento) {
-        this.nomeMedicamento = nomeMedicamento;
+    public void setCrmMedico(String crmMedico) {
+        this.crmMedico = crmMedico;
+    }
+
+    public List<Medicamento> getMedicamentos() {
+        return medicamentos;
+    }
+
+    public void setMedicamentos(List<Medicamento> medicamentos) {
+        this.medicamentos = medicamentos;
+        // Estabelece o relacionamento bidirecional
+        if (medicamentos != null) {
+            for (Medicamento medicamento : medicamentos) {
+                medicamento.setReceita(this);
+            }
+        }
     }
 
     public String getPosologia() {
@@ -92,6 +126,22 @@ public class Receita {
 
     public void setImagem(String imagem) {
         this.imagem = imagem;
+    }
+
+    public LocalDate getDataReceita() {
+        return dataReceita;
+    }
+
+    public void setDataReceita(LocalDate dataReceita) {
+        this.dataReceita = dataReceita;
+    }
+
+    public LocalDate getDataInclusao() {
+        return dataInclusao;
+    }
+
+    public void setDataInclusao(LocalDate dataInclusao) {
+        this.dataInclusao = dataInclusao;
     }
 
     public Documentos getDocumento() {

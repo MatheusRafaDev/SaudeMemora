@@ -90,10 +90,16 @@ export default function UploadDocumentos() {
         return;
       }
 
+      if (!documento) {
+        setMensagemErro("Nenhuma imagem do documento foi enviada.");
+        return;
+      }
+
       const response = await AdicionarDocumento(
         tipoDocumento,
         resultadoProcessamento,
-        paciente
+        paciente,
+        documento // Enviando a imagem aqui
       );
 
       if (response.success) {

@@ -199,7 +199,8 @@ export async function tratarOCRParaReceitas(textoOCR) {
     }
 
     const textoTratado = textoOCR
-      .replace(/[^a-zA-Z0-9.,\s]/g, "")
+      .normalize("NFD").replace(/[\u0300-\u036f]/g, "") 
+      .replace(/[^a-zA-Z0-9À-ÿ.,\s/-]/g, "")
       .trim();
 
     const prompt = `Você é um assistente que interpreta textos médicos extraídos via OCR e transforma os dados em JSON estruturado para serem incluídos em um sistema de receitas médicas.
@@ -207,8 +208,11 @@ export async function tratarOCRParaReceitas(textoOCR) {
 Leia o texto abaixo e extraia os campos:
 - "data" (formato YYYY-MM-DD ou DD/MM/YYYY),
 - "medico" (nome do médico),
-- "nomeMedicamento": nome do medicamento,
-- "posologia": instruções de uso,
+- "crm" (registro do médico),
+- "medicamentos" (uma lista de medicamentos, onde cada medicamento deve ter os seguintes campos):
+  - "nome": nome do medicamento,
+  - "quantidade": quantidade do medicamento,
+  - "formaDeUso": instruções de uso do medicamento,
 - "observacoes": observações adicionais,
 - "resumo": o mesmo texto abaixo, mas reescrito com ortografia corrigida, pontuação adequada e espaçamento correto. NÃO resuma nem interprete, apenas normalize.
 
@@ -216,8 +220,14 @@ Retorne apenas o JSON com os dados extraídos, no seguinte formato:
 {
   "data": "YYYY-MM-DD",
   "medico": "Nome do médico",
-  "nomeMedicamento": "Nome do medicamento",
-  "posologia": "Texto da posologia",
+  "crm": "CRM do médico",
+  "medicamentos": [
+    {
+      "nome": "Nome do medicamento",
+      "quantidade": "Quantidade do medicamento",
+      "formaDeUso": "Forma de uso"
+    }
+  ],
   "observacoes": "Texto das observações",
   "resumo": "Texto do OCR reescrito e normalizado"
 }
@@ -265,11 +275,30 @@ ${textoTratado}`;
       throw new Error("A resposta da API está incompleta.");
     }
 
+    let dataFormatada = "";
+    if (jsonReceita.data) {
+      const d = jsonReceita.data.trim();
+      if (d.includes("/")) {
+        const partes = d.split("/");
+        if (partes.length === 3) {
+          dataFormatada = `${partes[2]}-${partes[1].padStart(2,"0")}-${partes[0].padStart(2,"0")}`;
+        }
+      } else {
+        dataFormatada = d;
+      }
+    }
+
     return {
-      data: jsonReceita.data || "",
+      dataReceita: dataFormatada || "",
       medico: jsonReceita.medico || "",
-      nomeMedicamento: jsonReceita.nomeMedicamento || "",
-      posologia: jsonReceita.posologia || "",
+      crm: jsonReceita.crm || "",
+      medicamentos: Array.isArray(jsonReceita.medicamentos) 
+        ? jsonReceita.medicamentos.map(medicamento => ({
+            nome: medicamento.nome || "",
+            quantidade: medicamento.quantidade || "",
+            formaDeUso: medicamento.formaDeUso || ""
+          })) 
+        : [],
       observacoes: jsonReceita.observacoes || "",
       resumo: jsonReceita.resumo || ""
     };
@@ -278,6 +307,7 @@ ${textoTratado}`;
     return { error: error.message };
   }
 }
+
 
 export async function tratarOCRParaProntuarios(textoOCR) {
   try {

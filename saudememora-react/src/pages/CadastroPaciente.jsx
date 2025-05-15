@@ -60,11 +60,13 @@ const CadastroPaciente = () => {
     const isValid = validateForm();
     if (!isValid) return;
 
-    const result = await cadastrarPaciente(formData);
+    // Remove o campo confirmarSenha antes de enviar ao backend
+    const { confirmarSenha, ...dadosParaBackend } = formData;
+
+    const result = await cadastrarPaciente(dadosParaBackend);
 
     if (result.success) {
       localStorage.setItem("paciente", JSON.stringify(result.dados));
-
       navigate("/formulario-medico");
     } else {
       setError(result.message || "Erro desconhecido");

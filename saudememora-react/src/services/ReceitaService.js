@@ -74,6 +74,24 @@ const ReceitaService = {
       };
     }
   },
+
+  async createWithImage(formData) {
+    try {
+      // Não defina o Content-Type manualmente
+
+      console.log("FormData antes do envio:", formData);
+      const response = await axiosInstance.post("/api/receitas", formData);
+
+      console.log(response
+
+      )
+      return response.data;
+    } catch (error) {
+      throw new Error(
+        error.response?.data?.message || "Erro ao criar a receita."
+      );
+    }
+  },
 };
 
 export default ReceitaService;

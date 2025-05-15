@@ -33,19 +33,73 @@ export async function processarReceita(textoOCR, paciente, documentoId) {
   }
 }
 
+export async function processarReceitaComImagem(textoOCR, paciente, documentoId, imagem) {
+  try {
+    // Processa o OCR para receita
+    const receitaJSON = await tratarOCRParaReceitas(textoOCR);
+    if (receitaJSON.error) throw new Error(`Erro no OCR da receita: ${receitaJSON.error}`);
+
+    // Verifica se os medicamentos foram extraídos do OCR
+    const medicamentos = receitaJSON.medicamentos || [];
+    if (!Array.isArray(medicamentos) || medicamentos.length === 0) {
+      throw new Error("Nenhum medicamento foi encontrado no OCR.");
+    }
+
+    // Monta os dados da receita
+    const receitaData = {
+      medico: receitaJSON.medico || "Médico não informado",
+      crmMedico: receitaJSON.crm || "CRM não informado",
+      posologia: receitaJSON.posologia || "Posologia não informada",
+      observacoes: receitaJSON.observacoes || "Sem observações",
+      resumo: receitaJSON.resumo || textoOCR || "Sem resumo",
+      dataReceita: receitaJSON.dataReceita || null,
+      paciente: { id: paciente.id },
+      documento: { id: documentoId },
+      medicamentos: medicamentos.map((medicamento) => ({
+        nome: medicamento.nome || "Medicamento não informado",
+        quantidade: medicamento.quantidade || 0,
+        formaDeUso: medicamento.formaDeUso || "Uso não informado"
+      }))
+    };
+
+    // Cria o FormData para enviar a imagem e os dados da receita
+    const formData = new FormData();
+    formData.append("receitaData", JSON.stringify(receitaData));
+    formData.append("imagem", imagem);
+
+    // Envia a receita para o serviço
+    const response = await ReceitaService.createWithImage(formData);
+
+    console.log("Resposta do serviço de receita:", response);
+    return { success: true, message: "Receita incluída com sucesso!", data: response };
+  } catch (error) {
+    // Retorna erro caso algo dê errado no processo
+    return { success: false, message: error.message };
+  }
+}
+
+
+
 // Função para processar o tipo "Exame"
 export async function processarExame(textoOCR, paciente, documentoId) {
   try {
     const exameJSON = await tratarOCRParaExames(textoOCR);
     if (exameJSON.error) throw new Error(`Erro no OCR do exame: ${exameJSON.error}`);
 
-    const exameData = {
-      nomeExame: exameJSON.nomeExame || "Exame importado via OCR",
-      resultado: exameJSON.resultado || textoOCR,
-      imagem: "",
-      paciente: { id: paciente.id },
-      documento: { id: documentoId }
-    };
+  const exameData = {
+    nomeExame: exameJSON.nomeExame || exameJSON.tipo || "Exame importado via OCR",
+    tipo: exameJSON.tipo || "Tipo não informado",
+    data: exameJSON.data || new Date().toISOString().split("T")[0], // formato yyyy-mm-dd
+    laboratorio: exameJSON.laboratorio || "Laboratório não informado",
+    resultado: exameJSON.resultado || textoOCR || "Resultado não informado",
+    observacoes: exameJSON.observacoes || "Sem observações",
+    resumo: exameJSON.resumo || "Sem resumo",
+    imagem: "", // ou base64/URL se disponível
+    paciente: { id: paciente.id },
+    documento: { id: documentoId }
+  };
+
+
 
     const response = await ExameService.create(exameData);
     if (response?.success) return { success: true, message: "Exame incluído com sucesso!" };
@@ -63,10 +117,17 @@ export async function processarProntuario(textoOCR, paciente, documentoId) {
     if (prontuarioJSON.error) throw new Error(`Erro no OCR do prontuário: ${prontuarioJSON.error}`);
 
     const prontuarioData = {
-      conteudo: prontuarioJSON.conteudo || textoOCR,
+      data: prontuarioJSON.data || new Date().toISOString().split("T")[0],
+      medico: prontuarioJSON.medico || "Médico não informado",
+      especialidade: prontuarioJSON.especialidade || "Especialidade não informada",
+      observacoes: prontuarioJSON.observacoes || "Sem observações",
+      conclusoes: prontuarioJSON.conclusoes || "Sem conclusões",
+      resumo: prontuarioJSON.resumo || textoOCR || "Sem resumo",
+      conteudo: prontuarioJSON.conteudo || textoOCR || "Sem conteúdo original",
       paciente: { id: paciente.id },
       documento: { id: documentoId }
     };
+
 
     const response = await ProntuarioService.create(prontuarioData);
     if (response?.success) return { success: true, message: "Prontuário incluído com sucesso!" };

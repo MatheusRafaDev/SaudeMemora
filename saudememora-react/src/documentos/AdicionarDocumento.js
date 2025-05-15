@@ -1,16 +1,15 @@
 import DocumentoService from "../services/DocumentoService";
 
-import { processarReceita, processarExame, processarProntuario } from "./ProcessamentoDeTipoDoc";
+import { processarReceita, processarExame, processarProntuario,processarReceitaComImagem } from "./ProcessamentoDeTipoDoc";
 
 
-export async function AdicionarDocumento(tipoDocumento, textoOCR, paciente) {
+export async function AdicionarDocumento(tipoDocumento, textoOCR, paciente, imagem) {
   try {
     if (!tipoDocumento || !textoOCR || !paciente) {
       throw new Error("Dados insuficientes para processar o documento.");
     }
 
     const tipo = tipoDocumento.charAt(0).toUpperCase();
-
 
     const documentoData = {
       tipoDocumento: tipo,
@@ -26,10 +25,12 @@ export async function AdicionarDocumento(tipoDocumento, textoOCR, paciente) {
       throw new Error("Erro ao criar o documento: ID não retornado.");
     }
 
-    if (tipo === "R") return await processarReceita(textoOCR, paciente, documentoId);
-    if (tipo === "E") return await processarExame(textoOCR, paciente, documentoId);
-    if (tipo === "P") return await processarProntuario(textoOCR, paciente, documentoId);
+    // Passar a imagem para as funções específicas
+    if (tipo === "R") return await processarReceitaComImagem(textoOCR, paciente, documentoId, imagem);
+    if (tipo === "E") return await processarExame(textoOCR, paciente, documentoId, imagem);
+    if (tipo === "P") return await processarProntuario(textoOCR, paciente, documentoId, imagem);
 
+    throw new Error("Tipo de documento não suportado.");
   } catch (error) {
     console.error("❌ Erro ao processar o documento:", error.message);
     return { success: false, message: error.message };
