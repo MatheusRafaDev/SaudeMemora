@@ -11,6 +11,8 @@ import Perfil from "./pages/Perfil";
 import ListarDocumentos from "./pages/ListarDocumentos";
 import EditarPerfil from "./pages/EditarPerfil";
 import RelatorioDocumentos from "./pages/RelatorioDocumentos";
+import VisualizadorDocumento from "./pages/VisualizadorDocumento";
+
 
 const isPacienteLoggedIn = () => {
   const data = localStorage.getItem("paciente");
@@ -50,7 +52,9 @@ function App() {
 
         <Route path="/alterar-perfil" element={<EditarPerfil />}/>
 
-         <Route path="/meus-documentos" element={<ListarDocumentos />}/>
+        <Route path="/meus-documentos" element={<ListarDocumentos />}/>
+
+        <Route path="/visualizar-documento" element={<VisualizadorDocumento />}/>
 
       </Routes>
     </Router>

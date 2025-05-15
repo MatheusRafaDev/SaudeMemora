@@ -216,6 +216,7 @@ export default function UploadDocumentos() {
             className="btn btn-secondary w-100"
             onClick={handleAddDocument}
             disabled={!botaoHabilitado}
+            disabled={!botaoHabilitado}
           >
             📄 Adicionar Documento
           </button>
