@@ -48,7 +48,7 @@ function EditarPerfil() {
   };
 
   const validateForm = () => {
-    const { nome, dataNascimento, sexo, senha, confirmarSenha } = dadosForm;
+    const { nome, dataNascimento, sexo, senha,confirmarSenha} = dadosForm;
 
     if (!nome || !dataNascimento || !sexo) {
       setError('Nome, data de nascimento e sexo são obrigatórios!');
@@ -69,9 +69,11 @@ function EditarPerfil() {
     if (!validateForm()) return;
 
     try {
-      atualizarPaciente( paciente.id ,dadosForm);
-      console.log("Paciente atualizado com sucesso!");
-      localStorage.setItem('paciente', JSON.stringify(dadosForm));
+
+    const { confirmarSenha, ...dadosParaBackend } = dadosForm;
+
+      atualizarPaciente( paciente.id ,dadosParaBackend);
+      localStorage.setItem('paciente', JSON.stringify(dadosParaBackend ));
       navigate('/perfil');
     } catch (error) {
       setError('Erro ao atualizar o paciente.');
@@ -79,7 +81,7 @@ function EditarPerfil() {
   };
 
   if (!paciente) {
-    return null; // Aguarda o useEffect terminar de verificar o localStorage
+    return null; 
   }
 
   return (

@@ -98,7 +98,6 @@ export default function ReceitaComMedicamentos({ receita }) {
         </div>
       </div>
 
-      {/* Resumo */}
       <div className="card shadow-sm border-0">
         <div className="card-body" style={{ textAlign: "justify" }}>
           <h4 className="text-primary">

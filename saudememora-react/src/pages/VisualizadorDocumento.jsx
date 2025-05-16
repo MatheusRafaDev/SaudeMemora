@@ -11,6 +11,8 @@ const VisualizadorDocumento = () => {
   const documentoArray = location.state?.documento;
   const tipoDocumento = location.state?.tipo; 
 
+
+
   const documento = Array.isArray(documentoArray)
     ? documentoArray[0]
     : documentoArray;
@@ -45,7 +47,7 @@ const VisualizadorDocumento = () => {
       return (
         <div>
           <Nav />
-          <VisualizadorDocumentoClinico DocumentoClinico={documento} />
+          <VisualizadorDocumentoClinico documentoClinico={documento} />
         </div>
       );
 

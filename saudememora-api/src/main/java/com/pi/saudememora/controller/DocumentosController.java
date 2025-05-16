@@ -1,15 +1,18 @@
 package com.pi.saudememora.controller;
 
 import com.pi.saudememora.model.Documentos;
-import com.pi.saudememora.repository.DocumentosRepository;
+import com.pi.saudememora.repository.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Date;
 import java.util.List;
+
 
 @RestController
 @RequestMapping("/api/documentos")
@@ -20,6 +23,19 @@ public class DocumentosController {
 
     @Autowired
     private DocumentosRepository documentosRepository;
+
+    @Autowired
+    private ReceitaRepository receitaRepository;
+
+    @Autowired
+    private ExameRepository exameRepository;
+
+    @Autowired
+    private MedicamentoRepository medicamentoRepository ;
+
+    @Autowired
+    private DocumentoClinicoRepository documentoClinicoRepository;
+
 
     // GET por ID
     @GetMapping("/{id}")
@@ -108,4 +124,50 @@ public class DocumentosController {
                     return ResponseEntity.notFound().build(); // Retorna 404 se o documento não for encontrado
                 });
     }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deletarDocumento(@PathVariable Long id,
+                                                 @RequestParam("tipo") String tipo) {
+        try {
+            if (!documentosRepository.existsById(id)) {
+                return ResponseEntity.notFound().build();
+            }
+
+            switch (tipo.toUpperCase()) {
+                case "R": // Receita
+                    // Primeiro deleta os medicamentos associados
+                    medicamentoRepository.deleteByReceitaDocumentoId(id);
+                    // Depois deleta a receita
+                    receitaRepository.deleteAllByDocumentoId(id);
+                    break;
+                case "E": // Exame
+                    exameRepository.deleteAllByDocumentoId(id);
+                    break;
+                case "D": // Documento Clínico
+                    documentoClinicoRepository.deleteAllByDocumentoId(id);
+                    break;
+                default:
+                    return ResponseEntity.badRequest().build();
+            }
+
+            // Finalmente deleta o documento principal
+            documentosRepository.deleteById(id);
+
+            return ResponseEntity.noContent().build();
+
+        } catch (DataIntegrityViolationException e) {
+            // Log do erro
+            logger.error("Erro de integridade referencial ao deletar documento", e);
+            return ResponseEntity.status(HttpStatus.CONFLICT)
+                    .build();
+        } catch (Exception e) {
+            // Log do erro genérico
+            logger.error("Erro ao deletar documento", e);
+            return ResponseEntity.internalServerError().build();
+        }
+    }
+
+
+
+
 }

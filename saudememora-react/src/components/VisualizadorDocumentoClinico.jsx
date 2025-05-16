@@ -6,11 +6,15 @@ import {
   FaUserMd,
   FaHospital,
   FaInfoCircle,
+  FaStickyNote,
   FaArrowLeft,
 } from "react-icons/fa";
 
-export default function VisualizadorDocumentoClinico({ documento }) {
+export default function VisualizadorDocumentoClinico({ documentoClinico }) {
   const navigate = useNavigate();
+
+  const documento = documentoClinico
+
   const dataFormatada = documento.data ? new Date(documento.data).toLocaleDateString("pt-BR") : "Não informado";
 
   return (
@@ -28,7 +32,6 @@ export default function VisualizadorDocumentoClinico({ documento }) {
         <h3 className="text-secondary">Visualizar documento - Clínico</h3>
       </div>
 
-      {/* Imagem do documento */}
       <div className="card shadow-sm border-0 mb-4">
         <div className="card-body text-center">
           {documento.arquivo ? (
@@ -74,7 +77,30 @@ export default function VisualizadorDocumentoClinico({ documento }) {
             <strong>Observações:</strong> {documento.observacoes || "Nenhuma observação."}
           </p>
         </div>
+
+        
       </div>
+
+
+      <div className="card shadow-sm border-0">
+              <div className="card-body" style={{ textAlign: "justify" }}>
+                <h4 className="text-primary">
+                  <FaStickyNote /> Resumo
+                </h4>
+                <textarea
+                  className="form-control mt-3 border border-info rounded"
+                  value={documento.resumo || ""}
+                  rows={5}
+                  readOnly
+                  style={{
+                    backgroundColor: "#f8f9fa",
+                    fontSize: "1rem",
+                    padding: "10px",
+                    textAlign: "justify",
+                  }}
+                ></textarea>
+              </div>
+            </div>
 
       {/* Botão voltar */}
       <div className="mt-4">

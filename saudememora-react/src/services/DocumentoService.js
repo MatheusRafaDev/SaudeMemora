@@ -69,7 +69,6 @@ const DocumentoService = {
   // Criar um novo documento
   create: async (documento) => {
     try {
-
       const response = await axiosInstance.post(
         "/api/documentos",
         JSON.stringify(documento), // Certifique-se de enviar o corpo como JSON
@@ -88,7 +87,24 @@ const DocumentoService = {
       };
     }
   },
-  
+
+  deleteDocumento: async (id, tipo) => {
+  try {
+    const response = await axiosInstance.delete(`/api/documentos/${id}`, {
+      params: { tipo },  // envia o tipo como query param
+    });
+    return { success: true, data: response.data };
+  } catch (error) {
+    console.error("Erro ao deletar documento:", error);
+    return {
+      success: false,
+      message:
+        error.response?.data?.message || `Erro ao deletar documento do tipo ${tipo}!`,
+    };
+  }
+},
+
 };
+
 
 export default DocumentoService;
