@@ -1,8 +1,11 @@
 package com.pi.saudememora.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.pi.saudememora.model.Documentos;
 import jakarta.persistence.*;
 import java.util.Date;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 @Entity
 @Table(name = "tb_exame")
 public class Exame {
@@ -28,65 +31,42 @@ public class Exame {
     @Column(name = "ds_observacoes", length = 2000)
     private String observacoes;
 
-    // Relacionamento com a tabela Documentos
+    @Column(name = "ds_imagem")
+    private String imagem;
+
+    @Column(name = "nome_exame")
+    private String nomeExame;
+
     @ManyToOne
     @JoinColumn(name = "id_documento", nullable = false)
+    @JsonIgnoreProperties("exames")
     private Documentos documento;
 
     // Getters e Setters
-    public Long getId() {
-        return id;
-    }
+    public Long getId() { return id; }
+    public void setId(Long id) { this.id = id; }
 
-    public void setId(Long id) {
-        this.id = id;
-    }
+    public Date getData() { return data; }
+    public void setData(Date data) { this.data = data; }
 
-    public Date getData() {
-        return data;
-    }
+    public String getTipo() { return tipo; }
+    public void setTipo(String tipo) { this.tipo = tipo; }
 
-    public void setData(Date data) {
-        this.data = data;
-    }
+    public String getLaboratorio() { return laboratorio; }
+    public void setLaboratorio(String laboratorio) { this.laboratorio = laboratorio; }
 
-    public String getTipo() {
-        return tipo;
-    }
+    public String getResultado() { return resultado; }
+    public void setResultado(String resultado) { this.resultado = resultado; }
 
-    public void setTipo(String tipo) {
-        this.tipo = tipo;
-    }
+    public String getObservacoes() { return observacoes; }
+    public void setObservacoes(String observacoes) { this.observacoes = observacoes; }
 
-    public String getLaboratorio() {
-        return laboratorio;
-    }
+    public String getImagem() { return imagem; }
+    public void setImagem(String imagem) { this.imagem = imagem; }
 
-    public void setLaboratorio(String laboratorio) {
-        this.laboratorio = laboratorio;
-    }
+    public String getNomeExame() { return nomeExame; }
+    public void setNomeExame(String nomeExame) { this.nomeExame = nomeExame; }
 
-    public String getResultado() {
-        return resultado;
-    }
-
-    public void setResultado(String resultado) {
-        this.resultado = resultado;
-    }
-
-    public String getObservacoes() {
-        return observacoes;
-    }
-
-    public void setObservacoes(String observacoes) {
-        this.observacoes = observacoes;
-    }
-
-    public Documentos getDocumento() {
-        return documento;
-    }
-
-    public void setDocumento(Documentos documento) {
-        this.documento = documento;
-    }
+    public Documentos getDocumento() { return documento; }
+    public void setDocumento(Documentos documento) { this.documento = documento; }
 }

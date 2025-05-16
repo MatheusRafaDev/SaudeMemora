@@ -1,27 +1,52 @@
 import React from "react";
-import { useLocation } from "react-router-dom"; // importa o hook
-import { FiCalendar, FiUser } from "react-icons/fi";
-import ReceitaComMedicamentos from "../components/ReceitaComMedicamentos";
-
+import { useLocation } from "react-router-dom";
+import ReceitaComMedicamentos from "../components/VisualizadorReceita";
+import VisualizadorExame from "../components/VisualizadorExame"; 
 import Nav from "../components/Nav";
 
 const VisualizadorDocumento = () => {
   const location = useLocation();
+
   const documentoArray = location.state?.documento;
-  const documento =
-    Array.isArray(documentoArray) && documentoArray.length > 0
-      ? documentoArray[0]
-      : null;
+  const tipoDocumento = location.state?.tipo; 
 
-  if (!documento) return <p>Nenhum documento selecionado.</p>;
+  const documento = Array.isArray(documentoArray)
+    ? documentoArray[0]
+    : documentoArray;
 
-  if (documento.medicamentos) {
+  if (!documento) {
     return (
       <div>
         <Nav />
-        <ReceitaComMedicamentos receita={documento} />
+        <p>Nenhum documento selecionado.</p>
       </div>
     );
+  }
+
+  switch (tipoDocumento) {
+    case "R": 
+      return (
+        <div>
+          <Nav />
+          <ReceitaComMedicamentos receita={documento} />
+        </div>
+      );
+
+    case "E":
+      return (
+        <div>
+          <Nav />
+          <VisualizadorExame exame={documento} />
+        </div>
+      );
+
+    default:
+      return (
+        <div>
+          <Nav />
+          <p>Tipo de documento não suportado para visualização.</p>
+        </div>
+      );
   }
 };
 

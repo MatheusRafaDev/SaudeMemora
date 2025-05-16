@@ -192,6 +192,14 @@ Texto do formulário:
 }
 
 
+function normalizarTexto(texto) {
+  if (!texto || typeof texto !== "string") return "";
+  return texto
+    .replace(/\s+/g, " ")                // substitui múltiplos espaços por um único espaço
+    .replace(/(\.|\!|\?)\s*/g, "$1\n")  // coloca quebra de linha após . ! ?
+    .trim();
+}
+
 export async function tratarOCRParaReceitas(textoOCR) {
   try {
     if (!textoOCR || typeof textoOCR !== "string" || textoOCR.trim().length < 10) {
@@ -214,7 +222,7 @@ Leia o texto abaixo e extraia os campos:
   - "quantidade": quantidade do medicamento,
   - "formaDeUso": instruções de uso do medicamento,
 - "observacoes": observações adicionais,
-- "resumo": o mesmo texto abaixo, mas reescrito com ortografia corrigida, pontuação adequada e espaçamento correto. NÃO resuma nem interprete, apenas normalize.
+- "resumo": o mesmo texto abaixo, mas reescrito com ortografia corrigida.
 
 Retorne apenas o JSON com os dados extraídos, no seguinte formato:
 {
@@ -299,9 +307,11 @@ ${textoTratado}`;
             formaDeUso: medicamento.formaDeUso || ""
           })) 
         : [],
-      observacoes: jsonReceita.observacoes || "",
-      resumo: jsonReceita.resumo || ""
+      observacoes: normalizarTexto(jsonReceita.observacoes),
+      resumo: normalizarTexto(jsonReceita.resumo)
     };
+
+
   } catch (error) {
     console.error("❌ Erro ao tratar OCR:", error.message);
     return { error: error.message };
@@ -384,9 +394,9 @@ ${textoTratado}`;
       data: jsonProntuario.data || "",
       medico: jsonProntuario.medico || "",
       especialidade: jsonProntuario.especialidade || "",
-      observacoes: jsonProntuario.observacoes || "",
-      conclusoes: jsonProntuario.conclusoes || "",
-      resumo: jsonProntuario.resumo || "",
+      observacoes: normalizarTexto(jsonProntuario.observacoes),
+      conclusoes: normalizarTexto(jsonProntuario.conclusoes),
+      resumo: normalizarTexto(jsonProntuario.resumo),
     };
   } catch (error) {
     console.error("❌ Erro ao tratar OCR para Prontuário:", error.message);
@@ -412,7 +422,7 @@ Leia o texto abaixo e extraia os campos:
 - "laboratorio": nome do laboratório que realizou o exame,
 - "resultado": resultado do exame,
 - "observacoes": observações adicionais,
-- "resumo": o mesmo texto abaixo, mas reescrito com ortografia corrigida, pontuação adequada e espaçamento correto. NÃO resuma nem interprete, apenas normalize.
+- "resumo": o mesmo texto abaixo, mas reescrito com ortografia corrigida.
 
 Retorne apenas o JSON com os dados extraídos, no seguinte formato:
 {
@@ -470,11 +480,11 @@ ${textoTratado}`;
       tipo: jsonExame.tipo || "",
       laboratorio: jsonExame.laboratorio || "",
       resultado: jsonExame.resultado || "",
-      observacoes: jsonExame.observacoes || "",
-      resumo: jsonExame.resumo || "",
+      observacoes: normalizarTexto(jsonExame.observacoes),
+      resumo: normalizarTexto(jsonExame.resumo),
     };
   } catch (error) {
-    console.error("❌ Erro ao tratar OCR para Exame:", error.message);
+    console.error("❌ Erro ao tratar OCR para Exames:", error.message);
     return { error: error.message };
   }
 }

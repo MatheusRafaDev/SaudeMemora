@@ -93,6 +93,7 @@ const ReceitaService = {
   createWithImage: async (formData) => {
     try {
       const response = await axiosInstance.post("/api/receitas", formData);
+      
       return response.data;
     } catch (error) {
       throw new Error(

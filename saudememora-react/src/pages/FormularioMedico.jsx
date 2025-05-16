@@ -48,7 +48,6 @@ const FormularioMedico = () => {
   const paciente = JSON.parse(localStorage.getItem("paciente")) || {};
   const [ficha, setFicha] = useState(null);
 
-  console.log(paciente)
   const obterFicha = async () => {
   if (!paciente.id) return;
 

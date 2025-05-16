@@ -3,9 +3,11 @@ package com.pi.saudememora.model;
 import jakarta.persistence.*;
 import org.springframework.web.bind.annotation.CrossOrigin;
 import org.springframework.web.bind.annotation.RestController;
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 
 import java.util.Date;
 
+@JsonIgnoreProperties(ignoreUnknown = true)
 @RestController
 @Entity
 @Table(name = "tb_ficha_medica")
@@ -271,6 +273,14 @@ public class FichaMedica {
 
     public void setRespiratorio(boolean problemasRespiratorios) {
         this.respiratorio = problemasRespiratorios;
+    }
+
+    public boolean isReumatica() {
+        return reumatica;
+    }
+
+    public void setReumatica(boolean reumatica) {
+        this.reumatica = reumatica;
     }
 
 

@@ -4,6 +4,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import "../styles/UploadDocumento.css";
 import Nav from "../components/Nav";
 import { ocrSpace } from "../ocr/ocrSpace";
+import { useNavigate } from "react-router-dom";
 import { AdicionarDocumento } from "../documentos/AdicionarDocumento";
 
 export default function UploadDocumentos() {
@@ -16,6 +17,7 @@ export default function UploadDocumentos() {
   const [tipoDocumento, setTipoDocumento] = useState("");
   const [paciente, setPaciente] = useState(null);
   const [mensagemErro, setMensagemErro] = useState("");
+    const navigate = useNavigate();
 
   useEffect(() => {
     const pacienteData = JSON.parse(localStorage.getItem("paciente")) || {};
@@ -99,7 +101,8 @@ export default function UploadDocumentos() {
         tipoDocumento,
         resultadoProcessamento,
         paciente,
-        documento // Enviando a imagem aqui
+        documento,
+        navigate
       );
 
       if (response.success) {

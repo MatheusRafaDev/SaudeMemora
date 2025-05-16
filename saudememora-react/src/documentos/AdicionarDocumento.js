@@ -1,14 +1,16 @@
 import DocumentoService from "../services/DocumentoService";
 
-import { processarReceita, processarExame, processarProntuario,processarReceitaComImagem } from "./ProcessamentoDeTipoDoc";
+import { processarReceita, processarExame, processarExameComImagem, processarProntuario,processarReceitaComImagem } from "./ProcessamentoDeTipoDoc";
 
+import { useNavigate } from "react-router-dom";
+export async function AdicionarDocumento(tipoDocumento, textoOCR, paciente, imagem,navigate ) {
 
-export async function AdicionarDocumento(tipoDocumento, textoOCR, paciente, imagem) {
   try {
     if (!tipoDocumento || !textoOCR || !paciente) {
       throw new Error("Dados insuficientes para processar o documento.");
     }
 
+   
     const tipo = tipoDocumento.charAt(0).toUpperCase();
 
     const documentoData = {
@@ -26,9 +28,9 @@ export async function AdicionarDocumento(tipoDocumento, textoOCR, paciente, imag
     }
 
     // Passar a imagem para as funções específicas
-    if (tipo === "R") return await processarReceitaComImagem(textoOCR, paciente, documentoId, imagem);
-    if (tipo === "E") return await processarExame(textoOCR, paciente, documentoId, imagem);
-    if (tipo === "P") return await processarProntuario(textoOCR, paciente, documentoId, imagem);
+    if (tipo === "R") return await processarReceitaComImagem(textoOCR, paciente, documentoId, imagem,navigate);
+    if (tipo === "E") return await processarExameComImagem(textoOCR, paciente, documentoId, imagem,navigate);
+    if (tipo === "P") return await processarProntuario(textoOCR, paciente, documentoId, imagem,navigate);
 
     throw new Error("Tipo de documento não suportado.");
   } catch (error) {
