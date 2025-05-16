@@ -33,7 +33,7 @@ export default function ReceitaComMedicamentos({ receita }) {
         <div className="card-body text-center">
           {receita.imagem ? (
             <img
-              src={`http://localhost:7070/api/receitas/imagem-receita/${receita.id}`}
+              src={`http://localhost:7070/api/receitas/imagem/${receita.id}`}
               alt="Imagem da Receita"
               className="img-fluid rounded"
               style={{

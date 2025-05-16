@@ -21,6 +21,7 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/receitas")
+@CrossOrigin(origins = "*")
 public class ReceitaController {
 
     private static final Logger logger = LoggerFactory.getLogger(ReceitaController.class);
@@ -83,7 +84,7 @@ public class ReceitaController {
     }
 
 
-    @GetMapping("/imagem-receita/{id}")
+    @GetMapping("/imagem/{id}")
     public ResponseEntity<byte[]> getImagemPorId(@PathVariable Long id) {
         try {
             Optional<Receita> receitaOpt = receitaRepository.findById(id);

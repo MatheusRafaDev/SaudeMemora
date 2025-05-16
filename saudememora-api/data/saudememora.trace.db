@@ -133,3 +133,6 @@ TRUNCATE TABLE TB_DOCUMENTOS [90106-232]
 2025-05-15 21:27:12.349279-03:00 jdbc[13]: exception
 org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "TRUNCATE [*]TB_DOCUMENTOS"; expected "TABLE"; SQL statement:
 TRUNCATE TB_DOCUMENTOS [42001-232]
+2025-05-15 23:32:56.811866-03:00 jdbc[13]: exception
+org.h2.jdbc.JdbcSQLSyntaxErrorException: Syntax error in SQL statement "[*]TB_PACIENTE EITAS"; expected "TRUNCATE"; SQL statement:
+TB_PACIENTE EITAS [42001-232]

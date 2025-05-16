@@ -215,14 +215,14 @@ export async function tratarOCRParaReceitas(textoOCR) {
 
 Leia o texto abaixo e extraia os campos:
 - "data" (formato YYYY-MM-DD ou DD/MM/YYYY),
-- "medico" (nome do médico),
+- "medico" "Formate o nome do médico com a capitalização correta, usando maiúscula só nas primeiras letras de cada palavra, sem deixar tudo em maiúsculo ou tudo minúsculo.",
 - "crm" (registro do médico),
 - "medicamentos" (uma lista de medicamentos, onde cada medicamento deve ter os seguintes campos):
   - "nome": nome do medicamento,
   - "quantidade": quantidade do medicamento,
   - "formaDeUso": instruções de uso do medicamento,
 - "observacoes": observações adicionais,
-- "resumo": o mesmo texto abaixo, mas reescrito com ortografia corrigida.
+- "resumo": "Reescreva este texto corrigindo a ortografia, melhorando a formatação e deixando com aparência mais limpa e profissional, como se fosse uma receita médica".
 
 Retorne apenas o JSON com os dados extraídos, no seguinte formato:
 {
@@ -431,7 +431,7 @@ Retorne apenas o JSON com os dados extraídos, no seguinte formato:
   "laboratorio": "Nome do laboratório",
   "resultado": "Resultado do exame",
   "observacoes": "Texto das observações",
-  "resumo": "Texto do OCR reescrito e normalizado"
+  "resumo": "Texto do OCR reescrito e normalizado. Corrija a ortografia, padronize os termos médicos e organize como se fosse o resultado de um exame laboratorial".
 }
 
 Texto do OCR:

@@ -1,48 +1,102 @@
 import { Link } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
-// import "@fortawesome/fontawesome-free/css/all.min.css"; // Importando os ícones do FontAwesome
+import "bootstrap-icons/font/bootstrap-icons.css";
 
 const Nav = () => {
   return (
-    <nav className="navbar navbar-expand-lg navbar-dark bg-primary">
+    <nav className="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm">
       <div className="container-fluid">
-        
         <Link className="navbar-brand d-flex align-items-center" to="/home">
-          <h1 className="mb-0 d-flex align-items-center text-white" style={{ fontSize: '1.5rem' }}>
-            <i className="fas fa-heartbeat me-2"></i>Saúde Memora
-          </h1>
+          <span className="d-flex align-items-center text-white fw-semibold" style={{ fontSize: '1.5rem' }}>
+            <i className="bi bi-heart-pulse me-2" style={{ color: '#7ad6ff' }}></i>
+            <span className="d-none d-sm-inline">Saúde Memora</span>
+          </span>
         </Link>
+
+        {/* Botão do menu hamburguer */}
+        <button 
+          className="navbar-toggler border-0 p-2" 
+          type="button" 
+          data-bs-toggle="collapse" 
+          data-bs-target="#navbarNav"
+          aria-controls="navbarNav"
+          aria-expanded="false"
+          aria-label="Toggle navigation"
+        >
+          <i className="bi bi-list text-white" style={{ fontSize: '1.8rem' }}></i>
+        </button>
 
         <div className="collapse navbar-collapse" id="navbarNav">
           <ul className="navbar-nav ms-auto">
-            <li className="nav-item me-3">
-              <Link className="nav-link" to="/perfil">
-                <i className="fas fa-user"></i>{" "}
-                <span className="d-none d-lg-inline">Perfil</span>
+            <li className="nav-item">
+              <Link 
+                className="nav-link d-flex align-items-center py-3 px-3 rounded mx-2 my-1 hover-effect"
+                to="/perfil"
+                data-bs-toggle="collapse" 
+                data-bs-target="#navbarNav"
+              >
+                <i className="bi bi-person-circle me-2" style={{ fontSize: '1.2rem' }}></i>
+                <span className="fw-medium">Perfil</span>
               </Link>
             </li>
-            <li className="nav-item me-3">
-              <Link className="nav-link" to="/meus-documentos">
-                <i className="fas fa-file-alt"></i>{" "}
-                <span className="d-none d-lg-inline">Documentos</span>
+            <li className="nav-item">
+              <Link 
+                className="nav-link d-flex align-items-center py-3 px-3 rounded mx-2 my-1 hover-effect" 
+                to="/meus-documentos"
+                data-bs-toggle="collapse" 
+                data-bs-target="#navbarNav"
+              >
+                <i className="bi bi-file-earmark-medical me-2" style={{ fontSize: '1.2rem' }}></i>
+                <span className="fw-medium">Documentos</span>
               </Link>
             </li>
-            <li className="nav-item me-3">
-              <Link className="nav-link" to="/upload-documentos">
-                <i className="fas fa-upload"></i>{" "}
-                <span className="d-none d-lg-inline">Processamento </span>
+            <li className="nav-item">
+              <Link 
+                className="nav-link d-flex align-items-center py-3 px-3 rounded mx-2 my-1 hover-effect" 
+                to="/upload-documentos"
+                data-bs-toggle="collapse" 
+                data-bs-target="#navbarNav"
+              >
+                <i className="bi bi-cloud-arrow-up me-2" style={{ fontSize: '1.2rem' }}></i>
+                <span className="fw-medium">Processamento</span>
               </Link>
             </li>
-            <li className="nav-item me-3">
-              <Link className="nav-link" to="/relatorios">
-                <i className="fas fa-chart-bar"></i>{" "}
-                <span className="d-none d-lg-inline">Relatórios</span>
+            <li className="nav-item">
+              <Link 
+                className="nav-link d-flex align-items-center py-3 px-3 rounded mx-2 my-1 hover-effect" 
+                to="/relatorios"
+                data-bs-toggle="collapse" 
+                data-bs-target="#navbarNav"
+              >
+                <i className="bi bi-clipboard2-data me-2" style={{ fontSize: '1.2rem' }}></i>
+                <span className="fw-medium">Relatórios</span>
               </Link>
             </li>
-
           </ul>
         </div>
       </div>
+      
+      {/* Estilos inline para os efeitos */}
+      <style>{`
+        .hover-effect {
+          transition: all 0.3s ease;
+        }
+        .hover-effect:hover {
+          background-color: rgba(255, 255, 255, 0.15);
+          transform: translateY(-2px);
+        }
+        @media (max-width: 992px) {
+          .navbar-collapse {
+            background-color: #0d6efd;
+            border-radius: 0.5rem;
+            margin-top: 0.5rem;
+            padding: 0.5rem;
+          }
+          .nav-link {
+            margin: 0.25rem 0;
+          }
+        }
+      `}</style>
     </nav>
   );
 };
