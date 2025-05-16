@@ -164,3 +164,6 @@ Caused by: org.h2.jdbc.JdbcSQLNonTransientConnectionException: The connection wa
 	at org.h2.message.DbException.getJdbcSQLException(DbException.java:690)
 	at org.h2.message.DbException.getJdbcSQLException(DbException.java:489)
 	... 16 more
+2025-05-16 14:10:20.886735-03:00 jdbc[33]: exception
+org.h2.jdbc.JdbcSQLDataException: Value too long for column "DS_RESUMO CHARACTER VARYING(255)": "U&'A ILSE LUZ HOSPITAL DA LUZ SANTO AMARO RUA LARDEARO FRANCO, 55 SANTO AMARO S\\... (537)"; SQL statement:
+insert into tb_documento_clinico (ds_conclusoes,ds_conteudo,dt_data,id_documento,ds_especialidade,ds_imagem,nm_medico,ds_observacoes,id_paciente,ds_resumo,id_documento_clinico) values (?,?,?,?,?,?,?,?,?,?,default) [22001-232]

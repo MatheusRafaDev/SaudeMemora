@@ -2,6 +2,7 @@ package com.pi.saudememora.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pi.saudememora.model.DocumentoClinico;
+import com.pi.saudememora.repository.DocumentoClinicoRepository;
 import com.pi.saudememora.service.DocumentoClinicoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -15,6 +16,7 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.List;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/documentosclinicos")
@@ -23,6 +25,8 @@ public class DocumentoClinicoController {
     @Autowired
     private DocumentoClinicoService service;
 
+    @Autowired
+    private DocumentoClinicoRepository documentoClinicoRepository;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -47,8 +51,9 @@ public class DocumentoClinicoController {
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> criarDocumentoClinicoComArquivo(
             @RequestParam("documentoData") String documentoData,
-            @RequestParam(value = "arquivo", required = false) MultipartFile arquivo) {
+            @RequestParam(value = "imagem", required = false) MultipartFile arquivo) {
         try {
+            System.out.println(arquivo);
             // Supondo que você use ObjectMapper para converter JSON em objeto
             DocumentoClinico documento = objectMapper.readValue(documentoData, DocumentoClinico.class);
 
@@ -81,6 +86,40 @@ public class DocumentoClinicoController {
         }
         return ResponseEntity.ok(atualizado);
     }
+
+    @GetMapping("/imagem/{id}")
+    public ResponseEntity<byte[]> getImagemDocumentoClinicoPorId(@PathVariable Long id) {
+        try {
+            Optional<DocumentoClinico> documentoOpt = documentoClinicoRepository.findById(id);
+
+            if (documentoOpt.isEmpty() || documentoOpt.get().getImagem() == null) {
+                return ResponseEntity.notFound().build();
+            }
+
+            DocumentoClinico documento = documentoOpt.get();
+            Path caminho = Paths.get(documento.getImagem());
+
+            if (!Files.exists(caminho)) {
+                return ResponseEntity.notFound().build();
+            }
+
+            byte[] imagemBytes = Files.readAllBytes(caminho);
+            String contentType = Files.probeContentType(caminho);
+
+            return ResponseEntity.ok()
+                    .contentType(MediaType.parseMediaType(contentType))
+                    .body(imagemBytes);
+
+        } catch (IOException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @GetMapping("/documento/{id}")
+    public List<DocumentoClinico> listarPorDocumento(@PathVariable Long id) {
+        return documentoClinicoRepository.findByDocumentoId(id);
+    }
+
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletar(@PathVariable Long id) {

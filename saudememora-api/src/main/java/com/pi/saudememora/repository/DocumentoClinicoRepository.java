@@ -12,7 +12,7 @@ import java.util.List;
 @Repository
 public interface DocumentoClinicoRepository extends JpaRepository<DocumentoClinico, Long> {
     List<DocumentoClinico> findByPacienteId(Long pacienteId);
-    DocumentoClinico findByDocumentoId(Long documentoId);
+    List<DocumentoClinico> findByDocumentoId(Long documentoId);
 
     @Transactional
     @Modifying

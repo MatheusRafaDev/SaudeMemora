@@ -13,7 +13,6 @@ import EditarPerfil from "./pages/EditarPerfil";
 import RelatorioDocumentos from "./pages/RelatorioDocumentos";
 import VisualizadorDocumento from "./pages/VisualizadorDocumento";
 
-
 const isPacienteLoggedIn = () => {
   const data = localStorage.getItem("paciente");
   if (!data) return false;
@@ -40,6 +39,8 @@ function App() {
           path="/home" 
           element={isPacienteLoggedIn() ? <Home /> : <Navigate to="/login" />} 
         />
+
+        <Route path="/relatorio-documentos" element={<RelatorioDocumentos />}/>
 
         <Route path="/criar-conta" element={<CadastroPaciente />} />
         <Route path="/perfil" element={<Perfil />} />

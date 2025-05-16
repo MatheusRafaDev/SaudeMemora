@@ -28,6 +28,7 @@ public class Documentos {
     private Date dataUpload;
 
 
+
     public Long getId() {
         return id;
     }
@@ -51,6 +52,7 @@ public class Documentos {
     public void setTipoDocumento(String tipoDocumento) {
         this.tipoDocumento = tipoDocumento;
     }
+
 
     public String getStatus() {
         return status;

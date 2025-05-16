@@ -84,6 +84,7 @@ public class ReceitaController {
     }
 
 
+
     @GetMapping("/imagem/{id}")
     public ResponseEntity<byte[]> getImagemPorId(@PathVariable Long id) {
         try {

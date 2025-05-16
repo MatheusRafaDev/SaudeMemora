@@ -12,30 +12,36 @@ import java.util.Optional;
 public class DocumentosService {
 
     @Autowired
-    private DocumentosRepository documentoRepository;
+    private DocumentosRepository documentosRepository;
 
     // Criar ou atualizar documento
     public Documentos save(Documentos documento) {
-        return documentoRepository.save(documento);
+        return documentosRepository.save(documento);
     }
 
     // Buscar todos os documentos
     public List<Documentos> findAll() {
-        return documentoRepository.findAll();
+        return documentosRepository.findAll();
     }
 
-    // Buscar documento por ID
+    // Buscar documento por ID (Optional)
     public Optional<Documentos> findById(Long id) {
-        return documentoRepository.findById(id);
+        return documentosRepository.findById(id);
+    }
+
+    // Buscar documento por ID (com exceção se não encontrado)
+    public Documentos buscarPorId(Long id) {
+        return documentosRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Documento não encontrado com id: " + id));
     }
 
     // Deletar documento por ID
     public void deleteById(Long id) {
-        documentoRepository.deleteById(id);
+        documentosRepository.deleteById(id);
     }
 
-    // Buscar documentos por algum critério específico (exemplo: status)
+    // Buscar documentos por status
     public List<Documentos> findByStatus(String status) {
-        return documentoRepository.findByStatus(status);
+        return documentosRepository.findByStatus(status);
     }
 }

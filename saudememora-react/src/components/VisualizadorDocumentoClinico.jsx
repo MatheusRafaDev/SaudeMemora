@@ -34,9 +34,9 @@ export default function VisualizadorDocumentoClinico({ documentoClinico }) {
 
       <div className="card shadow-sm border-0 mb-4">
         <div className="card-body text-center">
-          {documento.arquivo ? (
+          {documento.imagem? (
             <img
-              src={`http://localhost:7070/api/documentos/arquivo/${documento.id}`}
+              src={`http://localhost:7070/api/documentosclinicos/imagem/${documento.id}`}
               alt={`Documento ${documento.tipo}`}
               className="img-fluid rounded"
               style={{

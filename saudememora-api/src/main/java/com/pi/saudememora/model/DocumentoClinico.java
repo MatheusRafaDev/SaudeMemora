@@ -32,7 +32,8 @@ public class DocumentoClinico {
     @Column(name = "ds_imagem")
     private String imagem;
 
-    @Column(name = "ds_resumo")
+    @Lob
+    @Column(name = "ds_resumo", columnDefinition = "CLOB")
     private String resumo;
 
 

@@ -2,21 +2,23 @@ package com.pi.saudememora.controller;
 
 import com.pi.saudememora.model.Documentos;
 import com.pi.saudememora.repository.*;
+import com.pi.saudememora.service.DocumentosService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataIntegrityViolationException;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Date;
 import java.util.List;
-
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/documentos")
-@CrossOrigin(origins = "*") // Libera o CORS para testes locais
+@CrossOrigin(origins = "*")
 public class DocumentosController {
 
     private static final Logger logger = LoggerFactory.getLogger(DocumentosController.class);
@@ -31,25 +33,20 @@ public class DocumentosController {
     private ExameRepository exameRepository;
 
     @Autowired
-    private MedicamentoRepository medicamentoRepository ;
+    private MedicamentoRepository medicamentoRepository;
 
     @Autowired
     private DocumentoClinicoRepository documentoClinicoRepository;
 
+    @Autowired
+    private DocumentosService documentosService;
 
     // GET por ID
     @GetMapping("/{id}")
     public ResponseEntity<Documentos> getDocumentoById(@PathVariable Long id) {
-
         return documentosRepository.findById(id)
-                .map(documento -> {
-
-                    return ResponseEntity.ok(documento);
-                })
-                .orElseGet(() -> {
-
-                    return ResponseEntity.notFound().build();
-                });
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     // GET por ID do paciente
@@ -57,11 +54,6 @@ public class DocumentosController {
     public ResponseEntity<List<Documentos>> getDocumentosPorPaciente(@PathVariable Long id) {
         logger.info("Buscando documentos para o paciente com ID: {}", id);
         List<Documentos> documentos = documentosRepository.findByPacienteId(id);
-        if (documentos.isEmpty()) {
-            logger.warn("Nenhum documento encontrado para o paciente com ID: {}", id);
-        } else {
-            logger.info("Documentos encontrados para o paciente com ID {}: {}", id, documentos.size());
-        }
         return ResponseEntity.ok(documentos);
     }
 
@@ -70,61 +62,52 @@ public class DocumentosController {
     public ResponseEntity<List<Documentos>> getDocumentosPorTipo(@PathVariable String tipo) {
         logger.info("Buscando documentos do tipo: {}", tipo);
         List<Documentos> documentos = documentosRepository.findByTipoDocumento(tipo.toUpperCase());
-        if (documentos.isEmpty()) {
-            logger.warn("Nenhum documento encontrado para o tipo: {}", tipo);
-        } else {
-            logger.info("Documentos encontrados para o tipo {}: {}", tipo, documentos.size());
-        }
         return ResponseEntity.ok(documentos);
     }
 
-    // POST - Criar um novo documento
+
+
     @PostMapping
     public ResponseEntity<Documentos> createDocumento(@RequestBody Documentos documento) {
         logger.info("Recebendo requisição para criar documento: {}", documento);
         try {
-            // Define a data de upload como a data atual, se não for fornecida
             if (documento.getDataUpload() == null) {
                 documento.setDataUpload(new Date());
-                logger.info("Data de upload não fornecida. Definindo data atual: {}", documento.getDataUpload());
+                logger.info("Data de upload definida como data atual: {}", documento.getDataUpload());
             }
 
-            // Salva o documento no banco de dados
             Documentos novoDocumento = documentosRepository.save(documento);
-            logger.info("Documento criado com sucesso: {}", novoDocumento);
-
-            return ResponseEntity.status(201).body(novoDocumento); // Retorna 201 Created
+            return ResponseEntity.status(201).body(novoDocumento);
         } catch (Exception e) {
             logger.error("Erro ao criar documento: {}", e.getMessage(), e);
-            return ResponseEntity.status(500).body(null); // Retorna erro interno do servidor
+            return ResponseEntity.status(500).body(null);
         }
     }
 
     // PUT - Atualizar um documento existente
     @PutMapping("/{id}")
-    public ResponseEntity<Documentos> updateDocumento(
-            @PathVariable Long id,
-            @RequestBody Documentos documentoAtualizado) {
-        logger.info("Recebendo requisição para atualizar documento com ID: {}", id);
+    public ResponseEntity<Documentos> updateDocumento(@PathVariable Long id,
+                                                      @RequestBody Documentos documentoAtualizado) {
         return documentosRepository.findById(id)
                 .map(documento -> {
-                    // Atualiza os campos do documento
-                    logger.info("Documento encontrado. Atualizando campos...");
                     documento.setTipoDocumento(documentoAtualizado.getTipoDocumento());
                     documento.setStatus(documentoAtualizado.getStatus());
                     documento.setDataUpload(documentoAtualizado.getDataUpload());
                     documento.setPaciente(documentoAtualizado.getPaciente());
-
                     Documentos documentoSalvo = documentosRepository.save(documento);
-                    logger.info("Documento atualizado com sucesso: {}", documentoSalvo);
-                    return ResponseEntity.ok(documentoSalvo); // Retorna 200 OK
+                    return ResponseEntity.ok(documentoSalvo);
                 })
-                .orElseGet(() -> {
-                    logger.warn("Documento com ID {} não encontrado para atualização.", id);
-                    return ResponseEntity.notFound().build(); // Retorna 404 se o documento não for encontrado
-                });
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
+    @GetMapping
+    public ResponseEntity<List<Documentos>> getTodosDocumentos() {
+        logger.info("Buscando todos os documentos");
+        List<Documentos> documentos = documentosRepository.findAll();
+        return ResponseEntity.ok(documentos);
+    }
+
+    // DELETE - Deletar documento por tipo e id
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deletarDocumento(@PathVariable Long id,
                                                  @RequestParam("tipo") String tipo) {
@@ -134,40 +117,29 @@ public class DocumentosController {
             }
 
             switch (tipo.toUpperCase()) {
-                case "R": // Receita
-                    // Primeiro deleta os medicamentos associados
+                case "R":
                     medicamentoRepository.deleteByReceitaDocumentoId(id);
-                    // Depois deleta a receita
                     receitaRepository.deleteAllByDocumentoId(id);
                     break;
-                case "E": // Exame
+                case "E":
                     exameRepository.deleteAllByDocumentoId(id);
                     break;
-                case "D": // Documento Clínico
+                case "D":
                     documentoClinicoRepository.deleteAllByDocumentoId(id);
                     break;
                 default:
                     return ResponseEntity.badRequest().build();
             }
 
-            // Finalmente deleta o documento principal
             documentosRepository.deleteById(id);
-
             return ResponseEntity.noContent().build();
 
         } catch (DataIntegrityViolationException e) {
-            // Log do erro
-            logger.error("Erro de integridade referencial ao deletar documento", e);
-            return ResponseEntity.status(HttpStatus.CONFLICT)
-                    .build();
+            logger.error("Erro de integridade ao deletar documento", e);
+            return ResponseEntity.status(HttpStatus.CONFLICT).build();
         } catch (Exception e) {
-            // Log do erro genérico
             logger.error("Erro ao deletar documento", e);
             return ResponseEntity.internalServerError().build();
         }
     }
-
-
-
-
 }

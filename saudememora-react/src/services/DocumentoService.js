@@ -71,10 +71,10 @@ const DocumentoService = {
     try {
       const response = await axiosInstance.post(
         "/api/documentos",
-        JSON.stringify(documento), // Certifique-se de enviar o corpo como JSON
+        JSON.stringify(documento),
         {
           headers: {
-            "Content-Type": "application/json", // Define o cabeçalho corretamente
+            "Content-Type": "application/json",
           },
         }
       );
@@ -88,23 +88,40 @@ const DocumentoService = {
     }
   },
 
+  // Deletar um documento por ID e tipo
   deleteDocumento: async (id, tipo) => {
-  try {
-    const response = await axiosInstance.delete(`/api/documentos/${id}`, {
-      params: { tipo },  // envia o tipo como query param
-    });
-    return { success: true, data: response.data };
-  } catch (error) {
-    console.error("Erro ao deletar documento:", error);
-    return {
-      success: false,
-      message:
-        error.response?.data?.message || `Erro ao deletar documento do tipo ${tipo}!`,
-    };
-  }
-},
+    try {
+      const response = await axiosInstance.delete(`/api/documentos/${id}`, {
+        params: { tipo },
+      });
+      return { success: true, data: response.data };
+    } catch (error) {
+      console.error("Erro ao deletar documento:", error);
+      return {
+        success: false,
+        message:
+          error.response?.data?.message ||
+          `Erro ao deletar documento do tipo ${tipo}!`,
+      };
+    }
+  },
 
+  // Listar documentos com filtro
+  listarDocumentos: async () => {
+    try {
+      const response = await axiosInstance.get("/api/documentos");
+
+      if (response.status === 200) {
+        return { success: true, data: response.data };
+      }
+    } catch (error) {
+      console.error("Erro ao listar documentos:", error);
+      return {
+        success: false,
+        message: "Erro ao listar documentos!",
+      };
+    }
+  },
 };
-
 
 export default DocumentoService;

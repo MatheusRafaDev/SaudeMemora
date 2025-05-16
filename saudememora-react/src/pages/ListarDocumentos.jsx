@@ -218,10 +218,9 @@ export default function ListarDocumentos() {
               Exames: prev.Exames.filter((doc) => doc.id !== documentoId),
               Receitas: prev.Receitas.filter((doc) => doc.id !== documentoId),
             }));
-            showNotification(
-              `${getTipoNome(tipo)} deletado com sucesso!`,
-              "success"
-            );
+
+             closeModal();
+
           } else {
             showNotification(
               response.message || `Erro ao deletar ${getTipoNome(tipo)}`,
@@ -307,44 +306,44 @@ export default function ListarDocumentos() {
   const ConfirmationModal = ({ show, message, onConfirm, onClose }) => {
     return (
       <ReactModal
-        isOpen={show}
-        onRequestClose={onClose}
-        contentLabel="Confirmação"
-        className="modal-content"
-        overlayClassName="modal-overlay"
-      >
-        <div className="modal-inner">
-          <div className="flex justify-between items-start mb-4">
-            <h3 className="text-lg font-semibold text-gray-800">
-              Confirmar ação
-            </h3>
-            <button
-              onClick={onClose}
-              className="text-gray-500 hover:text-gray-700"
-            >
-              <FaTimes />
-            </button>
-          </div>
-          <p className="mb-6 text-gray-600">{message}</p>
-          <div className="flex justify-end gap-3">
-            <button
-              onClick={onClose}
-              className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-50 transition"
-            >
-              Cancelar
-            </button>
-            <button
-              onClick={() => {
-                onConfirm();
-                onClose();
-              }}
-              className="px-4 py-2 bg-red-600 text-white rounded-md hover:bg-red-700 transition flex items-center gap-2"
-            >
-              <FaCheck /> Confirmar
-            </button>
-          </div>
+      isOpen={show}
+      onRequestClose={onClose}
+      contentLabel="Confirmação"
+      className="modal-content"
+      overlayClassName="modal-overlay"
+    >
+      <div className="modal-inner">
+        <div className="flex justify-between items-start mb-4">
+          <h3 className="text-lg font-semibold text-gray-800">Confirmar ação</h3>
+          <button
+            onClick={onClose}
+            className="text-gray-500 hover:text-gray-700 transition"
+          >
+            <FaTimes />
+          </button>
         </div>
-      </ReactModal>
+        <p className="mb-6 text-gray-600">{message}</p>
+        <div className="flex justify-end gap-3">
+          <button
+            onClick={onClose}
+            className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-100 transition"
+          >
+            Cancelar
+          </button>
+          <button
+            onClick={onConfirm}
+            disabled={loading}
+            className={`px-4 py-2 rounded-md flex items-center gap-2 transition ${
+              loading
+                ? "bg-gray-300 cursor-not-allowed"
+                : "bg-red-600 hover:bg-red-700"
+            }`}
+          >
+            <FaCheck /> Confirmar
+          </button>
+        </div>
+      </div>
+    </ReactModal>
     );
   };
 
@@ -458,9 +457,14 @@ export default function ListarDocumentos() {
                       <div className="documento-info">
                         <div className="documento-header">
                           <span className="documento-tipo">{doc.titulo}</span>
-                          <span className="documento-data">
-                            {formatarData(doc.dataUpload)}
-                          </span>
+                          <span className="documento-id">ID: {doc.id}</span>
+                          <div
+                            className="documento-data"
+                            style={{ display: "flex", flexDirection: "column" }}
+                          >
+                            <span>Upload: {formatarData(doc.dataUpload)}</span>
+                            <span>Data do exame: {formatarData(doc.data)}</span>
+                          </div>
                         </div>
                         {doc.laboratorio && (
                           <div className="documento-meta">
@@ -504,6 +508,7 @@ export default function ListarDocumentos() {
                       <div className="documento-info">
                         <div className="documento-header">
                           <span className="documento-tipo">Receita</span>
+                          <span className="documento-id">ID: {doc.id}</span>
                           <span className="documento-data">
                             {formatarData(doc.dataUpload)}
                           </span>
