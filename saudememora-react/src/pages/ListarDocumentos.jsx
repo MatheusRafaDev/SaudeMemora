@@ -509,9 +509,13 @@ export default function ListarDocumentos() {
                         <div className="documento-header">
                           <span className="documento-tipo">Receita</span>
                           <span className="documento-id">ID: {doc.id}</span>
-                          <span className="documento-data">
-                            {formatarData(doc.dataUpload)}
-                          </span>
+                           <div
+                            className="documento-data"
+                            style={{ display: "flex", flexDirection: "column" }}
+                          >
+                            <span>Upload: {formatarData(doc.dataUpload)}</span>
+                            <span>Data da receita: {formatarData(doc.dataReceita)}</span>
+                          </div>
                         </div>
                         {doc.medico && (
                           <div className="documento-meta">

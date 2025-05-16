@@ -32,6 +32,8 @@ export async function ocrSpace2(file) {
       maxBodyLength: Infinity,
     });
 
+    console.log('Resposta do OCR.space:', res);
+
     if (res.data.IsErroredOnProcessing) {
       throw new Error(res.data.ErrorMessage || 'Erro ao processar imagem no OCR.space');
     }
@@ -57,26 +59,26 @@ export async function ocrSpace(file, options = {}) {
   const { logProgress = false } = options;
   const worker = await createWorker();
 
-
   try {
-    const processedBlob = await ProcessarImagem(file);
+    const processedBlob = await ProcessarImagem(file); // Suponha que você já tenha binarização, contraste, etc.
 
-    // Logs opcionais
     if (logProgress) {
       worker.on('progress', status => {
-        console.log(`Progresso: ${status.status} ${Math.round(status.progress * 100)}%`);
+        console.log(`Progresso OCR: ${status.status} (${Math.round(status.progress * 100)}%)`);
       });
     }
 
-
     await worker.setParameters({
-      tessedit_pageseg_mode: '6',  // valor deve ser string
+      tessedit_pageseg_mode: '3', // 3 = Fully automatic page segmentation, good balance
       preserve_interword_spaces: '1',
+      user_defined_dpi: '300',
       tessjs_create_hocr: '1',
-      tessedit_char_whitelist: '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZáéíóúâêîôûãõàèìòùçÁÉÍÓÚÂÊÎÔÛÃÕÀÈÌÒÙÇ.,;:!?()-_/\\\'"'
+      tessjs_create_tsv: '1',
+      tessedit_char_whitelist: '0123456789abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZáéíóúâêîôûãõàèìòùçÁÉÍÓÚÂÊÎÔÛÃÕÀÈÌÒÙÇ.,;:!?()[]{}-_/\\\'"@#$%&*+=<>'
     });
 
     const { data: { text } } = await worker.recognize(processedBlob);
+
     return processTesseractText(text);
 
   } catch (err) {
@@ -86,6 +88,7 @@ export async function ocrSpace(file, options = {}) {
     await worker.terminate().catch(e => console.warn('Erro ao encerrar worker:', e));
   }
 }
+
 
 /**
  * Processa o texto extraído pelo Tesseract

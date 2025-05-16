@@ -201,6 +201,9 @@ function normalizarTexto(texto) {
 }
 
 export async function tratarOCRParaReceitas(textoOCR) {
+
+  console.log("Texto OCR recebido:", textoOCR);
+
   try {
     if (!textoOCR || typeof textoOCR !== "string" || textoOCR.trim().length < 10) {
       throw new Error("Texto OCR inválido ou muito curto.");
@@ -271,6 +274,8 @@ ${textoTratado}`;
 
     if (!res.ok) throw new Error(`Erro na API: ${res.statusText}`);
     const data = await res.json();
+
+    console.log(data)
 
     let jsonReceita;
     try {
@@ -375,6 +380,8 @@ ${textoTratado}`;
       timeout: 15000,
     });
 
+    console.log("Resposta da API:", res);
+
     if (!res.ok) throw new Error(`Erro na API: ${res.statusText}`);
     const data = await res.json();
 
@@ -405,6 +412,7 @@ ${textoTratado}`;
 
 export async function tratarOCRParaDocumentoClinico(textoOCR) {
   try {
+    console.log("Texto OCR recebido:", textoOCR);
     if (!textoOCR || typeof textoOCR !== "string" || textoOCR.trim().length < 10) {
       throw new Error("Texto OCR inválido ou muito curto.");
     }
@@ -459,6 +467,8 @@ ${textoTratado}`;
       }),
       timeout: 15000,
     });
+
+    console.log("Resposta da API:", res);
 
     if (!res.ok) throw new Error(`Erro na API: ${res.statusText}`);
     const data = await res.json();
