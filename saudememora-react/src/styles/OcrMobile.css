@@ -1,0 +1,125 @@
+/* OCRMobile.module.css */
+
+.container {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  background-color: #f3f4f6; /* bg-gray-100 */
+}
+
+.header {
+  background-color: #2563eb; /* bg-blue-600 */
+  padding: 1rem;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.headerTitle {
+  color: white;
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.main {
+  flex-grow: 1;
+  padding: 1rem;
+}
+
+.sectionTitle {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+}
+
+.imagePreview {
+  margin-bottom: 1rem;
+  border-radius: 0.5rem;
+  overflow: hidden;
+  background-color: white;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.previewImage {
+  width: 100%;
+  height: auto;
+  object-fit: contain;
+}
+
+.select {
+  width: 100%;
+  padding: 0.75rem;
+  border-radius: 0.5rem;
+  background-color: #e5e7eb; /* bg-gray-200 */
+  color: #374151; /* text-gray-700 */
+  margin-bottom: 1rem;
+}
+
+.button {
+  width: 100%;
+  padding: 1rem;
+  border-radius: 0.5rem;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  background-color: #e5e7eb;
+  color: #374151;
+}
+
+.processButton {
+  width: 100%;
+  padding: 1rem;
+  border-radius: 0.5rem;
+  font-weight: 500;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  color: white;
+}
+
+.processButtonEnabled {
+  background-color: #2563eb; /* bg-blue-600 */
+}
+
+.processButtonDisabled {
+  background-color: #93c5fd; /* bg-blue-300 */
+}
+
+.spinner {
+  border-bottom: 2px solid white;
+  border-radius: 9999px;
+  height: 1.25rem;
+  width: 1.25rem;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+.textBox {
+  background-color: white;
+  padding: 1rem;
+  border-radius: 0.5rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+}
+
+.textTitle {
+  font-weight: 500;
+  margin-bottom: 0.5rem;
+}
+
+.textCorrectedTitle {
+  color: #16a34a; /* text-green-600 */
+}
+
+.textContent {
+  white-space: pre-wrap;
+  font-size: 0.875rem;
+  color: #374151;
+}
