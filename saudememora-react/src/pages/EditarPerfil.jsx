@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { IMaskInput } from 'react-imask';
+import { atualizarPaciente } from '../services/pacienteService';
 import 'bootstrap/dist/css/bootstrap.min.css';
 
 function EditarPerfil() {
@@ -68,7 +69,7 @@ function EditarPerfil() {
     if (!validateForm()) return;
 
     try {
-      localStorage.setItem('paciente', JSON.stringify(dadosForm));
+      atualizarPaciente( paciente.id ,dadosForm);
       console.log("Paciente atualizado com sucesso!");
       navigate('/perfil');
     } catch (error) {
