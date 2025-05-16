@@ -5,6 +5,7 @@ import Home from "./pages/Home";
 import CadastroPaciente from "./pages/CadastroPaciente";
 import FormularioMedico from "./pages/FormularioMedico";
 import OCRLeituraCursiva from "./pages/OCRLeituraCursiva";
+import OCRMobile from "./pages/OCRMobile";
 import UploadDocumentos from "./pages/UploadDocumentos";
 import Perfil from "./pages/Perfil";
 //import EditarPaciente from "./pages/EditarPaciente";
@@ -33,7 +34,7 @@ function App() {
     <Router>
       <Routes>
 
-        <Route path="/login" element={<Login />} />
+        <Route path="/" element={<Login />} />
         
     
         <Route 
@@ -48,14 +49,7 @@ function App() {
         <Route path="/relatorios" element={<RelatorioDocumentos />}/>
         <Route path="/ocr" element={<OCRLeituraCursiva />} />
 
-        <Route path="/upload-documentos" element={<UploadDocumentos />} />
-
-        <Route path="/alterar-perfil" element={<EditarPerfil />}/>
-
-        <Route path="/meus-documentos" element={<ListarDocumentos />}/>
-
-        <Route path="/visualizar-documento" element={<VisualizadorDocumento />}/>
-
+        
       </Routes>
     </Router>
   );

@@ -16,6 +16,7 @@
     "form-data": "^4.0.2",
     "http-proxy-middleware": "^3.0.5",
     "languagetool-api": "^1.1.2",
+    "lucide-react": "^0.510.0",
     "openai": "^4.97.0",
     "react": "^19.1.0",
     "react-bootstrap": "^2.10.9",
@@ -53,5 +54,10 @@
       "last 1 firefox version",
       "last 1 safari version"
     ]
+  },
+  "devDependencies": {
+    "autoprefixer": "^10.4.21",
+    "postcss": "^8.5.3",
+    "tailwindcss": "^4.1.7"
   }
 }
