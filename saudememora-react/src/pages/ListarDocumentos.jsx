@@ -3,13 +3,13 @@ import { useNavigate } from "react-router-dom";
 import DocumentoService from "../services/DocumentoService";
 import ReceitaService from "../services/ReceitaService";
 import ExameService from "../services/ExameService";
-import ProntuarioService from "../services/ProntuarioService";
+import DocumentoClinicoService from "../services/DocumentoClinicoService";
 import Nav from "../components/Nav";
 import { FaPrescriptionBottle, FaVials, FaFileAlt, FaTrash, FaEye, FaUserMd } from "react-icons/fa";
 
 export default function ListarDocumentos() {
   const [documentosDetalhados, setDocumentosDetalhados] = useState({
-    Prontuário: [],
+    DocumentosClinicos: [],
     Exames: [],
     Receitas: []
   });
@@ -38,11 +38,11 @@ export default function ListarDocumentos() {
         console.log("Documentos brutos da API:", response.data);
         
         const docs = {
-          Prontuário: await Promise.all(
+          DocumentosClinicos: await Promise.all(
             response.data
-              .filter(doc => doc.tipoDocumento === "P")
+              .filter(doc => doc.tipoDocumento === "D")
               .map(async doc => {
-                const detalhes = await ProntuarioService.getProntuarioByDocumentoId(doc.id);
+                const detalhes = await DocumentoClinicoService.getDocumentoClinicoByDocumentoId(doc.id);
                 const dados = Array.isArray(detalhes.data) ? detalhes.data[0] : detalhes.data;
 
                 return {
@@ -50,7 +50,7 @@ export default function ListarDocumentos() {
                   documentoId: doc.id, // Duplo mapeamento para segurança
                   ...dados,
                   ...doc,
-                  tipo: "Prontuário",
+                  tipo: "Documentos Clinicos",
                   titulo: `Consulta ${formatarData(doc.dataUpload)}`
                 };
               })
@@ -123,7 +123,9 @@ export default function ListarDocumentos() {
         const res = await ExameService.getExameByDocumentoId(documentoId);
         documento = Array.isArray(res.data) ? res.data[0] : res.data;
       } else {
-        const res = await DocumentoService.getDocumentoById(documentoId);
+        const res = await DocumentoClinicoService.getDocumentoClinicoByDocumentoId(documentoId);
+        
+        console.log(res)
         documento = Array.isArray(res.data) ? res.data[0] : res.data;
       }
 
@@ -145,7 +147,7 @@ export default function ListarDocumentos() {
       await DocumentoService.deleteDocumento(documentoId);
       
       setDocumentosDetalhados(prev => ({
-        Prontuário: prev.Prontuário.filter(doc => doc.id !== documentoId && doc.documentoId !== documentoId),
+        DocumentosClinicos: prev.DocumentosClinicos.filter(doc => doc.id !== documentoId && doc.documentoId !== documentoId),
         Exames: prev.Exames.filter(doc => doc.id !== documentoId && doc.documentoId !== documentoId),
         Receitas: prev.Receitas.filter(doc => doc.id !== documentoId && doc.documentoId !== documentoId)
       }));
@@ -200,15 +202,15 @@ export default function ListarDocumentos() {
         )}
 
         <div className="documentos-wrapper">
-          {/* Seção de Prontuários */}
-          {documentosDetalhados.Prontuário.length > 0 && (
+
+          {documentosDetalhados.DocumentosClinicos.length > 0 && (
             <section className="documentos-section">
               <h2>
-                <FaFileAlt className="icon" /> Prontuário
-                <span className="badge">{documentosDetalhados.Prontuário.length}</span>
+                <FaFileAlt className="icon" /> Documentos Clinicos
+                <span className="badge">{documentosDetalhados.DocumentosClinicos.length}</span>
               </h2>
               <ul className="documentos-list">
-                {documentosDetalhados.Prontuário.map((doc) => (
+                {documentosDetalhados.DocumentosClinicos.map((doc) => (
                   <li key={`P-${doc.id}`} className="documento-item">
                     <div className="documento-info">
                       <div className="documento-header">
@@ -227,7 +229,7 @@ export default function ListarDocumentos() {
                     <div className="documento-actions">
                       <button
                         className="btn-action"
-                        onClick={() => handleVisualizar(doc.id, "P")}
+                        onClick={() => handleVisualizar(doc.id, "D")}
                         title="Visualizar"
                       >
                         <FaEye />

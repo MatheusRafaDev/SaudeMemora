@@ -1,0 +1,90 @@
+package com.pi.saudememora.controller;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.pi.saudememora.model.DocumentoClinico;
+import com.pi.saudememora.service.DocumentoClinicoService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
+
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.util.List;
+
+@RestController
+@RequestMapping("/api/documentosclinicos")
+public class DocumentoClinicoController {
+
+    @Autowired
+    private DocumentoClinicoService service;
+
+
+    @Autowired
+    private ObjectMapper objectMapper;
+
+    @GetMapping
+    public List<DocumentoClinico> listarTodos() {
+        return service.listarTodos();
+    }
+
+    @GetMapping("/paciente/{pacienteId}")
+    public List<DocumentoClinico> listarPorPaciente(@PathVariable Long pacienteId) {
+        return service.listarPorPaciente(pacienteId);
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<DocumentoClinico> buscarPorId(@PathVariable Long id) {
+        return service.buscarPorId(id)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
+    public ResponseEntity<?> criarDocumentoClinicoComArquivo(
+            @RequestParam("documentoData") String documentoData,
+            @RequestParam(value = "arquivo", required = false) MultipartFile arquivo) {
+        try {
+            // Supondo que você use ObjectMapper para converter JSON em objeto
+            DocumentoClinico documento = objectMapper.readValue(documentoData, DocumentoClinico.class);
+
+            if (arquivo != null && !arquivo.isEmpty()) {
+                String nomeArquivo = System.currentTimeMillis() + "_" + arquivo.getOriginalFilename();
+                Path caminho = Paths.get("uploads/documentos", nomeArquivo);
+                Files.createDirectories(caminho.getParent());
+                Files.write(caminho, arquivo.getBytes());
+                documento.setImagem(caminho.toString());  // ajuste para o campo correto
+            }
+
+            DocumentoClinico salvo = service.salvar(documento);
+            return ResponseEntity.status(HttpStatus.CREATED).body(salvo);
+
+        } catch (IOException e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Erro ao salvar arquivo: " + e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Erro ao salvar documento: " + e.getMessage());
+        }
+    }
+
+
+    @PutMapping("/{id}")
+    public ResponseEntity<DocumentoClinico> atualizar(@PathVariable Long id, @RequestBody DocumentoClinico documento) {
+        DocumentoClinico atualizado = service.atualizar(id, documento);
+        if (atualizado == null) {
+            return ResponseEntity.notFound().build();
+        }
+        return ResponseEntity.ok(atualizado);
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Void> deletar(@PathVariable Long id) {
+        service.deletar(id);
+        return ResponseEntity.noContent().build();
+    }
+}

@@ -9,7 +9,7 @@ const Nav = () => {
         <Link className="navbar-brand d-flex align-items-center" to="/home">
           <span className="d-flex align-items-center text-white fw-semibold" style={{ fontSize: '1.5rem' }}>
             <i className="bi bi-heart-pulse me-2" style={{ color: '#7ad6ff' }}></i>
-            <span className="d-none d-sm-inline">Saúde Memora</span>
+            <span className="d-none d-sm-inline">SaúdeMemora</span>
           </span>
         </Link>
 

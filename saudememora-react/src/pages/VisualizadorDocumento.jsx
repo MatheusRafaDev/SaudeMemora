@@ -2,6 +2,7 @@ import React from "react";
 import { useLocation } from "react-router-dom";
 import ReceitaComMedicamentos from "../components/VisualizadorReceita";
 import VisualizadorExame from "../components/VisualizadorExame"; 
+import VisualizadorDocumentoClinico from "../components/VisualizadorDocumentoClinico"; 
 import Nav from "../components/Nav";
 
 const VisualizadorDocumento = () => {
@@ -39,6 +40,15 @@ const VisualizadorDocumento = () => {
           <VisualizadorExame exame={documento} />
         </div>
       );
+
+      case "D":
+      return (
+        <div>
+          <Nav />
+          <VisualizadorDocumentoClinico DocumentoClinico={documento} />
+        </div>
+      );
+
 
     default:
       return (

@@ -1,6 +1,6 @@
 import DocumentoService from "../services/DocumentoService";
 
-import { processarReceita, processarExame, processarExameComImagem, processarProntuario,processarReceitaComImagem } from "./ProcessamentoDeTipoDoc";
+import { processarExameComImagem, processarDocumentoClinicoComImagem,processarReceitaComImagem } from "./ProcessamentoDeTipoDoc";
 
 import { useNavigate } from "react-router-dom";
 export async function AdicionarDocumento(tipoDocumento, textoOCR, paciente, imagem,navigate ) {
@@ -25,12 +25,13 @@ export async function AdicionarDocumento(tipoDocumento, textoOCR, paciente, imag
 
     if (!documentoId) {
       throw new Error("Erro ao criar o documento: ID não retornado.");
-    }
+    }    
 
-    // Passar a imagem para as funções específicas
     if (tipo === "R") return await processarReceitaComImagem(textoOCR, paciente, documentoId, imagem,navigate);
     if (tipo === "E") return await processarExameComImagem(textoOCR, paciente, documentoId, imagem,navigate);
-    if (tipo === "P") return await processarProntuario(textoOCR, paciente, documentoId, imagem,navigate);
+    if (tipo === "D") return await processarDocumentoClinicoComImagem(textoOCR, paciente, documentoId, imagem,navigate);
+
+
 
     throw new Error("Tipo de documento não suportado.");
   } catch (error) {

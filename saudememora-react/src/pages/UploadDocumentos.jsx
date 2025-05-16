@@ -135,6 +135,12 @@ export default function UploadDocumentos() {
           <FiUpload /> Processamento de Documento
         </h4>
 
+        <div className="alert alert-info mt-3" role="alert">
+          🔍 Para melhores resultados, recomendamos fazer um{" "}
+          <strong>escaneamento do documento</strong> antes de enviá-lo. Fotos
+          com baixa qualidade podem prejudicar o reconhecimento do texto.
+        </div>
+
         {preview && (
           <div className="preview-container mb-3 text-center">
             <img
@@ -157,8 +163,8 @@ export default function UploadDocumentos() {
           >
             <option value="">Selecione o tipo</option>
             <option value="E">Exame</option>
-            <option value="P">Prontuário</option>
             <option value="R">Receitas</option>
+            <option value="D"> Documento Clínico</option>
           </select>
         </div>
 

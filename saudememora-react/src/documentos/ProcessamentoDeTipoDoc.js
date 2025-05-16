@@ -1,11 +1,11 @@
 import ReceitaService from "../services/ReceitaService";
 import ExameService from "../services/ExameService";
-import ProntuarioService from "../services/ProntuarioService";
+import DocumentoClinicoService from "../services/DocumentoClinicoService";
 
 import {
   tratarOCRParaReceitas,
   tratarOCRParaExames,
-  tratarOCRParaProntuarios,
+  tratarOCRParaDocumentoClinico,
 } from "../services/OpenRouter";
 
 export async function processarReceitaComImagem(
@@ -129,31 +129,44 @@ export async function processarExameComImagem(
   }
 }
 
-export async function processarProntuario(textoOCR, paciente, documentoId) {
+export async function processarDocumentoClinicoComImagem(textoOCR, paciente, documentoId,imagem,navigate) {
   try {
-    const prontuarioJSON = await tratarOCRParaProntuarios(textoOCR);
-    if (prontuarioJSON.error)
-      throw new Error(`Erro no OCR do prontuário: ${prontuarioJSON.error}`);
+    const documentoJSON = await tratarOCRParaDocumentoClinico(textoOCR);
+    if (documentoJSON.error)
+      throw new Error(`Erro no OCR do documento clínico: ${documentoJSON.error}`);
 
-    const prontuarioData = {
-      data: prontuarioJSON.data || new Date().toISOString().split("T")[0],
-      medico: prontuarioJSON.medico || "Médico não informado",
-      especialidade:
-        prontuarioJSON.especialidade || "Especialidade não informada",
-      observacoes: prontuarioJSON.observacoes || "Sem observações",
-      conclusoes: prontuarioJSON.conclusoes || "Sem conclusões",
-      resumo: prontuarioJSON.resumo || textoOCR || "Sem resumo",
-      conteudo: prontuarioJSON.conteudo || textoOCR || "Sem conteúdo original",
+    const documentoData = {
+      data: documentoJSON.data || new Date().toISOString().split("T")[0],
+      medico: documentoJSON.medico || "Médico não informado",
+      especialidade: documentoJSON.especialidade || "Especialidade não informada",
+      observacoes: documentoJSON.observacoes || "Sem observações",
+      conclusoes: documentoJSON.conclusoes || "Sem conclusões",
+      resumo: documentoJSON.resumo || textoOCR || "Sem resumo",
+      conteudo: documentoJSON.conteudo || textoOCR || "Sem conteúdo original",
       paciente: { id: paciente.id },
       documento: { id: documentoId },
+    
     };
 
-    const response = await ProntuarioService.create(prontuarioData);
-    if (response?.success)
-      return { success: true, message: "Prontuário incluído com sucesso!" };
+    const formData = new FormData();
+    formData.append("documentoData", JSON.stringify(documentoData));
+    formData.append("imagem", imagem);
 
-    throw new Error(response?.message || "Erro ao incluir o prontuário.");
+    let documentoDados;
+    const response = await DocumentoClinicoService.create(formData);
+    documentoDados = response.data;
+
+    navigate("/visualizar-documento", {
+      state: { documento: documentoDados, tipo: "D" },
+    });
+
+
+    if (response?.success)
+      return { success: true, message: "Documento clínico incluído com sucesso!" };
+
+    throw new Error(response?.message || "Erro ao incluir o documento clínico.");
   } catch (error) {
-    throw new Error(`Erro ao processar o prontuário: ${error.message}`);
+    throw new Error(`Erro ao processar o documento clínico: ${error.message}`);
   }
 }
+

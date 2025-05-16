@@ -55,7 +55,7 @@ function App() {
         <Route path="/meus-documentos" element={<ListarDocumentos />}/>
 
         <Route path="/visualizar-documento" element={<VisualizadorDocumento />}/>
-
+        <Route path="*" element={<Navigate to="/home" />} />
       </Routes>
     </Router>
   );

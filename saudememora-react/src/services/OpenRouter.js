@@ -318,92 +318,6 @@ ${textoTratado}`;
   }
 }
 
-
-export async function tratarOCRParaProntuarios(textoOCR) {
-  try {
-    if (!textoOCR || typeof textoOCR !== "string" || textoOCR.trim().length < 10) {
-      throw new Error("Texto OCR inválido ou muito curto.");
-    }
-
-    const textoTratado = textoOCR
-      .replace(/[^a-zA-Z0-9.,\s]/g, "")
-      .trim();
-
-    const prompt = `Você é um assistente que interpreta textos extraídos via OCR e transforma os dados em JSON estruturado para prontuários médicos.
-
-Leia o texto abaixo e extraia os campos:
-- "data" (formato YYYY-MM-DD ou DD/MM/YYYY),
-- "medico": nome do médico,
-- "especialidade": especialidade médica do profissional,
-- "observacoes": observações adicionais,
-- "conclusoes": conclusões do médico sobre o caso,
-- "resumo": o mesmo texto abaixo, mas reescrito com ortografia corrigida, pontuação adequada e espaçamento correto. NÃO resuma nem interprete, apenas normalize.
-
-Retorne apenas o JSON com os dados extraídos, no seguinte formato:
-{
-  "data": "YYYY-MM-DD",
-  "medico": "Nome do médico",
-  "especialidade": "Especialidade médica",
-  "observacoes": "Texto das observações",
-  "conclusoes": "Texto das conclusões",
-  "resumo": "Texto do OCR reescrito e normalizado"
-}
-
-Texto do OCR:
-${textoTratado}`;
-
-    const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${OPENROUTER_API_KEY}`,
-      },
-      body: JSON.stringify({
-        model: "openai/gpt-3.5-turbo",
-        messages: [
-          {
-            role: "system",
-            content:
-              "Você é um assistente que interpreta e organiza dados extraídos via OCR para inclusão em um sistema de prontuários médicos.",
-          },
-          {
-            role: "user",
-            content: prompt,
-          },
-        ],
-        temperature: 0.0,
-      }),
-      timeout: 15000,
-    });
-
-    if (!res.ok) throw new Error(`Erro na API: ${res.statusText}`);
-    const data = await res.json();
-
-    let jsonProntuario;
-    try {
-      jsonProntuario = JSON.parse(data.choices[0].message.content);
-    } catch (e) {
-      throw new Error("Resposta da API não é um JSON válido.");
-    }
-
-    if (!jsonProntuario || typeof jsonProntuario !== "object") {
-      throw new Error("A resposta da API está incompleta.");
-    }
-
-    return {
-      data: jsonProntuario.data || "",
-      medico: jsonProntuario.medico || "",
-      especialidade: jsonProntuario.especialidade || "",
-      observacoes: normalizarTexto(jsonProntuario.observacoes),
-      conclusoes: normalizarTexto(jsonProntuario.conclusoes),
-      resumo: normalizarTexto(jsonProntuario.resumo),
-    };
-  } catch (error) {
-    console.error("❌ Erro ao tratar OCR para Prontuário:", error.message);
-    return { error: error.message };
-  }
-}
-
 export async function tratarOCRParaExames(textoOCR) {
   try {
     if (!textoOCR || typeof textoOCR !== "string" || textoOCR.trim().length < 10) {
@@ -485,6 +399,91 @@ ${textoTratado}`;
     };
   } catch (error) {
     console.error("❌ Erro ao tratar OCR para Exames:", error.message);
+    return { error: error.message };
+  }
+}
+
+export async function tratarOCRParaDocumentoClinico(textoOCR) {
+  try {
+    if (!textoOCR || typeof textoOCR !== "string" || textoOCR.trim().length < 10) {
+      throw new Error("Texto OCR inválido ou muito curto.");
+    }
+
+    const textoTratado = textoOCR
+      .replace(/[^a-zA-Z0-9.,\s]/g, "")
+      .trim();
+
+    const prompt = `Você é um assistente que interpreta textos extraídos via OCR e transforma os dados em JSON estruturado para documentos clínicos.
+
+Leia o texto abaixo e extraia os campos:
+- "data" (formato YYYY-MM-DD ou DD/MM/YYYY),
+- "medico": nome do médico,
+- "especialidade": especialidade médica do profissional,
+- "observacoes": observações adicionais,
+- "conclusoes": conclusões do médico sobre o caso,
+- "resumo": o mesmo texto abaixo, mas reescrito com ortografia corrigida, pontuação adequada e espaçamento correto. NÃO resuma nem interprete, apenas normalize.
+
+Retorne apenas o JSON com os dados extraídos, no seguinte formato:
+{
+  "data": "YYYY-MM-DD",
+  "medico": "Nome do médico",
+  "especialidade": "Especialidade médica",
+  "observacoes": "Texto das observações",
+  "conclusoes": "Texto das conclusões",
+  "resumo": "Texto do OCR reescrito e normalizado"
+}
+
+Texto do OCR:
+${textoTratado}`;
+
+    const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${OPENROUTER_API_KEY}`,
+      },
+      body: JSON.stringify({
+        model: "openai/gpt-3.5-turbo",
+        messages: [
+          {
+            role: "system",
+            content:
+              "Você é um assistente que interpreta e organiza dados extraídos via OCR para inclusão em um sistema de documentos clínicos.",
+          },
+          {
+            role: "user",
+            content: prompt,
+          },
+        ],
+        temperature: 0.0,
+      }),
+      timeout: 15000,
+    });
+
+    if (!res.ok) throw new Error(`Erro na API: ${res.statusText}`);
+    const data = await res.json();
+
+    let jsonDocumento;
+    try {
+      jsonDocumento = JSON.parse(data.choices[0].message.content);
+    } catch (e) {
+      throw new Error("Resposta da API não é um JSON válido.");
+    }
+
+    if (!jsonDocumento || typeof jsonDocumento !== "object") {
+      throw new Error("A resposta da API está incompleta.");
+    }
+
+    return {
+      data: jsonDocumento.data || "",
+      medico: jsonDocumento.medico || "",
+      especialidade: jsonDocumento.especialidade || "",
+      observacoes: normalizarTexto(jsonDocumento.observacoes),
+      conclusoes: normalizarTexto(jsonDocumento.conclusoes),
+      resumo: normalizarTexto(jsonDocumento.resumo),
+    };
+  } catch (error) {
+    console.error("❌ Erro ao tratar OCR para Documento Clínico:", error.message);
     return { error: error.message };
   }
 }

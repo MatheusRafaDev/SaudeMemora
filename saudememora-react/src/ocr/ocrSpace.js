@@ -52,6 +52,42 @@ export async function ocrSpace(file) {
   }
 }
 
+export async function ocrSpacePdf(file) {
+  try {
+    const formData = new FormData();
+
+    // Adiciona o arquivo PDF ao FormData
+    formData.append('apikey', API_KEY);
+    formData.append('file', file, 'documento.pdf'); // Nome do arquivo importante para PDFs
+    formData.append('language', 'por');
+    formData.append('isOverlayRequired', 'true');
+    formData.append('detectOrientation', 'true');
+    formData.append('scale', 'true');
+    formData.append('OCREngine', '2');
+    formData.append('isTable', 'true');
+    formData.append('filetype', 'pdf'); // Especifica que é um PDF
+
+    const res = await axios.post(URL, formData, {
+      headers: { 'Content-Type': 'multipart/form-data' },
+      maxContentLength: Infinity,
+      maxBodyLength: Infinity,
+    });
+
+    if (res.data.IsErroredOnProcessing) {
+      throw new Error(res.data.ErrorMessage || 'Erro ao processar PDF no OCR.space');
+    }
+
+    let parsedText = getParsedText(res.data);
+
+    console.log('Texto extraído do PDF:', parsedText);
+    
+    return parsedText;
+
+  } catch (err) {
+    handleError(err);
+    return '';
+  }
+}
 
 function handleError(err) {
   if (axios.isAxiosError(err)) {

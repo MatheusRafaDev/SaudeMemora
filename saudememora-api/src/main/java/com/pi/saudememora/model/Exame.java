@@ -37,6 +37,8 @@ public class Exame {
     @Column(name = "nome_exame")
     private String nomeExame;
 
+
+
     @ManyToOne
     @JoinColumn(name = "id_documento", nullable = false)
     @JsonIgnoreProperties("exames")
