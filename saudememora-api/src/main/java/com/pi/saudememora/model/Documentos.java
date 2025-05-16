@@ -19,13 +19,13 @@ public class Documentos {
     private Paciente paciente;
 
 
-    @Column(name = "ds_tipo_documento", length = 1, nullable = false)
-    private String tipoDocimento;
+    @Column(name = "ds_tipo_documento", length = 20, nullable = false)
+    private String tipoDocumento;
 
     @Column(name = "ds_url_arquivo ", length = 2000)
     private String urlArquivo;
 
-    @Column(name = "ds_status  ", length = 1, nullable = false)
+    @Column(name = "ds_status  ", length = 20, nullable = false)
     private String status;
 
     @Column(name = "ds_data_upload", nullable = false)  // Tipo String, você pode usar um tipo de dado de data se preferir
@@ -48,11 +48,11 @@ public class Documentos {
     }
 
     public String getTipoDocimento() {
-        return tipoDocimento;
+        return tipoDocumento;
     }
 
     public void setTipoDocimento(String tipoDocimento) {
-        this.tipoDocimento = tipoDocimento;
+        this.tipoDocumento = tipoDocimento;
     }
 
     public String getUrlArquivo() {

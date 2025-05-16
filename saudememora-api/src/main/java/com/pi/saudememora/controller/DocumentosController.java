@@ -21,15 +21,11 @@ public class DocumentosController {
 
     @Autowired
     private DocumentosService documentosService;
-
-    @GetMapping("/listar")
-    public List<Documentos> listarPacientes() { 
-        return documentosRepository.findAll();
-    }
-
     @GetMapping("/listarFiltro")
-    public ResponseEntity<Documentos> buscarDocumentos(@RequestBody Documentos documento) {
-        Optional<Documentos> documentos = documentosRepository.findAllOptional(documento);
+    public ResponseEntity<Documentos> buscarDocumentos(@RequestParam String tipo,
+                                                       @RequestParam String status,
+                                                       @RequestParam String dataUpload) {
+        Optional<Documentos> documentos = documentosRepository.findByStatusAndTipoDocumentoAndDataUpload(tipo, status, dataUpload);
         return documentos.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 }

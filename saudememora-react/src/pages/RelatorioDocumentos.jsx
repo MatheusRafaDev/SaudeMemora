@@ -1,29 +1,29 @@
 import React, { useState } from 'react';
-import '../styles/RelatorioDocumentos.css'; 
-
+import '../styles/RelatorioDocumentos.css';
+import { listarDocumentos } from "../services/DocumentosService";
 
 const RelatorioDocumentos = () => {
   const [tipo, setTipo] = useState('');
   const [status, setStatus] = useState('');
-  const [dataInicio, setDataInicio] = useState('');
-  const [dataFim, setDataFim] = useState('');
+  const [dataUpload, setDataUpload] = useState('');
+  const [documentos, setDocumentos] = useState([]);
 
-  const documentos = [
-    {
-      id: 1,
-      paciente: 101,
-      tipo: 'Receita',
-      status: 'Finalizado',
-      dataUpload: '30/04/2025, 10:20:00'
-    },
-    {
-      id: 2,
-      paciente: 102,
-      tipo: 'Exame',
-      status: 'Em processamento',
-      dataUpload: '29/04/2025, 14:05:00'
+  const buscarDocumentos = async () => {
+    try {
+      console.log("Buscando documentos com os seguintes filtros:", {
+        tipo,status,dataUpload
+      }); 
+      const resultado = await listarDocumentos(tipo, status, dataUpload);
+      if (resultado.success) {
+        setDocumentos(resultado.data);
+      } else {
+        alert("Erro ao buscar documentos");
+      }
+    } catch (error) {
+      console.error("Erro ao buscar documentos:", error);
+      alert("Erro inesperado.");
     }
-  ];
+  };
 
   return (
     <div className="container">
@@ -44,12 +44,10 @@ const RelatorioDocumentos = () => {
       </select>
 
       <label>Data Início:</label>
-      <input type="date" value={dataInicio} onChange={(e) => setDataInicio(e.target.value)} />
-
-      <label>Data Fim:</label>
-      <input type="date" value={dataFim} onChange={(e) => setDataFim(e.target.value)} />
+      <input type="date" value={dataUpload} onChange={(e) => setDataUpload(e.target.value)} />
 
       <div className="button-group">
+        <button className="btn" onClick={buscarDocumentos}>Listar Documentos Encontrados</button>
         <button className="btn">Exportar para Excel</button>
         <button className="btn">Exportar para PDF</button>
       </div>
@@ -58,7 +56,7 @@ const RelatorioDocumentos = () => {
         <div key={doc.id} className="card">
           <p><strong>ID:</strong> {doc.id}</p>
           <p><strong>Paciente:</strong> {doc.paciente}</p>
-          <p><strong>Tipo:</strong> {doc.tipo}</p>
+          <p><strong>Tipo:</strong> {doc.tipoDocumento}</p>
           <p><strong>Status:</strong> {doc.status}</p>
           <p><strong>Data Upload:</strong> {doc.dataUpload}</p>
         </div>

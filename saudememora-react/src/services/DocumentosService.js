@@ -1,14 +1,13 @@
 import axiosInstance from "../axiosConfig"; 
 
-export const listarDocumentos = async (tipo,status,dataInicio,dataFim) => {
+export const listarDocumentos = async (tipo,status,dataUpload) => {
     try {
-        const response = await axiosInstance.get("/api/documentos/listarFiltro", {
-            documento: {
-            tipo,
-            status,
-            dataInicio,
-            dataFim,
-            },
+        const response = await axiosInstance.get("/api/documentos/listarFiltro", {  
+          params: {
+            tipo: 'Receita',
+            status: 'Finalizado',
+            dataUpload: '2025-05-25'
+          }
         }); 
       if (response.status === 200) {
         return { success: true, data: response.data };
