@@ -89,6 +89,7 @@ export default function ReceitaComMedicamentos({ receita }) {
                 <div>
                   <strong>{med.nome}</strong>
                   <p className="mb-0 text-muted">
+                    <strong>Posologia: </strong>
                     {med.quantidade} — {med.formaDeUso}
                   </p>
                 </div>
