@@ -95,9 +95,11 @@ export default function Login() {
             <button
               onClick={() => navigate("/esqueci-senha")}
               className="btn btn-link p-0"
+              disabled
             >
               Esqueci a senha
             </button>
+
           </div>
         </div>
       </main>

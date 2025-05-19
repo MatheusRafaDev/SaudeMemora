@@ -30,7 +30,7 @@ let tesseractWorker;
 async function getWorker() {
   if (!tesseractWorker) {
     tesseractWorker = await createWorker();
-    await tesseractWorker.loadLanguage('por');
+    await tesseractWorker.load();
     await tesseractWorker.initialize('por');
   }
   return tesseractWorker;
