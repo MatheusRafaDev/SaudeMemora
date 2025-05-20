@@ -1,4 +1,4 @@
-import { processarFormularioMedico } from "../services/OpenRouter";
+import { ajustarTextoFormulario, ajustarDadosMedicos, ajustarJSON } from "../services/OpenRouter";
 
 export async function aplicarCamposComOCR(
   textoOCR,
@@ -6,72 +6,62 @@ export async function aplicarCamposComOCR(
   setRespostas,
   ocrExecutado
 ) {
-  if (!ocrExecutado || !textoOCR) {
-    console.warn("OCR não executado ou texto vazio");
-    return;
-  }
+  if (!ocrExecutado || !textoOCR) return;
 
   try {
 
-    const jsonExtraido = await processarFormularioMedico(textoOCR);
+    const dados_medicos = await ajustarDadosMedicos(textoOCR);
+    const resultado = await ajustarTextoFormulario(dados_medicos);
+    const json = await ajustarJSON(resultado);
 
-    // Mapeamento de campos antigos para novos (se necessário)
-    const mapeamentoCampos = {
-      "cardiaco": "cardio",
-      "hemorragico": "hemorragicos",
-      "alergia_medicamentos": "alergia_medicamento"
-    };
-
+      /*
+      var json = {
+        tratamento_medico: "não",
+        gravida: "não",
+        regime: "não",
+        diabetes: "não",
+        alergias: "não",
+        reumatica: "não",
+        coagulacao: "não",
+        anestesia: "não",
+        hepatite: "não",
+        hiv: "não",
+        drogas: "não",
+        fumante: "não",
+        pressao: "normal",
+        respiratorio: "sim"
+      };
+    */
     const novasRespostas = {};
-    const valoresPressaoValidos = ["NORMAL", "ALTA", "BAIXA"];
 
     perguntas.forEach((pergunta) => {
       const chave = pergunta.chave;
-      
-      // Verifica se há mapeamento para o campo
-      const chaveOrigem = mapeamentoCampos[chave] || chave;
-      
-      let valor = jsonExtraido[chaveOrigem];
+      let valor = json[chave];
 
-      // Tratamento padrão para valores não definidos
-      if (valor === undefined || valor === null) {
-        novasRespostas[chave] = pergunta.tipo === "pressao" ? "" : "NAO";
-        return;
-      }
+      if (valor !== undefined && valor !== null) {
+        valor = valor.toString().trim().toUpperCase().replace("NÃO", "NAO");
 
-      // Padronização do valor
-      valor = valor.toString().trim().toUpperCase()
-        .replace("NÃO", "NAO")
-        .replace("NAO", "NAO")
-        .replace("SIM", "SIM");
-
-      // Tratamento especial para pressão arterial
-      if (pergunta.tipo === "pressao") {
-        // Encontra o valor mais próximo (para lidar com variações como "ALTAMENTE" -> "ALTA")
-        const valorPressao = valoresPressaoValidos.find(v => 
-          valor.includes(v) || v.includes(valor)
-        );
-        novasRespostas[chave] = valorPressao || "";
-      } 
-      // Tratamento para campos SIM/NAO
-      else {
-        novasRespostas[chave] = valor === "SIM" ? "SIM" : "NAO";
-        
-        // Se for SIM e houver campo extra no OCR, preenche
-        if (valor === "SIM" && jsonExtraido[`${chaveOrigem}_detalhe`]) {
-          novasRespostas[`${chave}_extra`] = jsonExtraido[`${chaveOrigem}_detalhe`];
+        if (pergunta.tipo === "pressao") {
+          if (["NORMAL", "ALTA", "BAIXA"].includes(valor)) {
+            novasRespostas[chave] = valor;
+          } else {
+            novasRespostas[chave] = "";
+          }
+        } else {
+          novasRespostas[chave] = valor;
         }
+      } else {
+
+        novasRespostas[chave] = pergunta.tipo === "pressao" ? "" : "NAO";
       }
     });
 
-    // Atualiza o estado das respostas preservando valores existentes
-    setRespostas(prevRespostas => ({
+    setRespostas((prevRespostas) => ({
       ...prevRespostas,
-      ...novasRespostas
+      ...novasRespostas,
     }));
 
   } catch (error) {
     console.error("Erro ao aplicar campos com OCR:", error);
-    throw new Error("Falha ao processar OCR. Verifique o formato do texto.");
   }
 }

@@ -12,6 +12,8 @@ import ListarDocumentos from "./pages/ListarDocumentos";
 import EditarPerfil from "./pages/EditarPerfil";
 import RelatorioDocumentos from "./pages/RelatorioDocumentos";
 import VisualizadorDocumento from "./pages/VisualizadorDocumento";
+import "bootstrap/dist/js/bootstrap.bundle.min.js";
+
 
 const isPacienteLoggedIn = () => {
   const data = localStorage.getItem("paciente");

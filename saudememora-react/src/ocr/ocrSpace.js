@@ -39,7 +39,7 @@ async function getWorker() {
 /**
  * Versão melhorada do OCR.space com tratamento de erros robusto
  */
-export async function ocrSpace2(file) {
+export async function ocrSpace(file) {
   try {
     const processedBlob = await ProcessarImagem(file, {
       targetDPI: 400,
@@ -79,7 +79,7 @@ export async function ocrSpace2(file) {
 /**
  * Versão otimizada do Tesseract.js com configuração avançada
  */
-export async function ocrSpace(file, options = {}) {
+export async function ocrSpace2(file, options = {}) {
   const { logProgress = false } = options;
   const worker = await getWorker();
 

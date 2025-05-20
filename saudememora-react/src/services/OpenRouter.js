@@ -13,143 +13,193 @@ function normalizarTexto(texto) {
 }
 
 
-export async function processarFormularioMedico(text) {
-  if (!text || typeof text !== "string" || text.trim().length < 10) {
-    throw new Error("Texto do formulário inválido ou muito curto");
-  }
 
-  const headers = {
-    "Content-Type": "application/json",
-    Authorization: `Bearer ${OPENROUTER_API_KEY}`,
-  };
+export async function ajustarTextoFormulario(text) {
+  try {
+    // Verifica se o texto é válido
+    if (!text || typeof text !== "string" || text.trim().length < 10) {
+      throw new Error("Texto do formulário inválido ou muito curto");
+    }
 
-  // Função auxiliar para chamada da API OpenRouter
-  async function chamarOpenRouter(prompt, temperature = 0.0, timeout = 15000) {
+    // Substitui ocorrências de "NORMAL A ALTA" ou "NORMAL A BAIXA" por "NORMAL"
+    let textoCorrigido = text.replace(/NORMAL\s*A\s*(ALTA|BAIXA)/g, "NORMAL");
+
+    // Substitui qualquer ocorrência de "SIM ( )" ou "SIM()" por "NÃO"
+    textoCorrigido = textoCorrigido
+      .replace(/SIM\s*\(\s*\)/g, "SIM ()")
+      .replace(/SIM\s*\(\s*\)/g, "NÃO");
+
+    // O prompt de correção a ser enviado para o GPT
+    const prompt = `Leia o questionário abaixo e, ao final, retorne apenas as respostas exatamente como estão, sem correção de ortografia ou formatação. Não modifique nada nos parênteses ou erros de digitação. Apenas forneça as perguntas seguidas das respostas no formato de JSON, com as respostas como "SIM" ou "NÃO" e para na pressao escolher enre normal,alto e baixo se encaixa mais no texto. Não adicione explicações ou observações.
+
+    Texto do formulário:
+    ${textoCorrigido}
+    `;
+
+    // Requisição para a API com o controle de temperatura ajustado para consistência
     const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
       method: "POST",
-      headers,
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${OPENROUTER_API_KEY}`,
+      },
       body: JSON.stringify({
         model: "openai/gpt-3.5-turbo",
         messages: [
-          { role: "system", content: "Você é um assistente especializado em formular e extrair dados médicos com precisão." },
-          { role: "user", content: prompt }
+          {
+            role: "system",
+            content:
+              "Você é um assistente que ajusta respostas de formulários médicos com base em regras definidas para marcações incorretas ou omissas.",
+          },
+          {
+            role: "user",
+            content: prompt,
+          },
         ],
-        temperature,
+        temperature: 0.0, // Ajusta para gerar respostas mais consistentes
       }),
-      timeout,
+      timeout: 15000,
+    });
+
+    // Verifica se a resposta foi bem-sucedida
+    if (!res.ok) throw new Error(`Erro na API: ${res.statusText}`);
+
+    // Processa a resposta
+    const data = await res.json();
+    return data.choices[0].message.content; // Retorna o conteúdo corrigido (em JSON)
+  } catch (error) {
+    console.error("Erro ao processar o formulário:", error);
+    return { error: error.message }; // Retorna o erro caso haja falhas
+  }
+}
+
+export async function ajustarDadosMedicos(text) {
+  try {
+    if (!text || typeof text !== "string" || text.trim().length < 10) {
+      throw new Error("Texto do formulário inválido ou muito curto");
+    }
+
+    const prompt = `Extraia do texto abaixo apenas as perguntas médicas com as respostas sem corrigir ortografia e nem corrigir as respostas. Deixe os parênteses da forma que estavam e os erros também. Apenas corte as perguntas e respostas.
+
+Texto do formulário:
+${text}
+`;
+
+    const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${OPENROUTER_API_KEY}`,
+      },
+      body: JSON.stringify({
+        model: "openai/gpt-3.5-turbo",
+        messages: [
+          {
+            role: "system",
+            content:
+              "Você é um assistente que extrai apenas os dados médicos de formulários, sem realizar correções.",
+          },
+          {
+            role: "user",
+            content: prompt,
+          },
+        ],
+        temperature: 0.0,
+      }),
+      timeout: 15000,
     });
 
     if (!res.ok) throw new Error(`Erro na API: ${res.statusText}`);
     const data = await res.json();
-    return data.choices[0].message.content.trim();
+
+    return data.choices[0].message.content;
+  } catch (error) {
+    console.error("Erro ao processar dados médicos:", error);
+    return `Erro: ${error.message}`;
   }
-
-  try {
-    // 1. Pré-processar o texto para melhorar entrada
-    const textoNormalizado = text.replace(/\s{2,}/g, " ").replace(/\n{2,}/g, "\n");
-
-    // 2. Etapa de limpeza do texto
-    const limparPrompt = `Extraia do texto abaixo APENAS as informações médicas relevantes, removendo:
-- Cabeçalhos
-- Rodapés
-- Instruções
-- Textos não relacionados às perguntas do formulário
-
-Mantenha:
-- As perguntas originais
-- As respostas exatamente como estão, mesmo com erros
-- Detalhes entre parênteses
-
-Retorne o texto limpo, com cada pergunta e resposta em uma linha separada.
-
-Texto original:
-${textoNormalizado}`;
-
-    const perguntasRespostasBrutas = await chamarOpenRouter(limparPrompt);
-
-    // 3. Estruturação das perguntas e respostas
-    const estruturarPrompt = `Analise o texto abaixo e:
-1. Identifique claramente perguntas e respostas
-2. Marque como "não" qualquer resposta vazia ou com parênteses vazios
-3. Mantenha os detalhes das respostas exatamente como estão
-4. Retorne o texto reorganizado com cada pergunta e resposta em uma linha separada
-
-Exemplo de saída:
-tratamento_medico: sim (quimioterapia)
-gravida: não
-diabetes: sim (tipo 2)
-
-Texto original:
-${perguntasRespostasBrutas}`;
-
-    const perguntasRespostasEstruturadas = await chamarOpenRouter(estruturarPrompt, 0.0, 15000);
-
-    // 4. Extração final em JSON
-    const jsonPrompt = `
-Você receberá um texto contendo respostas de um formulário médico. Sua tarefa é extrair os dados e devolver em JSON com a seguinte estrutura:
-
-{
-  "tratamento_medico": "sim/não",
-  "tratamento_medico_detalhe": "motivo se houver",
-  "gravida": "sim/não",
-  "gravida_detalhe": "meses se houver",
-  "regime": "sim/não",
-  "regime_detalhe": "tipo se houver",
-  "diabetes": "sim/não",
-  "diabetes_detalhe": "tipo se houver",
-  "alergias": "sim/não",
-  "alergias_detalhe": "a que se houver",
-  "reumatica": "sim/não",
-  "coagulacao": "sim/não",
-  "cardio": "sim/não",
-  "cardio_detalhe": "qual doença se houver",
-  "hemorragicos": "sim/não",
-  "anestesia": "sim/não",
-  "anestesia_detalhe": "qual problema se houver",
-  "alergia_medicamento": "sim/não",
-  "alergia_medicamento_detalhe": "qual medicamento se houver",
-  "hepatite": "sim/não",
-  "hepatite_detalhe": "há quanto tempo se houver",
-  "hiv": "sim/não",
-  "drogas": "sim/não",
-  "fumante": "sim/não",
-  "fumou": "sim/não",
-  "pressao": "normal/alta/baixa",
-  "respiratorio": "sim/não",
-  "respiratorio_detalhe": "qual problema se houver",
-  "doenca_familia": "sim/não",
-  "doenca_familia_detalhe": "quais doenças se houver"
 }
 
-Regras:
-1. Use apenas letras minúsculas (sim/não)
-2. Mantenha os detalhes exatamente como estão no texto, sem correções
-3. Inclua apenas os campos que existirem no texto
-4. Para pressão, use apenas: normal, alta ou baixa
-5. Não adicione campos que não existam no texto
-
-Texto do formulário:
-"""${perguntasRespostasEstruturadas}"""
-`;
-
-    let jsonResposta = await chamarOpenRouter(jsonPrompt, 0.1, 20000);
-
-    // Limpar possíveis marcas de código
-    jsonResposta = jsonResposta.replace(/```json/g, "").replace(/```/g, "").trim();
-
-    // Validar e retornar JSON
-    try {
-      console.log("JSON Resposta:", jsonResposta);
-      return JSON.parse(jsonResposta);
-    } catch (e) {
-      throw new Error("Resposta da IA não é um JSON válido:\n" + jsonResposta);
+export async function ajustarJSON(text) {
+  try {
+    if (!text || typeof text !== "string" || text.trim().length < 10) {
+      throw new Error("Texto do formulário inválido ou muito curto");
     }
 
+    const prompt = `
+Você receberá um texto contendo respostas de um formulário médico.
+
+Sua tarefa é extrair os dados e devolver em JSON **resumido**, sem acentos, tudo em letras minúsculas, com as chaves no estilo snake_case.
+
+Siga exatamente este modelo:
+
+{
+  "tratamento_medico": "",
+  "gravida": "",
+  "regime": "",
+  "diabetes": "",
+  "alergias": "",
+  "reumatica": "",
+  "coagulacao": "",
+  "cardiaco": "",
+  "hemorragico": "",
+  "anestesia": "",
+  "alergia_medicamentos": "",
+  "hepatite": "",
+  "hiv": "",
+  "drogas": "",
+  "fumante": "",
+  "fumou": "",
+  "pressao": "",
+  "respiratorio": ""
+}
+
+Preencha apenas com os dados que existirem no texto.  
+Se algum campo não estiver presente no texto, **omita do JSON**.  
+**Não corrija erros de digitação**, apenas interprete conforme o texto.  
+Texto do formulário:
+"""${text}"""
+`;
+
+    const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${OPENROUTER_API_KEY}`,
+      },
+      body: JSON.stringify({
+        model: "openai/gpt-3.5-turbo",
+        messages: [
+          {
+            role: "system",
+            content: "Você é um assistente que extrai apenas os dados médicos de formulários, sem realizar correções.",
+          },
+          {
+            role: "user",
+            content: prompt,
+          },
+        ],
+        temperature: 0.0,
+      }),
+      timeout: 15000,
+    });
+
+    if (!res.ok) throw new Error(`Erro na API: ${res.statusText}`);
+    
+    const data = await res.json();
+
+    // Remover delimitadores de bloco de código (```json e ```)
+    let content = data.choices[0].message.content;
+    content = content.replace(/```json/g, "").replace(/```/g, "").trim();
+
+    // Convertendo a string JSON limpa para um objeto
+    const jsonObject = JSON.parse(content);
+    return jsonObject;
   } catch (error) {
-    console.error("Erro no processamento do formulário médico:", error);
-    throw error;
+    console.error("Erro ao processar dados médicos:", error);
+    return { error: error.message };
   }
 }
+
 
 
 
@@ -193,7 +243,7 @@ Retorne apenas o JSON com os dados extraídos, no seguinte formato:
     }
   ],
   "observacoes": "Texto das observações",
-  "resumo": "Texto do OCR reescrito e normalizado"
+  "resumo": "Texto do OCR reescrito e normalizado. Corrija a ortografia, padronize os termos médicos e organize como se fosse uma receita".
 }
 
 Não adicione comentários nem explicações.
@@ -391,7 +441,7 @@ Retorne apenas o JSON com os dados extraídos, no seguinte formato:
   "especialidade": "Especialidade médica",
   "observacoes": "Texto das observações",
   "conclusoes": "Texto das conclusões",
-  "resumo": "Texto do OCR reescrito e normalizado"
+  "resumo": "reformatar textos extraídos via OCR para melhorar a legibilidade."
 }
 
 Texto do OCR:
@@ -450,3 +500,77 @@ ${textoTratado}`;
     return { error: error.message };
   }
 }
+
+export async function formatarTextoOCR(textoOCR) {
+
+  try {
+    if (!textoOCR || typeof textoOCR !== "string" || textoOCR.trim().length < 10) {
+      throw new Error("Texto OCR inválido ou muito curto.");
+    }
+
+    const textoTratado = textoOCR
+      .normalize("NFD").replace(/[\u0300-\u036f]/g, "") // Remove acentos
+      .replace(/[^a-zA-Z0-9À-ÿ.,\s/-]/g, "") // Remove caracteres especiais
+      .trim();
+
+    const prompt = `Você é um assistente que formata textos extraídos via OCR para melhorar a legibilidade.
+    
+Sua tarefa é:
+1. Corrigir erros comuns de OCR
+2. Ajustar a formatação para melhor legibilidade
+3. Manter todo o conteúdo original
+4. Organizar o texto em parágrafos lógicos
+5. Aplicar capitalização correta (nomes próprios, início de frases)
+6. Corrigir espaçamento e pontuação
+
+Não altere o significado do texto, apenas melhore sua apresentação.
+
+Retorne apenas o texto formatado, sem comentários ou explicações.
+
+Texto a ser formatado:
+${textoTratado}`;
+
+    const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${OPENROUTER_API_KEY}`,
+      },
+      body: JSON.stringify({
+        model: "openai/gpt-3.5-turbo",
+        messages: [
+          {
+            role: "system",
+            content: "Você é um assistente especializado em reformatar textos extraídos via OCR para melhorar a legibilidade.",
+          },
+          {
+            role: "user",
+            content: prompt,
+          },
+        ],
+        temperature: 0.2, // Um pouco mais flexível que 0.0 para permitir melhorias criativas na formatação
+      }),
+      timeout: 15000,
+    });
+
+    if (!res.ok) throw new Error(`Erro na API: ${res.statusText}`);
+    const data = await res.json();
+
+    const textoFormatado = data.choices[0].message.content.trim();
+
+    if (!textoFormatado || textoFormatado.length < 10) {
+      throw new Error("A resposta da API está vazia ou muito curta.");
+    }
+
+    return textoFormatado;
+
+  } catch (error) {
+    console.error("❌ Erro ao formatar texto OCR:", error.message);
+    return { 
+      textoOriginal: textoOCR,
+      error: error.message,
+      sucesso: false 
+    };
+  }
+}
+

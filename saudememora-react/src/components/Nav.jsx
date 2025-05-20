@@ -1,8 +1,13 @@
+import { useState } from "react";
 import { Link } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
 
 const Nav = () => {
+  const [open, setOpen] = useState(false);
+
+  const toggleMenu = () => setOpen(!open);
+
   return (
     <nav className="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm">
       <div className="container-fluid">
@@ -13,27 +18,24 @@ const Nav = () => {
           </span>
         </Link>
 
-        {/* Botão do menu hamburguer */}
         <button 
           className="navbar-toggler border-0 p-2" 
           type="button" 
-          data-bs-toggle="collapse" 
-          data-bs-target="#navbarNav"
           aria-controls="navbarNav"
-          aria-expanded="false"
+          aria-expanded={open}
           aria-label="Toggle navigation"
+          onClick={toggleMenu}
         >
           <i className="bi bi-list text-white" style={{ fontSize: '1.8rem' }}></i>
         </button>
 
-        <div className="collapse navbar-collapse" id="navbarNav">
+        <div className={`collapse navbar-collapse ${open ? "show" : ""}`} id="navbarNav">
           <ul className="navbar-nav ms-auto">
             <li className="nav-item">
               <Link 
                 className="nav-link d-flex align-items-center py-3 px-3 rounded mx-2 my-1 hover-effect"
                 to="/perfil"
-                data-bs-toggle="collapse" 
-                data-bs-target="#navbarNav"
+                onClick={() => setOpen(false)} // fecha menu ao clicar
               >
                 <i className="bi bi-person-circle me-2" style={{ fontSize: '1.2rem' }}></i>
                 <span className="fw-medium">Perfil</span>
@@ -43,8 +45,7 @@ const Nav = () => {
               <Link 
                 className="nav-link d-flex align-items-center py-3 px-3 rounded mx-2 my-1 hover-effect" 
                 to="/meus-documentos"
-                data-bs-toggle="collapse" 
-                data-bs-target="#navbarNav"
+                onClick={() => setOpen(false)}
               >
                 <i className="bi bi-file-earmark-medical me-2" style={{ fontSize: '1.2rem' }}></i>
                 <span className="fw-medium">Documentos</span>
@@ -54,8 +55,7 @@ const Nav = () => {
               <Link 
                 className="nav-link d-flex align-items-center py-3 px-3 rounded mx-2 my-1 hover-effect" 
                 to="/upload-documentos"
-                data-bs-toggle="collapse" 
-                data-bs-target="#navbarNav"
+                onClick={() => setOpen(false)}
               >
                 <i className="bi bi-cloud-arrow-up me-2" style={{ fontSize: '1.2rem' }}></i>
                 <span className="fw-medium">Processamento</span>
@@ -65,8 +65,7 @@ const Nav = () => {
               <Link 
                 className="nav-link d-flex align-items-center py-3 px-3 rounded mx-2 my-1 hover-effect" 
                 to="/relatorios"
-                data-bs-toggle="collapse" 
-                data-bs-target="#navbarNav"
+                onClick={() => setOpen(false)}
               >
                 <i className="bi bi-clipboard2-data me-2" style={{ fontSize: '1.2rem' }}></i>
                 <span className="fw-medium">Relatórios</span>
@@ -75,8 +74,7 @@ const Nav = () => {
           </ul>
         </div>
       </div>
-      
-      {/* Estilos inline para os efeitos */}
+
       <style>{`
         .hover-effect {
           transition: all 0.3s ease;

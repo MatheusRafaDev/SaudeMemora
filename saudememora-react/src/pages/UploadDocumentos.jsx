@@ -4,6 +4,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import "../styles/UploadDocumento.css";
 import Nav from "../components/Nav";
 import { ocrSpace } from "../ocr/ocrSpace";
+import { formatarTextoOCR } from "../services/OpenRouter";
 import { useNavigate } from "react-router-dom";
 import { AdicionarDocumento } from "../documentos/AdicionarDocumento";
 
@@ -12,12 +13,15 @@ export default function UploadDocumentos() {
   const [preview, setPreview] = useState(null);
   const [status, setStatus] = useState("Aguardando envio...");
   const [progresso, setProgresso] = useState(0);
-  const [resultadoProcessamento, setResultadoProcessamento] = useState("");
+  const [textoOCR, setTextoOCR] = useState(""); // Armazena o texto original do OCR
+  const [textoExibicao, setTextoExibicao] = useState(""); // Armazena o texto formatado para exibição
   const [botaoHabilitado, setBotaoHabilitado] = useState(false);
   const [tipoDocumento, setTipoDocumento] = useState("");
   const [paciente, setPaciente] = useState(null);
   const [mensagemErro, setMensagemErro] = useState("");
-    const navigate = useNavigate();
+  const [processando, setProcessando] = useState(false);
+  const [adicionandoDocumento, setAdicionandoDocumento] = useState(false);
+  const navigate = useNavigate();
 
   useEffect(() => {
     const pacienteData = JSON.parse(localStorage.getItem("paciente")) || {};
@@ -31,7 +35,8 @@ export default function UploadDocumentos() {
       setPreview(URL.createObjectURL(file));
       setStatus("Arquivo selecionado. Pronto para envio.");
       setProgresso(0);
-      setResultadoProcessamento("");
+      setTextoOCR("");
+      setTextoExibicao("");
       setBotaoHabilitado(false);
       setMensagemErro("");
     }
@@ -47,6 +52,9 @@ export default function UploadDocumentos() {
       return;
     }
 
+    if (processando) return;
+
+    setProcessando(true);
     setStatus("Enviando...");
     setProgresso(0);
 
@@ -58,26 +66,37 @@ export default function UploadDocumentos() {
     }, 200);
 
     try {
-      const textoExtraido = await ocrSpace(documento);
+      // 1. Extrai texto original com OCR
+      const textoOriginal = await ocrSpace(documento);
+      setTextoOCR(textoOriginal); // Guarda o original para enviar ao backend
+      
+      // 2. Formata o texto apenas para exibição
+      const formatado = await formatarTextoOCR(textoOriginal);
+      setTextoExibicao(formatado.textoFormatado || textoOriginal); // Mostra formatado (ou original se falhar)
+
       clearInterval(intervalo);
       setProgresso(100);
-      setStatus("Documento enviado e em processamento.");
-      setResultadoProcessamento(textoExtraido || "Nenhum texto reconhecido.");
+      setStatus("Documento processado com sucesso!");
       setBotaoHabilitado(true);
       setMensagemErro("");
     } catch (erro) {
       clearInterval(intervalo);
       setProgresso(0);
       setStatus("Erro ao processar o documento.");
-      setResultadoProcessamento("Erro: " + erro.message);
+      setTextoExibicao("Erro no processamento: " + erro.message);
       setBotaoHabilitado(false);
       setMensagemErro("Erro ao processar o documento: " + erro.message);
+    } finally {
+      setProcessando(false);
     }
   };
 
   const handleAddDocument = async () => {
+    if (adicionandoDocumento) return;
+    
     try {
-      if (!resultadoProcessamento) {
+      // SEMPRE usa textoOCR (original) para enviar ao backend
+      if (!textoOCR) {
         setMensagemErro("Nenhum texto processado para adicionar.");
         return;
       }
@@ -97,9 +116,12 @@ export default function UploadDocumentos() {
         return;
       }
 
+      setAdicionandoDocumento(true);
+      setStatus("Adicionando documento...");
+
       const response = await AdicionarDocumento(
         tipoDocumento,
-        resultadoProcessamento,
+        textoOCR, // <<<< IMPORTANTE: Envia o texto OCR original
         paciente,
         documento,
         navigate
@@ -109,22 +131,24 @@ export default function UploadDocumentos() {
         setMensagemErro("");
         setDocumento(null);
         setPreview(null);
-        resetState("Aguardando envio...");
+        resetState("Documento adicionado com sucesso!");
       } else {
         setMensagemErro(response.message);
       }
     } catch (error) {
       setMensagemErro("Erro ao adicionar o documento: " + error.message);
+    } finally {
+      setAdicionandoDocumento(false);
     }
   };
 
   const resetState = (initialStatus) => {
     setStatus(initialStatus);
     setProgresso(0);
-    setResultadoProcessamento("");
+    setTextoOCR("");
+    setTextoExibicao("");
     setBotaoHabilitado(false);
     setMensagemErro("");
-
   };
 
   return (
@@ -160,20 +184,25 @@ export default function UploadDocumentos() {
             className="form-control"
             value={tipoDocumento}
             onChange={(e) => setTipoDocumento(e.target.value)}
+            disabled={processando || adicionandoDocumento}
           >
             <option value="">Selecione o tipo</option>
             <option value="E">Exame</option>
             <option value="R">Receitas</option>
-            <option value="D"> Documento Clínico</option>
+            <option value="D">Documento Clínico</option>
           </select>
         </div>
 
         <div className="button-group mt-3">
-          <button className="btn btn-secondary" onClick={handleCameraClick}>
+          <button 
+            className="btn btn-secondary" 
+            onClick={handleCameraClick}
+            disabled={processando || adicionandoDocumento}
+          >
             <FiCamera /> Tirar Foto
           </button>
 
-          <label className="btn btn-secondary">
+          <label className={`btn btn-secondary ${(processando || adicionandoDocumento) ? 'disabled' : ''}`}>
             <FiFileText /> Escolher Arquivo
             <input
               id="cameraInput"
@@ -182,11 +211,23 @@ export default function UploadDocumentos() {
               capture="environment"
               onChange={handleFileChange}
               hidden
+              disabled={processando || adicionandoDocumento}
             />
           </label>
 
-          <button className="btn btn-primary" onClick={handleUpload}>
-            🚀 Processar Documento
+          <button 
+            className="btn btn-primary" 
+            onClick={handleUpload}
+            disabled={!documento || processando || adicionandoDocumento}
+          >
+            {processando ? (
+              <>
+                <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                Processando...
+              </>
+            ) : (
+              '🚀 Processar Documento'
+            )}
           </button>
         </div>
 
@@ -201,7 +242,7 @@ export default function UploadDocumentos() {
 
         <div className="mt-3">
           <strong>Status:</strong>{" "}
-          {status === "Documento enviado e em processamento." ? (
+          {status === "Documento processado com sucesso!" || status === "Documento adicionado com sucesso!" ? (
             <span className="text-success">
               <FiCheckCircle /> {status}
             </span>
@@ -214,19 +255,29 @@ export default function UploadDocumentos() {
           <strong>Resultado do Processamento:</strong>
           <textarea
             className="form-control"
-            rows="4"
-            value={resultadoProcessamento}
+            rows="8"
+            value={textoExibicao} 
             readOnly
           />
+          <small className="text-muted">
+            Texto formatado para visualização (o sistema armazena o texto original)
+          </small>
         </div>
 
         <div className="mt-3">
           <button
-            className="btn btn-secondary w-100"
+            className="btn btn-success w-100"
             onClick={handleAddDocument}
-            disabled={!botaoHabilitado}
+            disabled={!botaoHabilitado || adicionandoDocumento}
           >
-            📄 Adicionar Documento
+            {adicionandoDocumento ? (
+              <>
+                <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
+                Salvando...
+              </>
+            ) : (
+              '💾 Salvar Documento'
+            )}
           </button>
         </div>
 
