@@ -3,11 +3,14 @@ import { FiFileText, FiFilter, FiDownload, FiPrinter } from "react-icons/fi";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "../styles/RelatorioDocumentos.css";
 import DocumentoService from "../services/DocumentoService";
+import ExameService from "../services/ExameService";
+import ReceitaService from "../services/ReceitaService";
 import Nav from "../components/Nav";
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
 import jsPDF from "jspdf";
 import autoTable from "jspdf-autotable";
+
 
 const RelatorioDocumentos = () => {
   const [tipo, setTipo] = useState("");
@@ -191,32 +194,137 @@ const RelatorioDocumentos = () => {
   };
 
   // Função para exportar PDF
-  const exportarParaPDF = () => {
-    const doc = new jsPDF();
+  const exportarParaPDF = async () => {
   
-    const colunas = ["ID", "Paciente", "Tipo", "Status", "Data Upload"];
-    const linhas = documentos.map((doc) => [
-      doc.id,
-      doc.paciente?.nome || "Sem nome",
-      doc.tipoDocumento === "R"
-        ? "Receita"
-        : doc.tipoDocumento === "E"
-        ? "Exame"
-        : "Documento Clínico",
-      doc.status,
-      new Date(doc.dataUpload).toLocaleDateString("pt-BR"),
-    ]);
-  
-    doc.text("Relatório de Documentos", 14, 15);
-  
-    autoTable(doc, {
-      startY: 20,
-      head: [colunas],
-      body: linhas,
-      styles: { fontSize: 10 },
+    documentos.forEach(async (documento) => {
+      const doc = new jsPDF();
+      if (documento.tipoDocumento === "E") {
+
+        const res = await ExameService.getExameByDocumentoId(documento.id);
+        
+        let y = 20;
+
+        doc.setFontSize(18);
+        doc.text("Relatorio documento - Exame", 105, y, { align: "center" });
+
+        y += 15;
+
+        doc.setFontSize(14);
+        doc.setFont(undefined, "bold");
+        doc.text(res.tipo || "Tipo do Exame", 14, y);
+
+        y += 10;
+
+        doc.setFontSize(12);
+        doc.setFont(undefined, "normal");
+
+        doc.text(' Nome exame: '+res.nomeExame, 14, y);
+        y += 8;
+
+        doc.text(' Data: '+new Date(res.data).toLocaleDateString("pt-BR"), 14, y);
+        y += 8;
+
+        doc.text(' Tipo: '+res.tipo, 14, y);
+        y += 8;
+
+        doc.text(' Laboratório: '+ res.laboratorio, 14, y);
+        y += 8;
+
+        doc.text(" Resultado:", 14, y);
+        y += 8;
+
+        const resultado = doc.splitTextToSize(res.resultado, 180); // quebra texto longo
+        doc.text(resultado ?? "Sem resultado disponível", 14, y);
+        y += resultado.length * 8;
+
+        if (res.observacoes) {
+          doc.setFont(undefined, "bold");
+          doc.text("Observações:", 14, y);
+          doc.setFont(undefined, "normal");
+          y += 8;
+
+          const obs = doc.splitTextToSize(res.observacoes ?? "Nenhuma observação.", 180);
+          doc.text(obs, 14, y);
+          y += obs.length * 8;
+        }
+      }
+      else if (documento.tipoDocumento === "R") {
+
+        const res = await ReceitaService.getReceitaByDocumentoId(documento.id);        
+        let y = 20;
+
+        // Título
+        doc.setFontSize(18);
+        doc.text("Relatorio documento - Receita", 105, y, { align: "center" });
+        y += 10;
+
+
+        // Dados principais
+        doc.setFontSize(12);
+        doc.setFont(undefined, "bold");
+        doc.text(" Data:", 14, y);
+        doc.setFont(undefined, "normal");
+        doc.text(res.dataReceita || "-", 40, y);
+        y += 7;
+
+        doc.setFont(undefined, "bold");
+        doc.text(" Doutor(a):", 14, y);
+        doc.setFont(undefined, "normal");
+        doc.text(res.medico || "-", 40, y);
+        y += 7;
+
+        doc.setFont(undefined, "bold");
+        doc.text(" CRM/MS:", 14, y);
+        doc.setFont(undefined, "normal");
+        doc.text(res.crmMedico || "-", 40, y);
+        y += 7;
+
+        doc.setFont(undefined, "bold");
+        doc.text(" Notas:", 14, y);
+        doc.setFont(undefined, "normal");
+        doc.text(res.observacoes || "-", 40, y);
+        y += 12;
+
+        // Título Medicamentos
+        doc.setFontSize(13);
+        doc.setFont(undefined, "bold");
+        doc.setTextColor(0, 102, 204); // Azul
+        doc.text(" Medicamentos", 14, y);
+        y += 8;
+
+        // Tabela de medicamentos
+        autoTable(doc, {
+          startY: y,
+          styles: { fontSize: 11 },
+          head: [["Nome", "Posologia"]],
+          body: documento.medicamentos?.map((med) => [
+            med.nome,
+            med.posologia,
+          ]),
+          margin: { left: 14, right: 14 },
+        });
+
+        y = doc.lastAutoTable.finalY + 10;
+
+        // Título Resumo
+        doc.setFontSize(13);
+        doc.setFont(undefined, "bold");
+        doc.setTextColor(0, 102, 204);
+        doc.text(" Resumo", 14, y);
+        y += 7;
+
+        // Caixa de texto do resumo
+        doc.setDrawColor(0, 0, 255);
+        doc.setLineWidth(0.3);
+        doc.rect(14, y, 180, 40); // Caixa azul clara
+        doc.setTextColor(0, 0, 0);
+        doc.setFontSize(11);
+        const textoResumo = doc.splitTextToSize(res.resumo, 176);
+        doc.text(textoResumo, 16, y + 6);
+
+      }
+      doc.save("documento_exame.pdf");
     });
-  
-    doc.save("relatorio_documentos.pdf");
   };
   
 
