@@ -4,6 +4,10 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import "../styles/RelatorioDocumentos.css";
 import DocumentoService from "../services/DocumentoService";
 import Nav from "../components/Nav";
+import * as XLSX from "xlsx";
+import { saveAs } from "file-saver";
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
 
 const RelatorioDocumentos = () => {
   const [tipo, setTipo] = useState("");
@@ -160,15 +164,61 @@ const RelatorioDocumentos = () => {
 
   // Função para exportar dados
   const exportarParaExcel = () => {
-    // Implementação da exportação para Excel
-    alert("Exportar para Excel - funcionalidade em desenvolvimento");
+    const dados = documentos.map((doc) => ({
+      ID: doc.id,
+      Paciente: doc.paciente?.nome || "Sem nome",
+      Tipo:
+        doc.tipoDocumento === "R"
+          ? "Receita"
+          : doc.tipoDocumento === "E"
+          ? "Exame"
+          : "Documento Clínico",
+      Status: doc.status,
+      "Data Upload": new Date(doc.dataUpload).toLocaleDateString("pt-BR"),
+    }));
+  
+    const worksheet = XLSX.utils.json_to_sheet(dados);
+    const workbook = XLSX.utils.book_new();
+    XLSX.utils.book_append_sheet(workbook, worksheet, "Relatório");
+  
+    const excelBuffer = XLSX.write(workbook, {
+      bookType: "xlsx",
+      type: "array",
+    });
+  
+    const blob = new Blob([excelBuffer], { type: "application/octet-stream" });
+    saveAs(blob, "relatorio_documentos.xlsx");
   };
 
   // Função para exportar PDF
   const exportarParaPDF = () => {
-    // Implementação da exportação para PDF
-    alert("Exportar para PDF - funcionalidade em desenvolvimento");
+    const doc = new jsPDF();
+  
+    const colunas = ["ID", "Paciente", "Tipo", "Status", "Data Upload"];
+    const linhas = documentos.map((doc) => [
+      doc.id,
+      doc.paciente?.nome || "Sem nome",
+      doc.tipoDocumento === "R"
+        ? "Receita"
+        : doc.tipoDocumento === "E"
+        ? "Exame"
+        : "Documento Clínico",
+      doc.status,
+      new Date(doc.dataUpload).toLocaleDateString("pt-BR"),
+    ]);
+  
+    doc.text("Relatório de Documentos", 14, 15);
+  
+    autoTable(doc, {
+      startY: 20,
+      head: [colunas],
+      body: linhas,
+      styles: { fontSize: 10 },
+    });
+  
+    doc.save("relatorio_documentos.pdf");
   };
+  
 
   return (
     <div>
