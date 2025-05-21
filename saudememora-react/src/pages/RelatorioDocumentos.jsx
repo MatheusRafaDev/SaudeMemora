@@ -211,39 +211,39 @@ const RelatorioDocumentos = () => {
 
         doc.setFontSize(14);
         doc.setFont(undefined, "bold");
-        doc.text(res.tipo || "Tipo do Exame", 14, y);
+        doc.text(res.data[0].tipo || "Tipo do Exame", 14, y);
 
         y += 10;
 
         doc.setFontSize(12);
         doc.setFont(undefined, "normal");
 
-        doc.text(' Nome exame: '+res.nomeExame, 14, y);
+        doc.text(' Nome exame: '+res.data[0].nomeExame, 14, y);
         y += 8;
 
-        doc.text(' Data: '+new Date(res.data).toLocaleDateString("pt-BR"), 14, y);
+        doc.text(' Data: '+new Date(res.data[0].data).toLocaleDateString("pt-BR"), 14, y);
         y += 8;
 
-        doc.text(' Tipo: '+res.tipo, 14, y);
+        doc.text(' Tipo: '+res.data[0].tipo, 14, y);
         y += 8;
 
-        doc.text(' Laboratório: '+ res.laboratorio, 14, y);
+        doc.text(' Laboratório: '+ res.data[0].laboratorio, 14, y);
         y += 8;
 
         doc.text(" Resultado:", 14, y);
         y += 8;
 
-        const resultado = doc.splitTextToSize(res.resultado, 180); // quebra texto longo
+        const resultado = doc.splitTextToSize(res.data[0].resultado, 180); // quebra texto longo
         doc.text(resultado ?? "Sem resultado disponível", 14, y);
         y += resultado.length * 8;
 
-        if (res.observacoes) {
+        if (res.data[0].observacoes) {
           doc.setFont(undefined, "bold");
           doc.text("Observações:", 14, y);
           doc.setFont(undefined, "normal");
           y += 8;
 
-          const obs = doc.splitTextToSize(res.observacoes ?? "Nenhuma observação.", 180);
+          const obs = doc.splitTextToSize(res.data[0].observacoes ?? "Nenhuma observação.", 180);
           doc.text(obs, 14, y);
           y += obs.length * 8;
         }
@@ -264,25 +264,25 @@ const RelatorioDocumentos = () => {
         doc.setFont(undefined, "bold");
         doc.text(" Data:", 14, y);
         doc.setFont(undefined, "normal");
-        doc.text(res.dataReceita || "-", 40, y);
+        doc.text(res.data[0].dataReceita || "-", 40, y);
         y += 7;
 
         doc.setFont(undefined, "bold");
         doc.text(" Doutor(a):", 14, y);
         doc.setFont(undefined, "normal");
-        doc.text(res.medico || "-", 40, y);
+        doc.text(res.data[0].medico || "-", 40, y);
         y += 7;
 
         doc.setFont(undefined, "bold");
         doc.text(" CRM/MS:", 14, y);
         doc.setFont(undefined, "normal");
-        doc.text(res.crmMedico || "-", 40, y);
+        doc.text(res.data[0].crmMedico || "-", 40, y);
         y += 7;
 
         doc.setFont(undefined, "bold");
         doc.text(" Notas:", 14, y);
         doc.setFont(undefined, "normal");
-        doc.text(res.observacoes || "-", 40, y);
+        doc.text(res.data[0].observacoes || "-", 40, y);
         y += 12;
 
         // Título Medicamentos
@@ -297,7 +297,7 @@ const RelatorioDocumentos = () => {
           startY: y,
           styles: { fontSize: 11 },
           head: [["Nome", "Posologia"]],
-          body: documento.medicamentos?.map((med) => [
+          body: res.data[0].medicamentos?.map((med) => [
             med.nome,
             med.posologia,
           ]),
@@ -319,7 +319,7 @@ const RelatorioDocumentos = () => {
         doc.rect(14, y, 180, 40); // Caixa azul clara
         doc.setTextColor(0, 0, 0);
         doc.setFontSize(11);
-        const textoResumo = doc.splitTextToSize(res.resumo, 176);
+        const textoResumo = doc.splitTextToSize(res.data[0].resumo, 176);
         doc.text(textoResumo, 16, y + 6);
 
       }
