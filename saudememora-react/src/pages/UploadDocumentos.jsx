@@ -13,8 +13,8 @@ export default function UploadDocumentos() {
   const [preview, setPreview] = useState(null);
   const [status, setStatus] = useState("Aguardando envio...");
   const [progresso, setProgresso] = useState(0);
-  const [textoOCR, setTextoOCR] = useState(""); // Armazena o texto original do OCR
-  const [textoExibicao, setTextoExibicao] = useState(""); // Armazena o texto formatado para exibição
+  const [textoOCR, setTextoOCR] = useState(""); 
+  const [textoExibicao, setTextoExibicao] = useState(""); 
   const [botaoHabilitado, setBotaoHabilitado] = useState(false);
   const [tipoDocumento, setTipoDocumento] = useState("");
   const [paciente, setPaciente] = useState(null);
@@ -121,7 +121,7 @@ export default function UploadDocumentos() {
 
       const response = await AdicionarDocumento(
         tipoDocumento,
-        textoOCR, // <<<< IMPORTANTE: Envia o texto OCR original
+        textoOCR, 
         paciente,
         documento,
         navigate
@@ -266,7 +266,7 @@ export default function UploadDocumentos() {
 
         <div className="mt-3">
           <button
-            className="btn btn-success w-100"
+            className="btn btn-secondary w-100"
             onClick={handleAddDocument}
             disabled={!botaoHabilitado || adicionandoDocumento}
           >

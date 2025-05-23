@@ -4,64 +4,71 @@ export async function aplicarCamposComOCR(
   textoOCR,
   perguntas,
   setRespostas,
-  ocrExecutado
+  setMensagem 
 ) {
-  if (!ocrExecutado || !textoOCR) return;
+  if (!textoOCR || textoOCR.trim() === "") {
+    setMensagem("Nenhum texto OCR disponível para processar");
+    return;
+  }
 
   try {
+    setMensagem("Processando dados médicos...");
+    
+    // 1. Processa os dados médicos brutos
+    const dadosMedicos = await ajustarDadosMedicos(textoOCR);
+    if (!dadosMedicos) {
+      throw new Error("Falha ao processar dados médicos");
+    }
 
-    const dados_medicos = await ajustarDadosMedicos(textoOCR);
-    const resultado = await ajustarTextoFormulario(dados_medicos);
-    const json = await ajustarJSON(resultado);
+    // 2. Ajusta para o formato do formulário
+    const resultadoFormatado = await ajustarTextoFormulario(dadosMedicos);
+    if (!resultadoFormatado) {
+      throw new Error("Falha ao formatar dados para o formulário");
+    }
 
-      /*
-      var json = {
-        tratamento_medico: "não",
-        gravida: "não",
-        regime: "não",
-        diabetes: "não",
-        alergias: "não",
-        reumatica: "não",
-        coagulacao: "não",
-        anestesia: "não",
-        hepatite: "não",
-        hiv: "não",
-        drogas: "não",
-        fumante: "não",
-        pressao: "normal",
-        respiratorio: "sim"
-      };
-    */
+    // 3. Converte para JSON estruturado
+    const jsonRespostas = await ajustarJSON(resultadoFormatado);
+    if (!jsonRespostas) {
+      throw new Error("Falha ao converter para JSON");
+    }
+
+    // Mapeia as respostas para o formato esperado pelo estado
     const novasRespostas = {};
 
     perguntas.forEach((pergunta) => {
       const chave = pergunta.chave;
-      let valor = json[chave];
+      let valor = jsonRespostas[chave];
 
-      if (valor !== undefined && valor !== null) {
-        valor = valor.toString().trim().toUpperCase().replace("NÃO", "NAO");
-
-        if (pergunta.tipo === "pressao") {
-          if (["NORMAL", "ALTA", "BAIXA"].includes(valor)) {
-            novasRespostas[chave] = valor;
-          } else {
-            novasRespostas[chave] = "";
-          }
-        } else {
-          novasRespostas[chave] = valor;
-        }
+      // Tratamento padrão para valores não encontrados
+      if (valor === undefined || valor === null) {
+        valor = pergunta.tipo === "pressao" ? "" : "NAO";
       } else {
+        // Normaliza o valor
+        valor = valor.toString().trim().toUpperCase();
+        valor = valor.replace("NÃO", "NAO");
+        
+        // Validação específica para pressão arterial
+        if (pergunta.tipo === "pressao") {
+          if (!["NORMAL", "ALTA", "BAIXA"].includes(valor)) {
+            valor = "";
+          }
+        }
+      }
 
-        novasRespostas[chave] = pergunta.tipo === "pressao" ? "" : "NAO";
+      novasRespostas[chave] = valor;
+      
+      // Limpa campos extras se a resposta for NÃO
+      if (pergunta.mostrarExtra && valor === "NAO") {
+        novasRespostas[`${chave}_extra`] = "";
       }
     });
 
-    setRespostas((prevRespostas) => ({
-      ...prevRespostas,
-      ...novasRespostas,
-    }));
+    // Atualiza o estado com as novas respostas
+    setRespostas(prev => ({ ...prev, ...novasRespostas }));
+    setMensagem("Campos preenchidos com sucesso!");
 
   } catch (error) {
     console.error("Erro ao aplicar campos com OCR:", error);
+    setMensagem(`Erro ao processar OCR: ${error.message}`);
   }
 }

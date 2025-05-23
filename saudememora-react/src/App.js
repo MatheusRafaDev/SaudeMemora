@@ -12,6 +12,7 @@ import ListarDocumentos from "./pages/ListarDocumentos";
 import EditarPerfil from "./pages/EditarPerfil";
 import RelatorioDocumentos from "./pages/RelatorioDocumentos";
 import VisualizadorDocumento from "./pages/VisualizadorDocumento";
+import VisualizarFichaMedica from "./pages/VisualizarFichaMedica";
 import "bootstrap/dist/js/bootstrap.bundle.min.js";
 
 
@@ -43,6 +44,7 @@ function App() {
         />
 
         <Route path="/relatorio-documentos" element={<RelatorioDocumentos />}/>
+         <Route path="/visualizar-ficha" element={<VisualizarFichaMedica />}/>
 
         <Route path="/criar-conta" element={<CadastroPaciente />} />
         <Route path="/perfil" element={<Perfil />} />

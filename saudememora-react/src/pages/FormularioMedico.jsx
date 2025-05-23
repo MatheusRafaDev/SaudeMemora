@@ -8,33 +8,117 @@ import { useNavigate } from "react-router-dom";
 import {
   cadastrarFichaMedica,
   buscarFichaMedica,
-  buscarImagemFichaMedica,
   atualizarFichaMedica,
 } from "../services/FichaMedicaService";
 
 const perguntas = [
-  { chave: "tratamento_medico", pergunta: "Está em tratamento médico?" },
-  { chave: "gravida", pergunta: "Está grávida?" },
-  { chave: "regime", pergunta: "Está fazendo algum regime?" },
-  { chave: "diabetes", pergunta: "Possui diabetes?" },
-  { chave: "alergias", pergunta: "Tem alergias?" },
-  { chave: "reumatica", pergunta: "Teve febre reumática?" },
-  { chave: "coagulacao", pergunta: "Tem problemas de coagulação?" },
-  { chave: "cardio", pergunta: "Possui doença cárdio vascular?" },
-  { chave: "hemorragicos", pergunta: "Tem problemas hemorrágicos?" },
-  { chave: "anestesia", pergunta: "Já teve problemas com anestesia?" },
-  { chave: "alergia_medicamento", pergunta: "Tem alergia a medicamentos?" },
-  { chave: "hepatite", pergunta: "Já teve hepatite?" },
-  { chave: "hiv", pergunta: "É portador do vírus HIV?" },
-  { chave: "drogas", pergunta: "Usa ou já usou drogas?" },
-  { chave: "fumante", pergunta: "É fumante?" },
-  { chave: "fumou", pergunta: "Já fumou?" },
+  {
+    chave: "tratamento_medico",
+    pergunta: "Está em tratamento médico?",
+    mostrarExtra: true,
+    extra: "Qual tratamento?",
+  },
+  {
+    chave: "gravida",
+    pergunta: "Está grávida?",
+    mostrarExtra: true,
+    extra: "Quantos meses?",
+    dependeSexo: true,
+  },
+  {
+    chave: "regime",
+    pergunta: "Está fazendo algum regime?",
+    mostrarExtra: true,
+    extra: "Qual regime?",
+  },
+  {
+    chave: "diabetes",
+    pergunta: "Possui diabetes?",
+    mostrarExtra: true,
+    extra: "Tipo de diabetes?",
+  },
+  {
+    chave: "alergias",
+    pergunta: "Tem alergias?",
+    mostrarExtra: true,
+    extra: "A que?",
+  },
+  {
+    chave: "reumatica",
+    pergunta: "Teve febre reumática?",
+    mostrarExtra: false,
+  },
+  {
+    chave: "coagulacao",
+    pergunta: "Tem problemas de coagulação?",
+    mostrarExtra: false,
+  },
+  {
+    chave: "cardio",
+    pergunta: "Possui doença cárdio vascular?",
+    mostrarExtra: true,
+    extra: "Qual doença?",
+  },
+  {
+    chave: "hemorragicos",
+    pergunta: "Tem problemas hemorrágicos?",
+    mostrarExtra: false,
+  },
+  {
+    chave: "anestesia",
+    pergunta: "Já teve problemas com anestesia?",
+    mostrarExtra: true,
+    extra: "Qual problema?",
+  },
+  {
+    chave: "alergia_medicamento",
+    pergunta: "Tem alergia a medicamentos?",
+    mostrarExtra: true,
+    extra: "A qual medicamento?",
+  },
+  {
+    chave: "hepatite",
+    pergunta: "Já teve hepatite?",
+    mostrarExtra: true,
+    extra: "Há quanto tempo?",
+  },
+  {
+    chave: "hiv",
+    pergunta: "É portador do vírus HIV?",
+    mostrarExtra: false,
+  },
+  {
+    chave: "drogas",
+    pergunta: "Usa ou já usou drogas?",
+    mostrarExtra: false,
+  },
+  {
+    chave: "fumante",
+    pergunta: "É fumante?",
+    mostrarExtra: false,
+  },
+  {
+    chave: "fumou",
+    pergunta: "Já fumou?",
+    mostrarExtra: false,
+  },
   {
     chave: "pressao",
     pergunta: "Como está sua pressão arterial?",
     tipo: "pressao",
   },
-  { chave: "respiratorio", pergunta: "Tem problemas respiratórios?" },
+  {
+    chave: "respiratorio",
+    pergunta: "Tem problemas respiratórios?",
+    mostrarExtra: true,
+    extra: "Qual problema?",
+  },
+  {
+    chave: "doenca_familia",
+    pergunta: "Possui doenças na família?",
+    mostrarExtra: true,
+    extra: "Quais doenças?",
+  },
 ];
 
 const FormularioMedico = () => {
@@ -47,56 +131,97 @@ const FormularioMedico = () => {
   const navigate = useNavigate();
   const paciente = JSON.parse(localStorage.getItem("paciente")) || {};
   const [ficha, setFicha] = useState(null);
+  const [carregando, setCarregando] = useState(false);
 
   const obterFicha = async () => {
-  if (!paciente.id) return;
+    if (!paciente.id) return;
 
-  try {
-    let fichaResponse = await buscarFichaMedica(paciente.id); 
-    fichaResponse = fichaResponse.data;
+    setCarregando(true);
+    try {
+      const response = await buscarFichaMedica(paciente.id);
+      if (response.success && response.data) {
+        const fichaResponse = response.data;
+        setFicha(fichaResponse);
 
-    if (fichaResponse) {
-      setFicha(fichaResponse); 
-      const novasRespostas = {
-        tratamento_medico: fichaResponse.tratamentoMedico ? "SIM" : "NAO",
-        gravida: fichaResponse.gravidez ? "SIM" : "NAO",
-        regime: fichaResponse.regime ? "SIM" : "NAO",
-        diabetes: fichaResponse.diabetes ? "SIM" : "NAO",
-        alergias: fichaResponse.alergias ? "SIM" : "NAO",
-        reumatica: fichaResponse.febreReumatica ? "SIM" : "NAO",
-        coagulacao: fichaResponse.coagulacao ? "SIM" : "NAO",
-        cardio: fichaResponse.doencaCardioVascular ? "SIM" : "NAO",
-        hemorragicos: fichaResponse.hemorragicos ? "SIM" : "NAO",
-        anestesia: fichaResponse.problemasAnestesia ? "SIM" : "NAO",
-        alergia_medicamento: fichaResponse.alergiaMedicamentos ? "SIM" : "NAO",
-        hepatite: fichaResponse.hepatite ? "SIM" : "NAO",
-        hiv: fichaResponse.hiv ? "SIM" : "NAO",
-        drogas: fichaResponse.drogas ? "SIM" : "NAO",
-        fumante: fichaResponse.fumante ? "SIM" : "NAO",
-        fumou: fichaResponse.fumou ? "SIM" : "NAO",
-        pressao: fichaResponse.pressao,
-        respiratorio: fichaResponse.respiratorio ? "SIM" : "NAO",
-      };
+        const novasRespostas = {
+          tratamento_medico: fichaResponse.tratamentoMedico ? "SIM" : "NAO",
+          tratamento_medico_extra: fichaResponse.tratamentoMedico
+            ? fichaResponse.tratamentoMedicoExtra
+            : "",
+          gravida: fichaResponse.gravidez ? "SIM" : "NAO",
+          gravida_extra: fichaResponse.gravidez
+            ? fichaResponse.gravidezExtra
+            : "",
+          regime: fichaResponse.regime ? "SIM" : "NAO",
+          regime_extra: fichaResponse.regime ? fichaResponse.regimeExtra : "",
+          diabetes: fichaResponse.diabetes ? "SIM" : "NAO",
+          diabetes_extra: fichaResponse.diabetes
+            ? fichaResponse.diabetesExtra
+            : "",
+          alergias: fichaResponse.alergias ? "SIM" : "NAO",
+          alergias_extra: fichaResponse.alergias
+            ? fichaResponse.alergiasExtra
+            : "",
+          reumatica: fichaResponse.reumatica ? "SIM" : "NAO",
+          coagulacao: fichaResponse.coagulacao ? "SIM" : "NAO",
+          cardio: fichaResponse.doencaCardioVascular ? "SIM" : "NAO",
+          cardio_extra: fichaResponse.doencaCardioVascular
+            ? fichaResponse.doencaCardioVascularExtra
+            : "",
+          hemorragicos: fichaResponse.hemorragicos ? "SIM" : "NAO",
+          anestesia: fichaResponse.problemasAnestesia ? "SIM" : "NAO",
+          anestesia_extra: fichaResponse.problemasAnestesia
+            ? fichaResponse.problemasAnestesiaExtra
+            : "",
+          alergia_medicamento: fichaResponse.alergiaMedicamentos
+            ? "SIM"
+            : "NAO",
+          alergia_medicamento_extra: fichaResponse.alergiaMedicamentos
+            ? fichaResponse.alergiaMedicamentosExtra
+            : "",
+          hepatite: fichaResponse.hepatite ? "SIM" : "NAO",
+          hepatite_extra: fichaResponse.hepatite
+            ? fichaResponse.hepatiteExtra
+            : "",
+          hiv: fichaResponse.hiv ? "SIM" : "NAO",
+          drogas: fichaResponse.drogas ? "SIM" : "NAO",
+          fumante: fichaResponse.fumante ? "SIM" : "NAO",
+          fumou: fichaResponse.fumou ? "SIM" : "NAO",
+          pressao: fichaResponse.pressao || "",
+          respiratorio: fichaResponse.respiratorio ? "SIM" : "NAO",
+          respiratorio_extra: fichaResponse.respiratorio
+            ? fichaResponse.respiratorioExtra
+            : "",
+          doenca_familia: fichaResponse.doencaFamilia ? "SIM" : "NAO",
+          doenca_familia_extra: fichaResponse.doencaFamilia
+            ? fichaResponse.doencaFamiliaExtra
+            : "",
+        };
 
-      setRespostas(novasRespostas);
-      setTextoOCR(fichaResponse.ocrTexto || "");
-      setIsAtualizar(true);
+        setRespostas(novasRespostas);
+        setTextoOCR(fichaResponse.ocrTexto || "");
+        setIsAtualizar(true);
+      }
+    } catch (error) {
+      console.error("Erro ao buscar ficha:", error);
+      //setMensagem("Erro ao carregar ficha médica existente");
+    } finally {
+      setCarregando(false);
     }
-  } catch (error) {
-    console.error("Erro ao buscar ficha:", error);
-  }
-};
+  };
 
   useEffect(() => {
-     if (paciente.sexo && paciente.sexo.toLowerCase() === "m") {
-    setRespostas((prev) => ({ ...prev, gravida: "NAO" }));
-  }
-
-    if (paciente && paciente.id) {
-      obterFicha();
+    if (paciente.sexo && paciente.sexo.toLowerCase() === "m") {
+      setRespostas((prev) => ({
+        ...prev,
+        gravida: "NAO",
+        gravida_extra: "",
+      }));
     }
 
-    
+    if (paciente?.id) {
+      obterFicha();
+    }
   }, [paciente.id]);
 
   const handleFileChange = (e) => {
@@ -114,64 +239,118 @@ const FormularioMedico = () => {
       setMensagem("Por favor, selecione uma imagem válida.");
       return;
     }
-    const texto = await ocrSpace(imagem);
-    setTextoOCR(texto || "");
-    setOcrExecutado(true);
-    setMensagem("");
+
+    setCarregando(true);
+    try {
+      const texto = await ocrSpace(imagem);
+      setTextoOCR(texto || "");
+      setOcrExecutado(true);
+      setMensagem("");
+    } catch (error) {
+      setMensagem("Erro ao processar OCR. Tente novamente.");
+      console.error("OCR Error:", error);
+    } finally {
+      setCarregando(false);
+    }
   };
 
   const handleAplicarOCR = () => {
-    aplicarCamposComOCR(textoOCR, perguntas, setRespostas, ocrExecutado);
+    if (!ocrExecutado) {
+      setMensagem("Execute o OCR primeiro.");
+      return;
+    }
+    aplicarCamposComOCR(textoOCR, perguntas, setRespostas, setMensagem);
+    setMensagem("Campos preenchidos com sucesso!");
   };
 
   const handleChange = (chave, valor) => {
-    setRespostas((prev) => ({ ...prev, [chave]: valor }));
+    setRespostas((prev) => {
+      const newRespostas = { ...prev, [chave]: valor };
+
+      if (valor === "NAO") {
+        const question = perguntas.find((q) => q.chave === chave);
+        if (question?.mostrarExtra) {
+          newRespostas[`${chave}_extra`] = "";
+        }
+      }
+
+      return newRespostas;
+    });
   };
 
   const handleExtraChange = (chave, valor) => {
-    setRespostas((prev) => ({ ...prev, [chave + "_extra"]: valor }));
+    setRespostas((prev) => ({ ...prev, [`${chave}_extra`]: valor }));
   };
 
   const todosCamposPreenchidos = () => {
     return perguntas.every((item) => {
-      if (item.tipo === "pressao") {
-        return respostas[item.chave] && respostas[item.chave] !== "";
+      const answer = respostas[item.chave];
+
+      if (
+        !answer ||
+        (answer !== "SIM" && answer !== "NAO" && item.tipo !== "pressao")
+      ) {
+        return false;
       }
-      return respostas[item.chave] === "SIM" || respostas[item.chave] === "NAO";
+
+      if (item.tipo === "pressao") {
+        return answer && answer !== "";
+      }
+
+
+      return true;
     });
   };
 
   const handleFinalizar = async () => {
     if (!todosCamposPreenchidos()) {
-      setMensagem("Preencha todos os campos antes de continuar.");
-    } else {
-      const formData = new FormData();
+      setMensagem("Preencha todos os campos obrigatórios antes de continuar.");
+      return;
+    }
 
-      formData.append("respostas", JSON.stringify(respostas));
+    setCarregando(true);
+    try {
+      const dadosParaEnviar = { ...respostas };
+
+      perguntas.forEach((item) => {
+        if (item.mostrarExtra && dadosParaEnviar[item.chave] === "NAO") {
+          delete dadosParaEnviar[`${item.chave}_extra`];
+        }
+      });
+
+      const formData = new FormData();
+      formData.append("respostas", JSON.stringify(dadosParaEnviar));
       formData.append("textoOCR", textoOCR);
       formData.append("paciente", JSON.stringify(paciente));
+
       if (imagem instanceof File) {
         formData.append("imagem", imagem);
       }
 
+      let response;
       if (!isAtualizar) {
-        const response = await cadastrarFichaMedica(formData);
-        if (response.success) {
-          setMensagem(response.message);
-          navigate("/home");
-        } else {
-          setMensagem(response.message);
-        }
+        response = await cadastrarFichaMedica(formData);
       } else {
-
-        const response = await atualizarFichaMedica(ficha.id, formData);
-        if (response.success) {
-          setMensagem("Ficha atualizada com sucesso!");
-           navigate("/formulario-medico");
-        } else {
-          setMensagem("Erro ao atualizar a ficha!");
-        }
+        response = await atualizarFichaMedica(ficha.id, formData);
       }
+
+      if (response.success) {
+        setMensagem(
+          isAtualizar
+            ? "Ficha atualizada com sucesso!"
+            : "Ficha cadastrada com sucesso!"
+        );
+
+      } else {
+        setMensagem(response.message || "Erro ao processar a ficha.");
+      }
+    } catch (error) {
+      console.error("Erro ao salvar ficha:", error);
+      setMensagem(
+        "Ocorreu um erro ao salvar a ficha. Por favor, tente novamente."
+      );
+    } finally {
+      setCarregando(false);
     }
   };
 
@@ -183,12 +362,23 @@ const FormularioMedico = () => {
         <div className="saude-card shadow-sm p-4 rounded bg-white">
           <h4 className="mb-4 text-center">Formulário Médico (Anamnese)</h4>
           <form>
+            <div className="alert alert-info mt-3" role="alert">
+              🔍 Para melhores resultados, recomendamos fazer um{" "}
+              <strong>escaneamento do documento</strong> antes de enviá-lo.
+              Fotos com baixa qualidade podem prejudicar o reconhecimento do
+              texto.
+            </div>
             <div className="mb-3">
+              <label htmlFor="imagemFicha" className="form-label">
+                Upload da Ficha Médica (Imagem)
+              </label>
               <input
                 type="file"
+                id="imagemFicha"
                 accept="image/*"
                 onChange={handleFileChange}
                 className="form-control"
+                disabled={carregando}
               />
             </div>
 
@@ -212,14 +402,15 @@ const FormularioMedico = () => {
                 type="button"
                 className="btn btn-primary w-100"
                 onClick={executarOCR}
+                disabled={!imagem || carregando}
               >
-                Executar OCR
+                {carregando ? "Processando OCR..." : "Executar OCR"}
               </button>
               <button
                 type="button"
-                className="btn btn-outline-secondary mt-3 profile-button w-100"
+                className="btn btn-outline-secondary w-100"
                 onClick={handleAplicarOCR}
-                disabled={!ocrExecutado}
+                disabled={!ocrExecutado || carregando}
               >
                 Aplicar OCR
               </button>
@@ -235,113 +426,149 @@ const FormularioMedico = () => {
                 rows="5"
                 value={textoOCR}
                 readOnly
+                placeholder="O texto extraído aparecerá aqui..."
               />
             </div>
 
-            {perguntas.map((item) => (
+            
 
-              
-              <div key={item.chave} className="mb-4 border-bottom pb-3">
-                <div className="row">
-                  <div className="col-12 col-md-6 mb-2 mb-md-0">
-                    <label className="form-label">{item.pergunta}</label>
-                  </div>
-                  <div className="col-12 col-md-6">
-                    {item.tipo === "pressao" ? (
-                      <select
-                        className="form-select"
-                        value={respostas.pressao || ""}
-                        onChange={(e) =>
-                          handleChange("pressao", e.target.value)
-                        }
-                      >
-                        <option value="">Selecione</option>
-                        <option value="NORMAL">NORMAL</option>
-                        <option value="ALTA">ALTA</option>
-                        <option value="BAIXA">BAIXA</option>
-                      </select>
-                    ) : item.tipo === "data" ? (
-                      <select
-                        className="form-select"
-                        value={respostas[item.chave] || ""}
-                        onChange={(e) =>
-                          handleChange(item.chave, e.target.value)
-                        }
-                      >
-                        <option value="">Selecione</option>
-                        {item.opcoes?.map((opcao, index) => (
-                          <option key={index} value={opcao.value}>
-                            {new Date(opcao.value).toLocaleDateString()} 
-                          </option>
-                        ))}
-                      </select>
-                    ) : (
-                      <div className="d-flex flex-wrap gap-2">
-                        <div className="form-check">
-                          <input
-                            className="form-check-input"
-                            type="radio"
-                            id={`${item.chave}-sim`}
-                            name={item.chave}
-                            value="SIM"
-                            checked={respostas[item.chave] === "SIM"}
-                            onChange={() => handleChange(item.chave, "SIM")}
-                          />
-                          <label
-                            className="form-check-label"
-                            htmlFor={`${item.chave}-sim`}
-                          >
-                            Sim
-                          </label>
-                        </div>
-                        <div className="form-check">
-                          <input
-                            className="form-check-input"
-                            type="radio"
-                            id={`${item.chave}-nao`}
-                            name={item.chave}
-                            value="NAO"
-                            checked={respostas[item.chave] === "NAO"}
-                            onChange={() => handleChange(item.chave, "NAO")}
-                          />
-                          <label
-                            className="form-check-label"
-                            htmlFor={`${item.chave}-nao`}
-                          >
-                            Não
-                          </label>
-                        </div>
-                      </div>
-                    )}
-                    {item.extra && respostas[item.chave] === "SIM" && (
-                      <input
-                        type="text"
-                        className="form-control mt-2"
-                        placeholder={item.extra}
-                        value={respostas[item.chave + "_extra"] || ""}
-                        onChange={(e) =>
-                          handleExtraChange(item.chave, e.target.value)
-                        }
-                      />
-                    )}
+            {perguntas.map((item) => {
+              if (item.dependeSexo && paciente.sexo?.toLowerCase() === "m") {
+                return null;
+              }
+
+              return (
+                <div key={item.chave} className="mb-4 border-bottom pb-3">
+                  <div className="row">
+                    <div className="col-12 col-md-6 mb-2 mb-md-0">
+                      <label className="form-label">{item.pergunta}</label>
+                    </div>
+                    <div className="col-12 col-md-6">
+                      {item.tipo === "pressao" ? (
+                        <select
+                          className="form-select"
+                          value={respostas[item.chave] || ""}
+                          onChange={(e) =>
+                            handleChange(item.chave, e.target.value)
+                          }
+                          required
+                          disabled={carregando}
+                        >
+                          <option value="">Selecione</option>
+                          <option value="NORMAL">NORMAL</option>
+                          <option value="ALTA">ALTA</option>
+                          <option value="BAIXA">BAIXA</option>
+                        </select>
+                      ) : (
+                        <>
+                          <div className="d-flex align-items-center gap-3">
+                            <div className="form-check form-check-inline">
+                              <input
+                                className="form-check-input"
+                                type="radio"
+                                id={`${item.chave}-sim`}
+                                name={item.chave}
+                                value="SIM"
+                                checked={respostas[item.chave] === "SIM"}
+                                onChange={() => handleChange(item.chave, "SIM")}
+                                required
+                                disabled={carregando}
+                              />
+                              <label
+                                className="form-check-label"
+                                htmlFor={`${item.chave}-sim`}
+                              >
+                                Sim
+                              </label>
+                            </div>
+                            <div className="form-check form-check-inline">
+                              <input
+                                className="form-check-input"
+                                type="radio"
+                                id={`${item.chave}-nao`}
+                                name={item.chave}
+                                value="NAO"
+                                checked={respostas[item.chave] === "NAO"}
+                                onChange={() => handleChange(item.chave, "NAO")}
+                                required
+                                disabled={carregando}
+                              />
+                              <label
+                                className="form-check-label"
+                                htmlFor={`${item.chave}-nao`}
+                              >
+                                Não
+                              </label>
+                            </div>
+                          </div>
+
+                          {item.mostrarExtra &&
+                            respostas[item.chave] === "SIM" && (
+                              <div className="mt-2">
+                                <div className="input-group">
+                                  <span className="input-group-text bg-light">
+                                    {item.extra}
+                                  </span>
+                                  <input
+                                    type="text"
+                                    className="form-control"
+                                    value={
+                                      respostas[`${item.chave}_extra`] || ""
+                                    }
+                                    onChange={(e) =>
+                                      handleExtraChange(
+                                        item.chave,
+                                        e.target.value
+                                      )
+                                    }
+                                    disabled={carregando}
+                                    required={respostas[item.chave] === "SIM"}
+                                    placeholder={`Informe ${item.extra.toLowerCase()}`}
+                                  />
+                                </div>
+                              </div>
+                            )}
+                        </>
+                      )}
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
 
             {mensagem && (
-              <label className="text-danger d-block text-end mb-2">
+              <div
+                className={`alert ${
+                  mensagem.includes("sucesso")
+                    ? "alert-success"
+                    : "alert-danger"
+                }`}
+              >
                 {mensagem}
-              </label>
+              </div>
             )}
 
             <div className="text-end mt-4">
               <button
                 type="button"
-                className="btn btn-outline-primary px-4 w-100"
+                className="btn btn-primary px-4 w-100"
                 onClick={handleFinalizar}
+                disabled={!todosCamposPreenchidos()}
               >
-                {isAtualizar ? "Atualizar" : "Finalizar"}
+                {carregando ? (
+                  <span>
+                    <span
+                      className="spinner-border spinner-border-sm me-2"
+                      role="status"
+                      aria-hidden="true"
+                    ></span>
+                    {isAtualizar ? "Atualizando..." : "Salvando..."}
+                  </span>
+                ) : isAtualizar ? (
+                  "Atualizar Ficha"
+                ) : (
+                  "Salvar Ficha"
+                )}
               </button>
             </div>
           </form>

@@ -1,26 +1,13 @@
 package com.pi.saudememora.model;
 
 import jakarta.persistence.*;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.RestController;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-
 import java.util.Date;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
-@RestController
 @Entity
 @Table(name = "tb_ficha_medica")
-@CrossOrigin(origins = "*")
 public class FichaMedica {
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -30,7 +17,6 @@ public class FichaMedica {
     @ManyToOne
     @JoinColumn(name = "id_paciente", referencedColumnName = "id_paciente", nullable = false)
     private Paciente paciente;
-
 
     @Lob
     @Column(name = "ds_imagem")
@@ -44,7 +30,100 @@ public class FichaMedica {
     private Date dataCriacao;
 
     @Column(name = "tg_tratamento_medico")
-    private boolean tratamentoMedico;
+    private Boolean tratamentoMedico;
+    @Column(name = "ds_tratamento_medico", length = 255)
+    private String tratamentoMedicoExtra;
+
+    @Column(name = "tg_gravidez")
+    private Boolean gravidez;
+    @Column(name = "ds_gravidez", length = 50)
+    private String gravidezExtra;
+
+    @Column(name = "tg_regime")
+    private Boolean regime;
+    @Column(name = "ds_regime", length = 255)
+    private String regimeExtra;
+
+    @Column(name = "tg_diabetes")
+    private Boolean diabetes;
+    @Column(name = "ds_diabetes", length = 50)
+    private String diabetesExtra;
+
+    @Column(name = "tg_alergias")
+    private Boolean alergias;
+    @Column(name = "ds_alergias", length = 255)
+    private String alergiasExtra;
+
+    @Column(name = "tg_reumatica")
+    private Boolean reumatica;
+
+    @Column(name = "tg_coagulacao")
+    private Boolean coagulacao;
+
+    @Column(name = "tg_doenca_cardio_vascular")
+    private Boolean doencaCardioVascular;
+    @Column(name = "ds_doenca_cardio_vascular", length = 255)
+    private String doencaCardioVascularExtra;
+
+    @Column(name = "tg_hemorragicos")
+    private Boolean hemorragicos;
+
+    @Column(name = "tg_problemas_anestesia")
+    private Boolean problemasAnestesia;
+    @Column(name = "ds_problemas_anestesia", length = 255)
+    private String problemasAnestesiaExtra;
+
+    @Column(name = "tg_alergia_medicamentos")
+    private Boolean alergiaMedicamentos;
+    @Column(name = "ds_alergia_medicamentos", length = 255)
+    private String alergiaMedicamentosExtra;
+
+    @Column(name = "tg_hepatite")
+    private Boolean hepatite;
+    @Column(name = "ds_hepatite", length = 50)
+    private String hepatiteExtra;
+
+    @Column(name = "tg_hiv")
+    private Boolean hiv;
+
+    @Column(name = "tg_drogas")
+    private Boolean drogas;
+
+    @Column(name = "tg_fumante")
+    private Boolean fumante;
+
+    @Column(name = "tg_fumou")
+    private Boolean fumou;
+
+    @Column(name = "ds_pressao", length = 20)
+    private String pressao;
+
+    @Column(name = "tg_respiratorios")
+    private Boolean respiratorio;
+    @Column(name = "ds_respiratorios", length = 255)
+    private String respiratorioExtra;
+
+    @Column(name = "tg_doenca_familia")
+    private Boolean doencaFamilia;
+    @Column(name = "ds_doenca_familia", length = 255)
+    private String doencaFamiliaExtra;
+
+    // Getters e Setters para campos não booleanos
+    public Long getId() {
+        return id;
+    }
+
+    public void setId(Long id) {
+        this.id = id;
+    }
+
+    public Paciente getPaciente() {
+        return paciente;
+    }
+
+    public void setPaciente(Paciente paciente) {
+        this.paciente = paciente;
+    }
 
     public byte[] getImagem() {
         return imagem;
@@ -70,193 +149,205 @@ public class FichaMedica {
         this.dataCriacao = dataCriacao;
     }
 
-
-    @Column(name = "tg_gravidez")
-    private boolean gravidez;
-
-    @Column(name = "tg_regime")
-    private boolean regime;
-
-    @Column(name = "tg_diabetes")
-    private boolean diabetes;
-
-    @Column(name = "tg_alergias")
-    private boolean alergias;
-
-    @Column(name = "tg_reumatica")
-    private boolean reumatica;
-
-    @Column(name = "tg_coagulacao")
-    private boolean coagulacao;
-
-    @Column(name = "tg_doenca_cardio_vascular")
-    private boolean doencaCardioVascular;
-
-    @Column(name = "tg_hemorragicos")
-    private boolean hemorragicos;
-
-    @Column(name = "tg_problemas_anestesia")
-    private boolean problemasAnestesia;
-
-    @Column(name = "tg_alergia_medicamentos")
-    private boolean alergiaMedicamentos;
-
-    @Column(name = "tg_hepatite")
-    private boolean hepatite;
-
-    @Column(name = "tg_hiv")
-    private boolean hiv;
-
-    @Column(name = "tg_drogas")
-    private boolean drogas;
-
-    @Column(name = "tg_fumante")
-    private boolean fumante;
-
-    @Column(name = "tg_fumou")
-    private boolean Fumou;
-
-    @Column(name = "ds_pressao")
-    private String pressao;
-
-    @Column(name = "tg_respiratorios")
-    private boolean respiratorio;
-
-    // Getters e setters
+    // Métodos booleanos com prefixo 'is'
     public boolean isTratamentoMedico() {
-        return tratamentoMedico;
+        return tratamentoMedico != null && tratamentoMedico;
     }
 
-    public void setTratamentoMedico(boolean tratamentoMedico) {
+    public void setTratamentoMedico(Boolean tratamentoMedico) {
         this.tratamentoMedico = tratamentoMedico;
     }
 
-    public boolean isGravidez() {
-        return gravidez;
+    public String getTratamentoMedicoExtra() {
+        return tratamentoMedicoExtra;
     }
 
-    public void setGravidez(boolean gravidez) {
+    public void setTratamentoMedicoExtra(String tratamentoMedicoExtra) {
+        this.tratamentoMedicoExtra = tratamentoMedicoExtra;
+    }
+
+    public boolean isGravidez() {
+        return gravidez != null && gravidez;
+    }
+
+    public void setGravidez(Boolean gravidez) {
         this.gravidez = gravidez;
     }
 
-    public boolean isRegime() {
-        return regime;
+    public String getGravidezExtra() {
+        return gravidezExtra;
     }
 
-    public void setRegime(boolean regime) {
+    public void setGravidezExtra(String gravidezExtra) {
+        this.gravidezExtra = gravidezExtra;
+    }
+
+    public boolean isRegime() {
+        return regime != null && regime;
+    }
+
+    public void setRegime(Boolean regime) {
         this.regime = regime;
     }
 
-    public boolean isDiabetes() {
-        return diabetes;
+    public String getRegimeExtra() {
+        return regimeExtra;
     }
 
-    public void setDiabetes(boolean diabetes) {
+    public void setRegimeExtra(String regimeExtra) {
+        this.regimeExtra = regimeExtra;
+    }
+
+    public boolean isDiabetes() {
+        return diabetes != null && diabetes;
+    }
+
+    public void setDiabetes(Boolean diabetes) {
         this.diabetes = diabetes;
     }
 
-    public boolean isAlergias() {
-        return alergias;
+    public String getDiabetesExtra() {
+        return diabetesExtra;
     }
 
-    public void setAlergias(boolean alergias) {
+    public void setDiabetesExtra(String diabetesExtra) {
+        this.diabetesExtra = diabetesExtra;
+    }
+
+    public boolean isAlergias() {
+        return alergias != null && alergias;
+    }
+
+    public void setAlergias(Boolean alergias) {
         this.alergias = alergias;
     }
 
-    public boolean isFebre() {
-        return reumatica;
+    public String getAlergiasExtra() {
+        return alergiasExtra;
     }
 
-    public void setFebre(boolean reumatica) {
-        this.reumatica = this.reumatica;
+    public void setAlergiasExtra(String alergiasExtra) {
+        this.alergiasExtra = alergiasExtra;
     }
 
-    public Long getPacienteId() {
-        return paciente != null ? paciente.getId() : null;
+    public boolean isReumatica() {
+        return reumatica != null && reumatica;
     }
 
-    public void setPaciente(Paciente paciente) {
-        this.paciente = paciente;
+    public void setReumatica(Boolean reumatica) {
+        this.reumatica = reumatica;
     }
 
     public boolean isCoagulacao() {
-        return coagulacao;
+        return coagulacao != null && coagulacao;
     }
 
-    public void setCoagulacao(boolean coagulacao) {
+    public void setCoagulacao(Boolean coagulacao) {
         this.coagulacao = coagulacao;
     }
 
     public boolean isDoencaCardioVascular() {
-        return doencaCardioVascular;
+        return doencaCardioVascular != null && doencaCardioVascular;
     }
 
-    public void setDoencaCardioVascular(boolean doencaCardioVascular) {
+    public void setDoencaCardioVascular(Boolean doencaCardioVascular) {
         this.doencaCardioVascular = doencaCardioVascular;
     }
 
-    public boolean isHemorragicos() {
-        return hemorragicos;
+    public String getDoencaCardioVascularExtra() {
+        return doencaCardioVascularExtra;
     }
 
-    public void setHemorragicos(boolean hemorragicos) {
+    public void setDoencaCardioVascularExtra(String doencaCardioVascularExtra) {
+        this.doencaCardioVascularExtra = doencaCardioVascularExtra;
+    }
+
+    public boolean isHemorragicos() {
+        return hemorragicos != null && hemorragicos;
+    }
+
+    public void setHemorragicos(Boolean hemorragicos) {
         this.hemorragicos = hemorragicos;
     }
 
     public boolean isProblemasAnestesia() {
-        return problemasAnestesia;
+        return problemasAnestesia != null && problemasAnestesia;
     }
 
-    public void setProblemasAnestesia(boolean problemasAnestesia) {
+    public void setProblemasAnestesia(Boolean problemasAnestesia) {
         this.problemasAnestesia = problemasAnestesia;
     }
 
-    public boolean isAlergiaMedicamentos() {
-        return alergiaMedicamentos;
+    public String getProblemasAnestesiaExtra() {
+        return problemasAnestesiaExtra;
     }
 
-    public void setAlergiaMedicamentos(boolean alergiaMedicamentos) {
+    public void setProblemasAnestesiaExtra(String problemasAnestesiaExtra) {
+        this.problemasAnestesiaExtra = problemasAnestesiaExtra;
+    }
+
+    public boolean isAlergiaMedicamentos() {
+        return alergiaMedicamentos != null && alergiaMedicamentos;
+    }
+
+    public void setAlergiaMedicamentos(Boolean alergiaMedicamentos) {
         this.alergiaMedicamentos = alergiaMedicamentos;
     }
 
-    public boolean isHepatite() {
-        return hepatite;
+    public String getAlergiaMedicamentosExtra() {
+        return alergiaMedicamentosExtra;
     }
 
-    public void setHepatite(boolean hepatite) {
+    public void setAlergiaMedicamentosExtra(String alergiaMedicamentosExtra) {
+        this.alergiaMedicamentosExtra = alergiaMedicamentosExtra;
+    }
+
+    public boolean isHepatite() {
+        return hepatite != null && hepatite;
+    }
+
+    public void setHepatite(Boolean hepatite) {
         this.hepatite = hepatite;
     }
 
-    public boolean isHiv() {
-        return hiv;
+    public String getHepatiteExtra() {
+        return hepatiteExtra;
     }
 
-    public void setHiv(boolean hiv) {
+    public void setHepatiteExtra(String hepatiteExtra) {
+        this.hepatiteExtra = hepatiteExtra;
+    }
+
+    public boolean isHiv() {
+        return hiv != null && hiv;
+    }
+
+    public void setHiv(Boolean hiv) {
         this.hiv = hiv;
     }
 
     public boolean isDrogas() {
-        return drogas;
+        return drogas != null && drogas;
     }
 
-    public void setDrogas(boolean drogas) {
+    public void setDrogas(Boolean drogas) {
         this.drogas = drogas;
     }
 
     public boolean isFumante() {
-        return fumante;
+        return fumante != null && fumante;
     }
 
-    public void setFumante(boolean fumante) {
+    public void setFumante(Boolean fumante) {
         this.fumante = fumante;
     }
 
     public boolean isFumou() {
-        return Fumou;
+        return fumou != null && fumou;
     }
 
-    public void setFumou(boolean Fumou) {
-        this.Fumou = Fumou;
+    public void setFumou(Boolean fumou) {
+        this.fumou = fumou;
     }
 
     public String getPressao() {
@@ -268,24 +359,34 @@ public class FichaMedica {
     }
 
     public boolean isRespiratorio() {
-        return respiratorio;
+        return respiratorio != null && respiratorio;
     }
 
-    public void setRespiratorio(boolean problemasRespiratorios) {
-        this.respiratorio = problemasRespiratorios;
+    public void setRespiratorio(Boolean respiratorio) {
+        this.respiratorio = respiratorio;
     }
 
-    public boolean isReumatica() {
-        return reumatica;
+    public String getRespiratorioExtra() {
+        return respiratorioExtra;
     }
 
-    public void setReumatica(boolean reumatica) {
-        this.reumatica = reumatica;
+    public void setRespiratorioExtra(String respiratorioExtra) {
+        this.respiratorioExtra = respiratorioExtra;
     }
 
-
-    public Paciente getPaciente() {
-        return paciente;
+    public boolean isDoencaFamilia() {
+        return doencaFamilia != null && doencaFamilia;
     }
 
+    public void setDoencaFamilia(Boolean doencaFamilia) {
+        this.doencaFamilia = doencaFamilia;
+    }
+
+    public String getDoencaFamiliaExtra() {
+        return doencaFamiliaExtra;
+    }
+
+    public void setDoencaFamiliaExtra(String doencaFamiliaExtra) {
+        this.doencaFamiliaExtra = doencaFamiliaExtra;
+    }
 }

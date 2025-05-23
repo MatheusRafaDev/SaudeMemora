@@ -35,7 +35,7 @@ const Nav = () => {
               <Link 
                 className="nav-link d-flex align-items-center py-3 px-3 rounded mx-2 my-1 hover-effect"
                 to="/perfil"
-                onClick={() => setOpen(false)} // fecha menu ao clicar
+                onClick={() => setOpen(false)}
               >
                 <i className="bi bi-person-circle me-2" style={{ fontSize: '1.2rem' }}></i>
                 <span className="fw-medium">Perfil</span>
@@ -59,6 +59,16 @@ const Nav = () => {
               >
                 <i className="bi bi-cloud-arrow-up me-2" style={{ fontSize: '1.2rem' }}></i>
                 <span className="fw-medium">Processamento</span>
+              </Link>
+            </li>
+            <li className="nav-item">
+              <Link 
+                className="nav-link d-flex align-items-center py-3 px-3 rounded mx-2 my-1 hover-effect" 
+                to="/visualizar-ficha"
+                onClick={() => setOpen(false)}
+              >
+                <i className="bi bi-file-text me-2" style={{ fontSize: '1.2rem' }}></i>
+                <span className="fw-medium">Ficha Médica</span>
               </Link>
             </li>
             <li className="nav-item">
