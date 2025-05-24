@@ -31,7 +31,7 @@ async function getWorker() {
   if (!tesseractWorker) {
     tesseractWorker = await createWorker();
     await tesseractWorker.load();
-    await tesseractWorker.initialize('por');
+    //await tesseractWorker.initialize('por');
   }
   return tesseractWorker;
 }
@@ -166,3 +166,5 @@ function handleError(err, context = '') {
     window.trackJs.track(errorInfo);
   }
 }
+
+

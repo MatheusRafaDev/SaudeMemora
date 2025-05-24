@@ -7,12 +7,10 @@ if (!OPENROUTER_API_KEY) {
 function normalizarTexto(texto) {
   if (!texto || typeof texto !== "string") return "";
   return texto
-    .replace(/\s+/g, " ")                // substitui múltiplos espaços por um único espaço
-    .replace(/(\.|\!|\?)\s*/g, "$1\n")  // coloca quebra de linha após . ! ?
+    .replace(/\s+/g, " ") // substitui múltiplos espaços por um único espaço
+    .replace(/(\.|\!|\?)\s*/g, "$1\n") // coloca quebra de linha após . ! ?
     .trim();
 }
-
-
 
 export async function ajustarTextoFormulario(text) {
   try {
@@ -171,7 +169,8 @@ Texto do formulário:
         messages: [
           {
             role: "system",
-            content: "Você é um assistente que extrai apenas os dados médicos de formulários, sem realizar correções.",
+            content:
+              "Você é um assistente que extrai apenas os dados médicos de formulários, sem realizar correções.",
           },
           {
             role: "user",
@@ -184,12 +183,15 @@ Texto do formulário:
     });
 
     if (!res.ok) throw new Error(`Erro na API: ${res.statusText}`);
-    
+
     const data = await res.json();
 
     // Remover delimitadores de bloco de código (```json e ```)
     let content = data.choices[0].message.content;
-    content = content.replace(/```json/g, "").replace(/```/g, "").trim();
+    content = content
+      .replace(/```json/g, "")
+      .replace(/```/g, "")
+      .trim();
 
     // Convertendo a string JSON limpa para um objeto
     const jsonObject = JSON.parse(content);
@@ -200,20 +202,19 @@ Texto do formulário:
   }
 }
 
-
-
-
 export async function tratarOCRParaReceitas(textoOCR) {
-
-  console.log("Texto OCR recebido:", textoOCR);
-
   try {
-    if (!textoOCR || typeof textoOCR !== "string" || textoOCR.trim().length < 10) {
+    if (
+      !textoOCR ||
+      typeof textoOCR !== "string" ||
+      textoOCR.trim().length < 10
+    ) {
       throw new Error("Texto OCR inválido ou muito curto.");
     }
 
     const textoTratado = textoOCR
-      .normalize("NFD").replace(/[\u0300-\u036f]/g, "") 
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
       .replace(/[^a-zA-Z0-9À-ÿ.,\s/-]/g, "")
       .trim();
 
@@ -278,8 +279,6 @@ ${textoTratado}`;
     if (!res.ok) throw new Error(`Erro na API: ${res.statusText}`);
     const data = await res.json();
 
-    console.log(data)
-
     let jsonReceita;
     try {
       jsonReceita = JSON.parse(data.choices[0].message.content);
@@ -297,7 +296,10 @@ ${textoTratado}`;
       if (d.includes("/")) {
         const partes = d.split("/");
         if (partes.length === 3) {
-          dataFormatada = `${partes[2]}-${partes[1].padStart(2,"0")}-${partes[0].padStart(2,"0")}`;
+          dataFormatada = `${partes[2]}-${partes[1].padStart(
+            2,
+            "0"
+          )}-${partes[0].padStart(2, "0")}`;
         }
       } else {
         dataFormatada = d;
@@ -308,18 +310,16 @@ ${textoTratado}`;
       dataReceita: dataFormatada || "",
       medico: jsonReceita.medico || "",
       crm: jsonReceita.crm || "",
-      medicamentos: Array.isArray(jsonReceita.medicamentos) 
-        ? jsonReceita.medicamentos.map(medicamento => ({
+      medicamentos: Array.isArray(jsonReceita.medicamentos)
+        ? jsonReceita.medicamentos.map((medicamento) => ({
             nome: medicamento.nome || "",
             quantidade: medicamento.quantidade || "",
-            formaDeUso: medicamento.formaDeUso || ""
-          })) 
+            formaDeUso: medicamento.formaDeUso || "",
+          }))
         : [],
       observacoes: normalizarTexto(jsonReceita.observacoes),
-      resumo: normalizarTexto(jsonReceita.resumo)
+      resumo: normalizarTexto(jsonReceita.resumo),
     };
-
-
   } catch (error) {
     console.error("❌ Erro ao tratar OCR:", error.message);
     return { error: error.message };
@@ -328,13 +328,15 @@ ${textoTratado}`;
 
 export async function tratarOCRParaExames(textoOCR) {
   try {
-    if (!textoOCR || typeof textoOCR !== "string" || textoOCR.trim().length < 10) {
+    if (
+      !textoOCR ||
+      typeof textoOCR !== "string" ||
+      textoOCR.trim().length < 10
+    ) {
       throw new Error("Texto OCR inválido ou muito curto.");
     }
 
-    const textoTratado = textoOCR
-      .replace(/[^a-zA-Z0-9.,\s]/g, "")
-      .trim();
+    const textoTratado = textoOCR.replace(/[^a-zA-Z0-9.,\s]/g, "").trim();
 
     const prompt = `Você é um assistente que interpreta textos extraídos via OCR e transforma os dados em JSON estruturado para exames médicos.
 
@@ -383,8 +385,6 @@ ${textoTratado}`;
       timeout: 15000,
     });
 
-    console.log("Resposta da API:", res);
-
     if (!res.ok) throw new Error(`Erro na API: ${res.statusText}`);
     const data = await res.json();
 
@@ -415,14 +415,15 @@ ${textoTratado}`;
 
 export async function tratarOCRParaDocumentoClinico(textoOCR) {
   try {
-    console.log("Texto OCR recebido:", textoOCR);
-    if (!textoOCR || typeof textoOCR !== "string" || textoOCR.trim().length < 10) {
+    if (
+      !textoOCR ||
+      typeof textoOCR !== "string" ||
+      textoOCR.trim().length < 10
+    ) {
       throw new Error("Texto OCR inválido ou muito curto.");
     }
 
-    const textoTratado = textoOCR
-      .replace(/[^a-zA-Z0-9.,\s]/g, "")
-      .trim();
+    const textoTratado = textoOCR.replace(/[^a-zA-Z0-9.,\s]/g, "").trim();
 
     const prompt = `Você é um assistente que interpreta textos extraídos via OCR e transforma os dados em JSON estruturado para documentos clínicos.
 
@@ -471,8 +472,6 @@ ${textoTratado}`;
       timeout: 15000,
     });
 
-    console.log("Resposta da API:", res);
-
     if (!res.ok) throw new Error(`Erro na API: ${res.statusText}`);
     const data = await res.json();
 
@@ -496,38 +495,143 @@ ${textoTratado}`;
       resumo: normalizarTexto(jsonDocumento.resumo),
     };
   } catch (error) {
-    console.error("❌ Erro ao tratar OCR para Documento Clínico:", error.message);
+    console.error(
+      "❌ Erro ao tratar OCR para Documento Clínico:",
+      error.message
+    );
     return { error: error.message };
   }
 }
 
 export async function formatarTextoOCR(textoOCR) {
-
   try {
-    if (!textoOCR || typeof textoOCR !== "string" || textoOCR.trim().length < 10) {
+    if (
+      !textoOCR ||
+      typeof textoOCR !== "string" ||
+      textoOCR.trim().length < 10
+    ) {
       throw new Error("Texto OCR inválido ou muito curto.");
     }
 
-    const textoTratado = textoOCR
-      .normalize("NFD").replace(/[\u0300-\u036f]/g, "") // Remove acentos
-      .replace(/[^a-zA-Z0-9À-ÿ.,\s/-]/g, "") // Remove caracteres especiais
+    // Pré-processamento do texto para remover acentos, espaços extras e caracteres estranhos
+    let textoTratado = textoOCR
+      .normalize("NFD") // Decompõe caracteres acentuados em base + acento
+      .replace(/[\u0300-\u036f]/g, "") // Remove os acentos
+      .replace(/\r\n|\r|\n/g, " ") // Substitui quebras de linha por espaço
+      .replace(/\s+/g, " ") // Remove múltiplos espaços
+      .replace(/[^a-zA-Z0-9À-ÿ.,;:!?'"()\-\/\s]/g, "") // Remove caracteres especiais, mantendo pontuação importante
       .trim();
 
-    const prompt = `Você é um assistente que formata textos extraídos via OCR para melhorar a legibilidade.
-    
+    const systemMessage = `
+Você é um assistente especializado em reformatar textos extraídos via OCR para melhorar a legibilidade.
 Sua tarefa é:
-1. Corrigir erros comuns de OCR
-2. Ajustar a formatação para melhor legibilidade
-3. Manter todo o conteúdo original
-4. Organizar o texto em parágrafos lógicos
-5. Aplicar capitalização correta (nomes próprios, início de frases)
-6. Corrigir espaçamento e pontuação
+1. Corrigir erros comuns de OCR.
+2. Ajustar a formatação para melhor legibilidade.
+3. Manter todo o conteúdo original.
+4. Organizar o texto em parágrafos lógicos.
+5. Aplicar capitalização correta (nomes próprios, início de frases).
+6. Corrigir espaçamento e pontuação.
 
 Não altere o significado do texto, apenas melhore sua apresentação.
 
 Retorne apenas o texto formatado, sem comentários ou explicações.
+`.trim();
 
-Texto a ser formatado:
+    const userPrompt = `Texto a ser formatado:\n${textoTratado}`;
+
+    // Controle de timeout para fetch (fetch não tem timeout nativo)
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 15000); // 15 segundos
+
+    const response = await fetch(
+      "https://openrouter.ai/api/v1/chat/completions",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${OPENROUTER_API_KEY}`,
+        },
+        body: JSON.stringify({
+          model: "openai/gpt-3.5-turbo",
+          messages: [
+            { role: "system", content: systemMessage },
+            { role: "user", content: userPrompt },
+          ],
+          temperature: 0.3, // Pequena margem para melhorar fluidez e criatividade sem perder foco
+          max_tokens: 1000, // Limite para evitar corte prematuro
+        }),
+        signal: controller.signal,
+      }
+    );
+
+    clearTimeout(timeoutId);
+
+    if (!response.ok) {
+      throw new Error(
+        `Erro na API: ${response.status} - ${response.statusText}`
+      );
+    }
+
+    const data = await response.json();
+
+    if (
+      !data.choices ||
+      data.choices.length === 0 ||
+      !data.choices[0].message ||
+      !data.choices[0].message.content
+    ) {
+      throw new Error("Resposta da API inválida ou vazia.");
+    }
+
+    const textoFormatado = data.choices[0].message.content.trim();
+
+    if (textoFormatado.length < 10) {
+      throw new Error("O texto formatado retornado é muito curto.");
+    }
+
+    return textoFormatado;
+  } catch (error) {
+    console.error("❌ Erro ao formatar texto OCR:", error.message);
+
+    // Retorno uniforme com sucesso: false e o texto original para fallback
+    return {
+      sucesso: false,
+      textoOriginal: textoOCR,
+      error: error.message,
+    };
+  }
+}
+
+export async function extrairMedicamentosDoOCR(textoOCR) {
+  try {
+    if (
+      !textoOCR ||
+      typeof textoOCR !== "string" ||
+      textoOCR.trim().length < 10
+    ) {
+      throw new Error("Texto OCR inválido ou muito curto.");
+    }
+
+    const textoTratado = textoOCR
+      .normalize("NFD")
+      .replace(/[\u0300-\u036f]/g, "")
+      .replace(/[^a-zA-Z0-9À-ÿ.,\s/-]/g, "")
+      .trim();
+
+    const prompt = `Extraia apenas os medicamentos do texto OCR abaixo, retornando um JSON no formato:
+
+{
+  "medicamentos": [
+    {
+      "nome": "Nome do medicamento",
+      "quantidade": "Quantidade inicial ou total, se informada",
+      "formaDeUso": "Por quanto tempo usar (exemplo: '5 dias', 'até acabar') e via de administração e duração (por quanto tempo usar)."
+    }
+  ]
+}
+
+Texto OCR:
+
 ${textoTratado}`;
 
     const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
@@ -541,36 +645,44 @@ ${textoTratado}`;
         messages: [
           {
             role: "system",
-            content: "Você é um assistente especializado em reformatar textos extraídos via OCR para melhorar a legibilidade.",
+            content:
+              "Você é um assistente que extrai medicamentos de textos OCR médicos.",
           },
           {
             role: "user",
             content: prompt,
           },
         ],
-        temperature: 0.2, // Um pouco mais flexível que 0.0 para permitir melhorias criativas na formatação
+        temperature: 0.0,
       }),
       timeout: 15000,
     });
 
     if (!res.ok) throw new Error(`Erro na API: ${res.statusText}`);
+
     const data = await res.json();
 
-    const textoFormatado = data.choices[0].message.content.trim();
-
-    if (!textoFormatado || textoFormatado.length < 10) {
-      throw new Error("A resposta da API está vazia ou muito curta.");
+    let jsonReceita;
+    try {
+      jsonReceita = JSON.parse(data.choices?.[0]?.message?.content || "{}");
+    } catch (e) {
+      throw new Error("Resposta da API não é um JSON válido.");
     }
 
-    return textoFormatado;
+    // Validação: se o array estiver vazio ou não existir, joga erro
+    if (
+      !jsonReceita.medicamentos ||
+      !Array.isArray(jsonReceita.medicamentos) ||
+      jsonReceita.medicamentos.length === 0
+    ) {
+      throw new Error("Nenhum medicamento encontrado.");
+    }
 
+    return jsonReceita.medicamentos;
   } catch (error) {
-    console.error("❌ Erro ao formatar texto OCR:", error.message);
-    return { 
-      textoOriginal: textoOCR,
-      error: error.message,
-      sucesso: false 
-    };
+    console.error("❌ Erro ao extrair medicamentos:", error.message);
+    return { error: error.message };
   }
 }
+
 
