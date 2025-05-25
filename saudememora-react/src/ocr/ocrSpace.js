@@ -7,7 +7,6 @@ import getParsedText from './utils/ProcessarTexto';
 const API_KEY = process.env.REACT_APP_OCR_SPACE_API_KEY;
 const OCR_SPACE_URL = 'https://api.ocr.space/parse/image';
 
-// Configurações compartilhadas
 const OCR_CONFIG = {
   TESSERACT: {
     PSM: '6',  // Page segmentation mode
@@ -21,12 +20,8 @@ const OCR_CONFIG = {
   }
 };
 
-// Cache de worker para Tesseract
 let tesseractWorker;
 
-/**
- * Otimização: Worker reutilizável para Tesseract
- */
 async function getWorker() {
   if (!tesseractWorker) {
     tesseractWorker = await createWorker();
@@ -36,10 +31,7 @@ async function getWorker() {
   return tesseractWorker;
 }
 
-/**
- * Versão melhorada do OCR.space com tratamento de erros robusto
- */
-export async function ocrSpace(file) {
+export async function ocrSpace2(file) {
   try {
     const processedBlob = await ProcessarImagem(file, {
       targetDPI: 400,
@@ -76,10 +68,7 @@ export async function ocrSpace(file) {
   }
 }
 
-/**
- * Versão otimizada do Tesseract.js com configuração avançada
- */
-export async function ocrSpace2(file, options = {}) {
+export async function ocrSpace(file, options = {}) {
   const { logProgress = false } = options;
   const worker = await getWorker();
 
@@ -112,9 +101,6 @@ export async function ocrSpace2(file, options = {}) {
   }
 }
 
-/**
- * Sistema inteligente de fallback
- */
 export async function smartOCR(file, options = {}) {
   const { fallback = true, retryCount = 2 } = options;
 
@@ -138,7 +124,6 @@ export async function smartOCR(file, options = {}) {
   }
 }
 
-// Funções auxiliares permanecem as mesmas com pequenos ajustes
 function processTesseractText(text) {
   return text
     .split('\n')

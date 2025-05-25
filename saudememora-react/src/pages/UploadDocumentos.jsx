@@ -8,6 +8,7 @@ import { formatarTextoOCR } from "../services/OpenRouter";
 import { useNavigate } from "react-router-dom";
 import { AdicionarDocumento } from "../documentos/AdicionarDocumento";
 import { extrairMedicamentosDoOCR } from "../services/OpenRouter";
+import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 
 export default function UploadDocumentos() {
   const [documento, setDocumento] = useState(null);
@@ -99,7 +100,7 @@ export default function UploadDocumentos() {
         const inicialQuantidades = {};
         const inicialFormas = {};
         medicamentos.forEach((med) => {
-          inicialQuantidades[med.nome] = "";
+          inicialQuantidades[med.nome] = med.quantidade || "";
           inicialFormas[med.nome] = med.formaDeUso || "";
         });
         setQuantidades(inicialQuantidades);
@@ -162,9 +163,8 @@ export default function UploadDocumentos() {
       return;
     }
 
-    // Valida as quantidades dos remédios
     for (const remedio of remedios) {
-      if (!quantidades[remedio] || isNaN(quantidades[remedio])) {
+      if (!quantidades[remedio]) {
         setMensagemErro(`Informe a quantidade do remédio: ${remedio}`);
         return;
       }
@@ -174,14 +174,14 @@ export default function UploadDocumentos() {
     setStatus("Adicionando documento...");
 
     try {
-      // Passa também as formasDeUso para salvar se necessário
+
       const response = await AdicionarDocumento(
         tipoDocumento,
         textoOCR,
         paciente,
         documento,
         navigate,
-        { medicamentos, quantidades, formasDeUso } // Pode ajustar conforme sua API
+        { medicamentos, quantidades, formasDeUso }
       );
 
       if (response.success) {
@@ -226,12 +226,59 @@ export default function UploadDocumentos() {
         </div>
 
         {preview && (
-          <div className="preview-container mb-3 text-center">
-            <img
-              src={preview}
-              alt="Pré-visualização"
-              className="img-fluid rounded shadow"
-            />
+          <div
+            className="d-flex justify-content-center mb-3"
+            style={{ height: "400px" }}
+          >
+            {" "}
+            {/* Container com altura fixa e centralizado */}
+            <TransformWrapper
+              initialScale={1}
+              minScale={1}
+              maxScale={5}
+              wheel={{ step: 0.1 }}
+            >
+              {({ zoomIn, zoomOut, resetTransform }) => (
+                <>
+                  <div
+                    className="tools"
+                    style={{
+                      position: "absolute",
+                      zIndex: 10,
+                      top: "10px",
+                      left: "10px",
+                    }}
+                  >
+
+                  </div>
+                  <TransformComponent
+                    wrapperStyle={{
+                      width: "100%",
+                      height: "100%",
+                    }}
+                    contentStyle={{
+                      width: "100%",
+                      height: "100%",
+                      display: "flex",
+                      justifyContent: "center",
+                      alignItems: "center",
+                    }}
+                  >
+                    <img
+                      src={preview}
+                      alt="Pré-visualização"
+                      className="img-fluid rounded shadow"
+                      style={{
+                        maxHeight: "100%",
+                        maxWidth: "100%",
+                        objectFit: "contain",
+                        cursor: "grab",
+                      }}
+                    />
+                  </TransformComponent>
+                </>
+              )}
+            </TransformWrapper>
           </div>
         )}
 
@@ -343,43 +390,62 @@ export default function UploadDocumentos() {
             <table className="table table-bordered table-striped table-hover">
               <thead>
                 <tr>
-                  <th>Medicamento</th>
-                  <th>Quantidade</th>
-                  <th>Forma de Uso</th>
+                  <th colSpan="3">Medicamento</th>
                 </tr>
               </thead>
               <tbody>
                 {medicamentos.map((medicamento, index) => (
-                  <tr key={index}>
-                    <td>{medicamento.nome}</td>
-                    <td>
-                      <input
-                        type="text"
-                        min="0"
-                        className="form-control"
-                        value={quantidades[medicamento.nome] || ""}
-                        onChange={(e) =>
-                          handleQuantidadeChange(
-                            medicamento.nome,
-                            e.target.value
-                          )
-                        }
-                        disabled={adicionandoDocumento}
-                      />
-                    </td>
-                    <td>
-                      <input
-                        type="text"
-                        className="form-control"
-                        value={formasDeUso[medicamento.nome] || ""}
-                        onChange={(e) =>
-                          handleFormaUsoChange(medicamento.nome, e.target.value)
-                        }
-                        placeholder="Informe a forma de uso"
-                        disabled={adicionandoDocumento}
-                      />
-                    </td>
-                  </tr>
+                  <>
+                    <tr key={`nome-${index}`}>
+                      <td
+                        colSpan="3"
+                        style={{
+                          fontWeight: "bold",
+                          backgroundColor: "#f8f9fa",
+                        }}
+                      >
+                        {medicamento.nome}
+                      </td>
+                    </tr>
+
+                    <tr key={`qtd-${index}`}>
+                      <td>Quantidade:</td>
+
+                      <td>
+                        <input
+                          type="text"
+                          className="form-control"
+                          value={quantidades[medicamento.nome] || ""}
+                          onChange={(e) =>
+                            handleQuantidadeChange(
+                              medicamento.nome,
+                              e.target.value
+                            )
+                          }
+                          disabled={adicionandoDocumento}
+                        />
+                      </td>
+                    </tr>
+
+                    <tr key={`uso-${index}`}>
+                      <td>Forma de Uso:</td>
+                      <td colSpan="2">
+                        <input
+                          type="text"
+                          className="form-control"
+                          value={formasDeUso[medicamento.nome] || ""}
+                          onChange={(e) =>
+                            handleFormaUsoChange(
+                              medicamento.nome,
+                              e.target.value
+                            )
+                          }
+                          placeholder=""
+                          disabled={adicionandoDocumento}
+                        />
+                      </td>
+                    </tr>
+                  </>
                 ))}
               </tbody>
             </table>

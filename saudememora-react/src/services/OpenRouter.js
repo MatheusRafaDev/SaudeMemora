@@ -503,104 +503,6 @@ ${textoTratado}`;
   }
 }
 
-export async function formatarTextoOCR(textoOCR) {
-  try {
-    if (
-      !textoOCR ||
-      typeof textoOCR !== "string" ||
-      textoOCR.trim().length < 10
-    ) {
-      throw new Error("Texto OCR inválido ou muito curto.");
-    }
-
-    // Pré-processamento do texto para remover acentos, espaços extras e caracteres estranhos
-    let textoTratado = textoOCR
-      .normalize("NFD") // Decompõe caracteres acentuados em base + acento
-      .replace(/[\u0300-\u036f]/g, "") // Remove os acentos
-      .replace(/\r\n|\r|\n/g, " ") // Substitui quebras de linha por espaço
-      .replace(/\s+/g, " ") // Remove múltiplos espaços
-      .replace(/[^a-zA-Z0-9À-ÿ.,;:!?'"()\-\/\s]/g, "") // Remove caracteres especiais, mantendo pontuação importante
-      .trim();
-
-    const systemMessage = `
-Você é um assistente especializado em reformatar textos extraídos via OCR para melhorar a legibilidade.
-Sua tarefa é:
-1. Corrigir erros comuns de OCR.
-2. Ajustar a formatação para melhor legibilidade.
-3. Manter todo o conteúdo original.
-4. Organizar o texto em parágrafos lógicos.
-5. Aplicar capitalização correta (nomes próprios, início de frases).
-6. Corrigir espaçamento e pontuação.
-
-Não altere o significado do texto, apenas melhore sua apresentação.
-
-Retorne apenas o texto formatado, sem comentários ou explicações.
-`.trim();
-
-    const userPrompt = `Texto a ser formatado:\n${textoTratado}`;
-
-    // Controle de timeout para fetch (fetch não tem timeout nativo)
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 15000); // 15 segundos
-
-    const response = await fetch(
-      "https://openrouter.ai/api/v1/chat/completions",
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${OPENROUTER_API_KEY}`,
-        },
-        body: JSON.stringify({
-          model: "openai/gpt-3.5-turbo",
-          messages: [
-            { role: "system", content: systemMessage },
-            { role: "user", content: userPrompt },
-          ],
-          temperature: 0.3, // Pequena margem para melhorar fluidez e criatividade sem perder foco
-          max_tokens: 1000, // Limite para evitar corte prematuro
-        }),
-        signal: controller.signal,
-      }
-    );
-
-    clearTimeout(timeoutId);
-
-    if (!response.ok) {
-      throw new Error(
-        `Erro na API: ${response.status} - ${response.statusText}`
-      );
-    }
-
-    const data = await response.json();
-
-    if (
-      !data.choices ||
-      data.choices.length === 0 ||
-      !data.choices[0].message ||
-      !data.choices[0].message.content
-    ) {
-      throw new Error("Resposta da API inválida ou vazia.");
-    }
-
-    const textoFormatado = data.choices[0].message.content.trim();
-
-    if (textoFormatado.length < 10) {
-      throw new Error("O texto formatado retornado é muito curto.");
-    }
-
-    return textoFormatado;
-  } catch (error) {
-    console.error("❌ Erro ao formatar texto OCR:", error.message);
-
-    // Retorno uniforme com sucesso: false e o texto original para fallback
-    return {
-      sucesso: false,
-      textoOriginal: textoOCR,
-      error: error.message,
-    };
-  }
-}
 
 export async function extrairMedicamentosDoOCR(textoOCR) {
   try {
@@ -620,19 +522,20 @@ export async function extrairMedicamentosDoOCR(textoOCR) {
 
     const prompt = `Extraia apenas os medicamentos do texto OCR abaixo, retornando um JSON no formato:
 
-{
-  "medicamentos": [
-    {
-      "nome": "Nome do medicamento",
-      "quantidade": "Quantidade inicial ou total, se informada",
-      "formaDeUso": "Por quanto tempo usar (exemplo: '5 dias', 'até acabar') e via de administração e duração (por quanto tempo usar)."
-    }
-  ]
-}
+      {
+        "medicamentos": [
+          {
+            "nome": "Nome do medicamento (em formato normal, não em maiúsculas)",
+            "quantidade": "Dose por aplicação/uso (ex: '1 comprimido', '2 gotas', '5ml')",
+            "formaDeUso": "Via de administração + duração (ex: 'via oral por 5 dias', 'intramuscular por 1 semana')"
+          }
+        ]
+      }
 
-Texto OCR:
+      não quero que tenha marcação markdown, nem explicações, nem formatação. Apenas o JSON.
+      Texto OCR:
 
-${textoTratado}`;
+      ${textoTratado}`;
 
     const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
       method: "POST",
@@ -662,6 +565,8 @@ ${textoTratado}`;
 
     const data = await res.json();
 
+
+
     let jsonReceita;
     try {
       jsonReceita = JSON.parse(data.choices?.[0]?.message?.content || "{}");
@@ -686,3 +591,66 @@ ${textoTratado}`;
 }
 
 
+export async function formatarTextoOCR(textoOCR) {
+  try {
+    // Pré-processamento inteligente para qualquer tipo de texto
+    let textoTratado = textoOCR
+      .replace(/([a-z])([A-Z0-9])/g, '$1 $2')  // Separa palavras coladas (ex: "HospitalDaLuz" → "Hospital Da Luz")
+      .replace(/([0-9])([A-Za-z])/g, '$1 $2')  // Separa números de letras (ex: "G55" → "G 55")
+      .replace(/_/g, ' ')                       // Remove underscores
+      .replace(/\s+/g, ' ')                     // Normaliza espaços
+      .replace(/(\d)([A-Za-z])/g, '$1 $2')      // Separa letras de números (ex: "2ml" → "2 ml")
+      .trim();
+
+    const promptUniversal = `
+      Corrija e formate este texto extraído por OCR, melhorando a legibilidade e a estruturação conforme padrões de documentação médica.
+       Mantenha o conteúdo técnico preciso, mas ajuste erros de ortografia, pontuação e organização.
+    ${textoTratado}`;
+
+    const controller = new AbortController();
+    setTimeout(() => controller.abort(), 20000); // Timeout de 20s
+
+    const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${OPENROUTER_API_KEY}`
+      },
+      body: JSON.stringify({
+        model:  "openai/gpt-3.5-turbo", // Modelo mais preciso para textos variados
+        messages: [
+          {
+            role: "system",
+            content: "Você é um especialista em correção de textos extraídos por OCR. Sua tarefa é melhorar a legibilidade sem alterar o significado original."
+          },
+          {
+            role: "user",
+            content: promptUniversal
+          }
+        ],
+        temperature: 0, // Equilíbrio entre correção e criatividade
+        //max_tokens: 2000
+      }),
+      signal: controller.signal
+    });
+
+    if (!response.ok) throw new Error(`Erro na API: ${response.status}`);
+
+    const data = await response.json();
+    let textoFormatado = data.choices?.[0]?.message?.content?.trim();
+
+    // Pós-processamento para garantir consistência
+    if (textoFormatado) {
+      textoFormatado = textoFormatado
+        .replace(/(\d)\s*([mg])\s*\/\s*([ml])/gi, '$1$2/$3')  // Padroniza mg/ml
+        .replace(/\b(\d+)\s*([a-z]{2})\b/gi, '$1 $2')         // Espaço entre número e unidade (ex: "2ml" → "2 ml")
+        .replace(/\s{2,}/g, '\n\n');                          // Quebras de linha para parágrafos
+    }
+
+    return textoFormatado || textoOCR; // Fallback para o original se falhar
+
+  } catch (error) {
+    console.error("Erro ao formatar texto OCR:", error.message);
+    return textoOCR; // Retorna o original em caso de erro
+  }
+}
