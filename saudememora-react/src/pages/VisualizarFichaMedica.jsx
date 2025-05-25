@@ -1,9 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { buscarFichaMedica } from "../services/FichaMedicaService";
-
-import "jspdf-autotable";
 import Nav from "../components/Nav";
+import "../styles/VisualizarFichaMedica.css";
 
 const VisualizarFichaMedica = () => {
   const [ficha, setFicha] = useState(null);
@@ -50,9 +49,8 @@ const VisualizarFichaMedica = () => {
     return (
       <>
         <Nav />
-        <div className="container mt-5 text-center">
-          <div className="spinner-border text-primary" role="status" />
-          <p className="mt-3 fs-5">Carregando ficha médica...</p>
+        <div className="container mt-3 text-center">
+          <p className="mt-2">Carregando ficha médica...</p>
         </div>
       </>
     );
@@ -62,14 +60,16 @@ const VisualizarFichaMedica = () => {
     return (
       <>
         <Nav />
-        <div className="container mt-5">
-          <div className="alert alert-warning text-center">
-            <p className="mb-3">{mensagem || "Nenhuma ficha médica encontrada."}</p>
+        <div className="container mt-3">
+          <div className="alert alert-warning text-center py-3 px-2">
+            <p className="mb-3 fs-6">
+              {mensagem || "Nenhuma ficha médica encontrada."}
+            </p>
             <button
-              className="btn btn-primary"
+              className="btn btn-primary btn-sm px-3"
               onClick={() => navigate("/formulario-medico")}
             >
-              Criar Ficha Médica
+              Criar Ficha
             </button>
           </div>
         </div>
@@ -77,96 +77,120 @@ const VisualizarFichaMedica = () => {
     );
   }
 
-  const dadosTabela = [
-    [
-      "Tratamento médico:",
-      formatarResposta(ficha.tratamentoMedico, ficha.tratamentoMedicoExtra),
-    ],
-    [
-      "Grávida:",
-      paciente.sexo === "F"
-        ? formatarResposta(ficha.gravidez, ficha.gravidezExtra)
-        : "Não se aplica",
-    ],
-    ["Faz regime:", formatarResposta(ficha.regime, ficha.regimeExtra)],
-    ["Diabetes:", formatarResposta(ficha.diabetes, ficha.diabetesExtra)],
-    ["Alergias:", formatarResposta(ficha.alergias, ficha.alergiasExtra)],
-    ["Febre reumática:", formatarResposta(ficha.reumatica)],
-    ["Problemas de coagulação:", formatarResposta(ficha.coagulacao)],
-    [
-      "Doença cardiovascular:",
-      formatarResposta(ficha.doencaCardioVascular, ficha.doencaCardioVascularExtra),
-    ],
-    ["Problemas hemorrágicos:", formatarResposta(ficha.hemorragicos)],
-    [
-      "Problemas com anestesia:",
-      formatarResposta(ficha.problemasAnestesia, ficha.problemasAnestesiaExtra),
-    ],
-    [
-      "Alergia a medicamentos:",
-      formatarResposta(ficha.alergiaMedicamentos, ficha.alergiaMedicamentosExtra),
-    ],
-    ["Teve hepatite:", formatarResposta(ficha.hepatite, ficha.hepatiteExtra)],
-    ["Portador do HIV:", formatarResposta(ficha.hiv)],
-    ["Usa/Usou drogas:", formatarResposta(ficha.drogas)],
-    ["Fumante:", formatarResposta(ficha.fumante)],
-    ["Já fumou:", formatarResposta(ficha.fumou)],
-    ["Pressão arterial:", ficha.pressao || "Não informado"],
-    [
-      "Problemas respiratórios:",
-      formatarResposta(ficha.respiratorio, ficha.respiratorioExtra),
-    ],
-    [
-      "Doenças na família:",
-      formatarResposta(ficha.doencaFamilia, ficha.doencaFamiliaExtra),
-    ],
+  const dadosSaude = [
+    {
+      pergunta: "Tratamento médico",
+      valor: ficha.tratamentoMedico,
+      extra: ficha.tratamentoMedicoExtra,
+    },
+    {
+      pergunta: "Grávida",
+      valor: paciente.sexo === "F" ? ficha.gravidez : null,
+      extra: ficha.gravidezExtra,
+      condicional: paciente.sexo === "F",
+    },
+    { pergunta: "Faz regime", valor: ficha.regime, extra: ficha.regimeExtra },
+    { pergunta: "Diabetes", valor: ficha.diabetes, extra: ficha.diabetesExtra },
+    { pergunta: "Alergias", valor: ficha.alergias, extra: ficha.alergiasExtra },
+    { pergunta: "Febre reumática", valor: ficha.reumatica },
+    { pergunta: "Problemas de coagulação", valor: ficha.coagulacao },
+    {
+      pergunta: "Doença cardiovascular",
+      valor: ficha.doencaCardioVascular,
+      extra: ficha.doencaCardioVascularExtra,
+    },
+    { pergunta: "Problemas hemorrágicos", valor: ficha.hemorragicos },
+    {
+      pergunta: "Problemas com anestesia",
+      valor: ficha.problemasAnestesia,
+      extra: ficha.problemasAnestesiaExtra,
+    },
+    {
+      pergunta: "Alergia a medicamentos",
+      valor: ficha.alergiaMedicamentos,
+      extra: ficha.alergiaMedicamentosExtra,
+    },
+    {
+      pergunta: "Teve hepatite",
+      valor: ficha.hepatite,
+      extra: ficha.hepatiteExtra,
+    },
+    { pergunta: "Portador do HIV", valor: ficha.hiv },
+    { pergunta: "Usa/Usou drogas", valor: ficha.drogas },
+    { pergunta: "Fumante", valor: ficha.fumante },
+    { pergunta: "Já fumou", valor: ficha.fumou },
+    { pergunta: "Pressão arterial", valor: ficha.pressao, isText: true },
+    {
+      pergunta: "Problemas respiratórios",
+      valor: ficha.respiratorio,
+      extra: ficha.respiratorioExtra,
+    },
+    {
+      pergunta: "Doenças na família",
+      valor: ficha.doencaFamilia,
+      extra: ficha.doencaFamiliaExtra,
+    },
   ];
 
   return (
     <>
       <Nav />
-      <div className="container mt-5 mb-5">
-        <div className="card shadow rounded-4 border-0">
-          <div className="card-body p-4">
-            <h3 className="text-center mb-4 fw-bold text-primary">Ficha Médica</h3>
-            <div className="mb-4">
-              <h5 className="fw-semibold">Paciente</h5>
-              <p className="mb-1">
-                <strong>Nome:</strong> {paciente.nome || "Não informado"}
-              </p>
-              <p className="mb-1">
-                <strong>CPF:</strong> {paciente.cpf || "Não informado"}
-              </p>
-              <p className="mb-1">
-                <strong>Data Nascimento:</strong> {paciente.dataNascimento || "Não informado"}
-              </p>
-              <p className="mb-0">
-                <strong>Sexo:</strong> {paciente.sexo === "M" ? "Masculino" : "Feminino"}
-              </p>
-            </div>
 
-            <h5 className="fw-semibold mb-3 border-bottom pb-2">Dados de Saúde</h5>
-            <div className="table-responsive">
-              <table className="table table-striped table-hover align-middle">
-                <tbody>
-                  {dadosTabela.map(([pergunta, resposta], idx) => (
-                    <tr key={idx}>
-                      <th style={{ width: "40%" }}>{pergunta}</th>
-                      <td>{resposta}</td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+      <div className="container container-custom">
+        <div className="header-flex">
+          <div>
+            <h4 className="fw-bold text-primary">Ficha Médica</h4>
+            <small className="text-muted">Anamnese</small>
+          </div>
+          <button
+            className="btn btn-primary btn-sm btn-edit"
+            onClick={() => navigate("/formulario-medico")}
+          >
+            Editar Ficha
+          </button>
+        </div>
+        <div className="section">
+          <h6 className="fw-bold mb-2">Paciente</h6>
+          <div className="d-flex flex-column gap-1">
+            <p className="mb-0 small">
+              <strong>Nome:</strong> {paciente.nome || "Não informado"}
+            </p>
+            <p className="mb-0 small">
+              <strong>CPF:</strong> {paciente.cpf || "Não informado"}
+            </p>
+            <p className="mb-0 small">
+              <strong>Nascimento:</strong>{" "}
+              {paciente.dataNascimento || "Não informado"}
+            </p>
+          </div>
+        </div>
 
-            <div className="d-flex justify-content-center mt-3">
-              <button
-                className="btn btn-outline-primary"
-                onClick={() => navigate("/formulario-medico")}
-              >
-                Editar Ficha Médica
-              </button>
-            </div>
+        <div className="section">
+          <h6 className="fw-bold mb-2">Dados de Saúde</h6>
+          <div className="list-group list-group-flush">
+            {dadosSaude.map((item, idx) => {
+              if (item.condicional === false) return null;
+
+              const resposta = item.isText
+                ? item.valor || "Não informado"
+                : formatarResposta(item.valor, item.extra);
+
+              return (
+                <div
+                  key={idx}
+                  className="list-group-item px-0 py-2 border-0 d-flex flex-column flex-md-row justify-content-between align-items-start"
+                  style={{ borderBottom: "1px solid #eee" }}
+                >
+                  <span className="small fw-semibold">{item.pergunta}:</span>
+                  <span
+                    className="small text-muted mt-1 mt-md-0 text-start text-md-end"
+                    style={{ minWidth: "100px" }}
+                  >
+                    {resposta}
+                  </span>
+                </div>
+              );
+            })}
           </div>
         </div>
       </div>

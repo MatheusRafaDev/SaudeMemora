@@ -13,17 +13,14 @@ export async function processarReceitaComImagem(
   paciente,
   documentoId,
   imagem,
-  navigate
+  navigate,
+  medicamentos // array com { nome, quantidade, formaDeUso }
 ) {
   try {
     const receitaJSON = await tratarOCRParaReceitas(textoOCR);
-    if (receitaJSON.error)
-      throw new Error(`Erro no OCR da receita: ${receitaJSON.error}`);
 
-    const medicamentos = receitaJSON.medicamentos || [];
-    if (!Array.isArray(medicamentos) || medicamentos.length === 0) {
-      throw new Error("Nenhum medicamento foi encontrado no OCR.");
-    }
+    // Usa só o array de medicamentos recebido
+    const medicamentosFinal = Array.isArray(medicamentos) ? medicamentos : [];
 
     const receitaData = {
       medico: receitaJSON.medico || "Médico não informado",
@@ -35,29 +32,21 @@ export async function processarReceitaComImagem(
         receitaJSON.dataReceita || new Date().toISOString().split("T")[0],
       paciente: { id: paciente.id },
       documento: { id: documentoId },
-      medicamentos: medicamentos.map((medicamento) => ({
-        nome: medicamento.nome || "Medicamento não informado",
-        quantidade: medicamento.quantidade || 0,
-        formaDeUso: medicamento.formaDeUso || "Uso não informado",
-      })),
+      medicamentos: medicamentosFinal,
     };
-
 
     const formData = new FormData();
     formData.append("receitaData", JSON.stringify(receitaData));
     formData.append("imagem", imagem);
 
-    // Faz o envio e recebe a resposta da API
     const response = await ReceitaService.createWithImage(formData);
     const receitaSalva = response.data;
 
-    let documentoDados;
     const receitaResponse = await ReceitaService.getReceitaByDocumentoId(
       documentoId
     );
-    documentoDados = receitaResponse.data;
+    const documentoDados = receitaResponse.data;
 
-    
     navigate("/visualizar-documento", {
       state: { documento: documentoDados, tipo: "R" },
     });
@@ -71,6 +60,7 @@ export async function processarReceitaComImagem(
     return { success: false, message: error.message };
   }
 }
+
 
 export async function processarExameComImagem(
   textoOCR,
@@ -105,7 +95,6 @@ export async function processarExameComImagem(
 
     const exameSalvo = response.data;
 
-    
     let documentoDados;
     const receitaResponse = await ExameService.getExameByDocumentoId(
       documentoId
@@ -129,23 +118,31 @@ export async function processarExameComImagem(
   }
 }
 
-export async function processarDocumentoClinicoComImagem(textoOCR, paciente, documentoId,imagem,navigate) {
+export async function processarDocumentoClinicoComImagem(
+  textoOCR,
+  paciente,
+  documentoId,
+  imagem,
+  navigate
+) {
   try {
     const documentoJSON = await tratarOCRParaDocumentoClinico(textoOCR);
     if (documentoJSON.error)
-      throw new Error(`Erro no OCR do documento clínico: ${documentoJSON.error}`);
+      throw new Error(
+        `Erro no OCR do documento clínico: ${documentoJSON.error}`
+      );
 
     const documentoData = {
       data: documentoJSON.data || new Date().toISOString().split("T")[0],
       medico: documentoJSON.medico || "Médico não informado",
-      especialidade: documentoJSON.especialidade || "Especialidade não informada",
+      especialidade:
+        documentoJSON.especialidade || "Especialidade não informada",
       observacoes: documentoJSON.observacoes || "Sem observações",
       conclusoes: documentoJSON.conclusoes || "Sem conclusões",
       resumo: documentoJSON.resumo || textoOCR || "Sem resumo",
       conteudo: documentoJSON.conteudo || textoOCR || "Sem conteúdo original",
       paciente: { id: paciente.id },
       documento: { id: documentoId },
-    
     };
 
     const formData = new FormData();
@@ -160,13 +157,16 @@ export async function processarDocumentoClinicoComImagem(textoOCR, paciente, doc
       state: { documento: documentoDados, tipo: "D" },
     });
 
-
     if (response?.success)
-      return { success: true, message: "Documento clínico incluído com sucesso!" };
+      return {
+        success: true,
+        message: "Documento clínico incluído com sucesso!",
+      };
 
-    throw new Error(response?.message || "Erro ao incluir o documento clínico.");
+    throw new Error(
+      response?.message || "Erro ao incluir o documento clínico."
+    );
   } catch (error) {
     throw new Error(`Erro ao processar o documento clínico: ${error.message}`);
   }
 }
-

@@ -1,0 +1,21 @@
+/* src/global.css */
+
+html, body {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+
+  /* Para rolagem vertical */
+  overflow-y: scroll;
+
+  /* Firefox */
+  scrollbar-width: none; 
+
+  /* IE 10+ */
+  -ms-overflow-style: none; 
+}
+
+/* Chrome, Safari e Opera */
+body::-webkit-scrollbar {
+  display: none;
+}

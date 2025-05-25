@@ -5,15 +5,17 @@ import Home from "./pages/Home";
 import CadastroPaciente from "./pages/CadastroPaciente";
 import FormularioMedico from "./pages/FormularioMedico";
 import OCRLeituraCursiva from "./pages/OCRLeituraCursiva";
-import UploadDocumentos from "./pages/UploadDocumentos";
+import UploadDocumentos from "./pages/UploadDocumentos/UploadDocumentos";
 import Perfil from "./pages/Perfil";
-//import EditarPaciente from "./pages/EditarPaciente";
 import ListarDocumentos from "./pages/ListarDocumentos";
 import EditarPerfil from "./pages/EditarPerfil";
 import RelatorioDocumentos from "./pages/RelatorioDocumentos";
 import VisualizadorDocumento from "./pages/VisualizadorDocumento";
 import VisualizarFichaMedica from "./pages/VisualizarFichaMedica";
 import "bootstrap/dist/js/bootstrap.bundle.min.js";
+import "./styles/global.css";
+
+
 
 
 const isPacienteLoggedIn = () => {

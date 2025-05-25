@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { FiUpload, FiCamera, FiFileText, FiCheckCircle } from "react-icons/fi";
 import "bootstrap/dist/css/bootstrap.min.css";
-import "../styles/UploadDocumento.css";
-import Nav from "../components/Nav";
-import { ocrSpace } from "../ocr/ocrSpace";
-import { formatarTextoOCR } from "../services/OpenRouter";
+import "../../styles/UploadDocumento.css";
+import Nav from "../../components/Nav";
+import { ocrSpace } from "../../ocr/ocrSpace";
+import { formatarTextoOCR } from "../../services/OpenRouter";
 import { useNavigate } from "react-router-dom";
-import { AdicionarDocumento } from "../documentos/AdicionarDocumento";
-import { extrairMedicamentosDoOCR } from "../services/OpenRouter";
+import { AdicionarDocumento } from "../../documentos/AdicionarDocumento";
+import { extrairMedicamentosDoOCR } from "../../services/OpenRouter";
 import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 
 export default function UploadDocumentos() {
@@ -27,6 +27,7 @@ export default function UploadDocumentos() {
   const [medicamentos, setMedicamentos] = useState([]);
   const [quantidades, setQuantidades] = useState({});
   const [formasDeUso, setFormasDeUso] = useState({});
+  const [errosQuantidade, setErrosQuantidade] = useState({});
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -48,6 +49,7 @@ export default function UploadDocumentos() {
       setRemedios([]);
       setQuantidades({});
       setFormasDeUso({});
+      setErrosQuantidade({});
     }
   };
 
@@ -133,6 +135,13 @@ export default function UploadDocumentos() {
   };
 
   const handleQuantidadeChange = (remedio, valor) => {
+    const erro = !valor.trim()
+      ? "Quantidade é obrigatória"
+      : !/^\d+(\s*\w*)?$/.test(valor)
+      ? "Formato inválido (ex: 30 comprimidos)"
+      : "";
+
+    setErrosQuantidade((prev) => ({ ...prev, [remedio]: erro }));
     setQuantidades((prev) => ({ ...prev, [remedio]: valor }));
   };
 
@@ -164,24 +173,30 @@ export default function UploadDocumentos() {
     }
 
     for (const remedio of remedios) {
-      if (!quantidades[remedio]) {
-        setMensagemErro(`Informe a quantidade do remédio: ${remedio}`);
+      if (!quantidades[remedio] || !quantidades[remedio].trim()) {
+        setMensagemErro(
+          `Informe a quantidade válida para o remédio: ${remedio}`
+        );
+        setErrosQuantidade((prev) => ({
+          ...prev,
+          [remedio]: "Quantidade é obrigatória",
+        }));
         return;
       }
+
     }
 
     setAdicionandoDocumento(true);
     setStatus("Adicionando documento...");
 
     try {
-
       const response = await AdicionarDocumento(
         tipoDocumento,
-        textoOCR,
+        textoExibicao,
         paciente,
         documento,
         navigate,
-        { medicamentos, quantidades, formasDeUso }
+        medicamentos
       );
 
       if (response.success) {
@@ -207,6 +222,7 @@ export default function UploadDocumentos() {
     setRemedios([]);
     setQuantidades({});
     setFormasDeUso({});
+    setErrosQuantidade({});
     setBotaoHabilitado(false);
     setMensagemErro("");
   };
@@ -230,8 +246,6 @@ export default function UploadDocumentos() {
             className="d-flex justify-content-center mb-3"
             style={{ height: "400px" }}
           >
-            {" "}
-            {/* Container com altura fixa e centralizado */}
             <TransformWrapper
               initialScale={1}
               minScale={1}
@@ -248,9 +262,7 @@ export default function UploadDocumentos() {
                       top: "10px",
                       left: "10px",
                     }}
-                  >
-
-                  </div>
+                  ></div>
                   <TransformComponent
                     wrapperStyle={{
                       width: "100%",
@@ -374,19 +386,21 @@ export default function UploadDocumentos() {
 
         {textoExibicao && (
           <div className="mt-4">
-            <h5>Texto extraído do documento:</h5>
-            <pre
-              className="bg-light p-3 rounded"
-              style={{ whiteSpace: "pre-wrap" }}
-            >
-              {textoExibicao}
-            </pre>
-          </div>
+          <h5 className="mb-2">Texto extraído do documento:</h5>
+          <textarea
+            className="form-control"
+            rows="10"
+            value={textoExibicao}
+            onChange={(e) => setTextoExibicao(e.target.value)} 
+            style={{ whiteSpace: "pre-wrap" }}
+          />
+        </div>
         )}
 
         {tipoDocumento === "R" && medicamentos.length > 0 && (
           <div className="mt-4">
             <h5>Medicamentos encontrados:</h5>
+
             <table className="table table-bordered table-striped table-hover">
               <thead>
                 <tr>
@@ -395,8 +409,8 @@ export default function UploadDocumentos() {
               </thead>
               <tbody>
                 {medicamentos.map((medicamento, index) => (
-                  <>
-                    <tr key={`nome-${index}`}>
+                  <React.Fragment key={`med-${index}`}>
+                    <tr>
                       <td
                         colSpan="3"
                         style={{
@@ -408,9 +422,8 @@ export default function UploadDocumentos() {
                       </td>
                     </tr>
 
-                    <tr key={`qtd-${index}`}>
+                    <tr>
                       <td>Quantidade:</td>
-
                       <td>
                         <input
                           type="text"
@@ -427,7 +440,7 @@ export default function UploadDocumentos() {
                       </td>
                     </tr>
 
-                    <tr key={`uso-${index}`}>
+                    <tr>
                       <td>Forma de Uso:</td>
                       <td colSpan="2">
                         <input
@@ -445,10 +458,18 @@ export default function UploadDocumentos() {
                         />
                       </td>
                     </tr>
-                  </>
+                  </React.Fragment>
                 ))}
               </tbody>
+
             </table>
+                <div className="alert alert-warning mt-3" role="alert">
+                  ⚠️ <strong>Atenção:</strong> Certifique-se de que a{" "}
+                  <strong>quantidade</strong> e a{" "}
+                  <strong>forma de uso dos medicamentos</strong> estejam corretas
+                  no documento enviado.
+              </div>
+
           </div>
         )}
 
@@ -456,7 +477,10 @@ export default function UploadDocumentos() {
           <button
             className="btn btn-secondary w-100"
             onClick={handleAddDocument}
-            disabled={!botaoHabilitado || adicionandoDocumento}
+            disabled={
+              !botaoHabilitado ||
+              adicionandoDocumento 
+            }
           >
             {adicionandoDocumento ? (
               <>
