@@ -556,7 +556,7 @@ export async function extrairMedicamentosDoOCR(textoOCR) {
             content: prompt,
           },
         ],
-        temperature: 0.0,
+        temperature: 0.3,
       }),
       timeout: 15000,
     });
@@ -628,8 +628,8 @@ export async function formatarTextoOCR(textoOCR) {
             content: promptUniversal
           }
         ],
-        temperature: 0, // Equilíbrio entre correção e criatividade
-        //max_tokens: 2000
+        temperature: 0.3, // Equilíbrio entre correção e criatividade
+        max_tokens: 2000
       }),
       signal: controller.signal
     });
