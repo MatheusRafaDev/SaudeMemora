@@ -1,5 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
+import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 import {
   FaCalendarAlt,
   FaFileAlt,
@@ -14,6 +15,8 @@ export default function VisualizadorDocumentoClinico({ documentoClinico }) {
   const navigate = useNavigate();
 
   const documento = documentoClinico
+
+  console.log(documento)
 
   const dataFormatada = documento.data ? new Date(documento.data).toLocaleDateString("pt-BR") : "Não informado";
 
@@ -33,30 +36,73 @@ export default function VisualizadorDocumentoClinico({ documentoClinico }) {
       </div>
 
       <div className="card shadow-sm border-0 mb-4">
-        <div className="card-body text-center">
-          {documento.imagem? (
-            <img
-              src={`http://localhost:7070/api/documentosclinicos/imagem/${documento.id}`}
-              alt={`Documento ${documento.tipo}`}
-              className="img-fluid rounded"
+  <div className="card-body text-center" style={{ height: '300px', position: 'relative' }}>
+    {documento.imagem ? (
+      <TransformWrapper
+        initialScale={1}
+        minScale={1}
+        maxScale={5}
+        wheel={{ step: 0.1 }}
+      >
+        {({ zoomIn, zoomOut, resetTransform }) => (
+          <>
+            <div
+              className="tools"
               style={{
-                maxHeight: "300px",
-                objectFit: "contain",
-                margin: "0 auto",
-                display: "block",
+                position: "absolute",
+                zIndex: 10,
+                top: "10px",
+                left: "10px",
               }}
-            />
-          ) : (
-            <p className="text-muted">Documento não disponível</p>
-          )}
-        </div>
-      </div>
+            >
+              {/* Aqui você pode adicionar botões para zoom in/out e reset */}
+              {/* <button onClick={zoomIn}>+</button> */}
+              {/* <button onClick={zoomOut}>-</button> */}
+              {/* <button onClick={resetTransform}>Reset</button> */}
+            </div>
+            <TransformComponent
+              wrapperStyle={{
+                width: "100%",
+                height: "100%",
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+              contentStyle={{
+                width: "100%",
+                height: "100%",
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              <img
+                src={`http://localhost:7070/api/documentosclinicos/imagem/${documento.id}`}
+                alt={`Documento ${documento.tipo}`}
+                className="img-fluid rounded shadow"
+                style={{
+                  maxHeight: "100%",
+                  maxWidth: "100%",
+                  objectFit: "contain",
+                  cursor: "grab",
+                }}
+              />
+            </TransformComponent>
+          </>
+        )}
+      </TransformWrapper>
+    ) : (
+      <p className="text-muted">Documento não disponível</p>
+    )}
+  </div>
+</div>
+
 
       {/* Dados do documento */}
       <div className="card shadow-sm border-0 mb-4">
         <div className="card-body" style={{ textAlign: "justify" }}>
           <h5>
-            <FaFileAlt /> {documento.tipo || "Documento sem tipo"}
+            <FaFileAlt /> {documento.tipo || "Documento Clinico"}
           </h5>
           <p>
             <FaCalendarAlt /> <strong>Data:</strong> {dataFormatada}

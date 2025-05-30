@@ -83,11 +83,14 @@ export default function UploadDocumentos() {
       setTextoOCR(textoOriginal);
 
       const formatado = await formatarTextoOCR(textoOriginal,textoOriginal2);
+
+      //const formatado = await formatarTextoOCR(textoOriginal);
       setTextoExibicao(formatado);
 
-      const medicamentos = await extrairMedicamentosDoOCR(formatado);
+
 
       if (tipoDocumento === "R") {
+        const medicamentos = await extrairMedicamentosDoOCR(formatado);
         if (!Array.isArray(medicamentos) || medicamentos.length === 0) {
           console.error(
             "Erro ao extrair medicamentos: Nenhum medicamento encontrado"

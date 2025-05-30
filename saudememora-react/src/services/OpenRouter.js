@@ -229,7 +229,7 @@ Leia o texto abaixo e extraia os campos:
   - "quantidade": quantidade do medicamento,
   - "formaDeUso": instruções de uso do medicamento,
 - "observacoes": observações adicionais,
-- "resumo": "Reescreva este texto corrigindo a ortografia, melhorando a formatação e deixando com aparência mais limpa e profissional, como se fosse uma receita médica".
+- "resumo": "Reescreva este texto corrigindo a ortografia, melhorando a formatação e a idetação textual.
 
 Retorne apenas o JSON com os dados extraídos, no seguinte formato:
 {
@@ -346,7 +346,7 @@ Leia o texto abaixo e extraia os campos:
 - "laboratorio": nome do laboratório que realizou o exame,
 - "resultado": resultado do exame,
 - "observacoes": observações adicionais,
-- "resumo": o mesmo texto abaixo, mas reescrito com ortografia corrigida.
+- "resumo": o mesmo texto abaixo, mas reescrito com ortografia corrigida e identado bom para leitura.
 
 Retorne apenas o JSON com os dados extraídos, no seguinte formato:
 {
@@ -431,17 +431,17 @@ Leia o texto abaixo e extraia os campos:
 - "data" (formato YYYY-MM-DD ou DD/MM/YYYY),
 - "medico": nome do médico,
 - "especialidade": especialidade médica do profissional,
-- "observacoes": observações adicionais,
-- "conclusoes": conclusões do médico sobre o caso,
-- "resumo": o mesmo texto abaixo, mas reescrito com ortografia corrigida, pontuação adequada e espaçamento correto. NÃO resuma nem interprete, apenas normalize.
+- "observacoes": observações,
+- "conclusoes": conclusões do médico geral,
+- "resumo": o mesmo texto abaixo, mas reescrito com ortografia corrigida, pontuação adequada e espaçamento correto e faça uma identação textual.
 
 Retorne apenas o JSON com os dados extraídos, no seguinte formato:
 {
   "data": "YYYY-MM-DD",
   "medico": "Nome do médico",
   "especialidade": "Especialidade médica",
-  "observacoes": "Texto das observações",
-  "conclusoes": "Texto das conclusões",
+  "observacoes": "observações",
+  "conclusoes": "conclusões",
   "resumo": "reformatar textos extraídos via OCR para melhorar a legibilidade."
 }
 

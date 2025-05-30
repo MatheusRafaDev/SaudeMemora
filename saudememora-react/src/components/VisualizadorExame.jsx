@@ -1,5 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
+import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 import {
   FaCalendarAlt,
   FaFlask,
@@ -30,26 +31,65 @@ export default function VisualizadorExame({ exame }) {
         <h3 className="text-secondary">Visualizar documento - Exame</h3>
       </div>
 
-      {/* Imagem do exame */}
       <div className="card shadow-sm border-0 mb-4">
-        <div className="card-body text-center">
+        <div className="card-body text-center" style={{ height: '300px', position: 'relative' }}>
           {exame.imagem ? (
-            <img
-              src={`http://localhost:7070/api/exames/imagem/${exame.id}`}
-              alt={`Imagem do exame ${exame.nomeExame}`}
-              className="img-fluid rounded"
-              style={{
-                maxHeight: "300px",
-                objectFit: "contain",
-                margin: "0 auto",
-                display: "block",
-              }}
-            />
+            <TransformWrapper
+              initialScale={1}
+              minScale={1}
+              maxScale={5}
+              wheel={{ step: 0.1 }}
+            >
+              {({ zoomIn, zoomOut, resetTransform }) => (
+                <>
+                  <div
+                    className="tools"
+                    style={{
+                      position: "absolute",
+                      zIndex: 10,
+                      top: "10px",
+                      left: "10px",
+                    }}
+                  >
+
+                  </div>
+                  <TransformComponent
+                    wrapperStyle={{
+                      width: "100%",
+                      height: "100%",
+                      display: "flex",
+                      justifyContent: "center",
+                      alignItems: "center",
+                    }}
+                    contentStyle={{
+                      width: "100%",
+                      height: "100%",
+                      display: "flex",
+                      justifyContent: "center",
+                      alignItems: "center",
+                    }}
+                  >
+                    <img
+                      src={`http://localhost:7070/api/exames/imagem/${exame.id}`}
+                      alt={`Imagem do exame ${exame.nomeExame}`}
+                      className="img-fluid rounded shadow"
+                      style={{
+                        maxHeight: "100%",
+                        maxWidth: "100%",
+                        objectFit: "contain",
+                        cursor: "grab",
+                      }}
+                    />
+                  </TransformComponent>
+                </>
+              )}
+            </TransformWrapper>
           ) : (
             <p className="text-muted">Imagem não disponível</p>
           )}
         </div>
       </div>
+
 
       {/* Dados do exame */}
       <div className="card shadow-sm border-0 mb-4">

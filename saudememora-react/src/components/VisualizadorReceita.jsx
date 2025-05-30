@@ -1,5 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
+import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 import {
   FaCalendarAlt,
   FaUserMd,
@@ -30,26 +31,67 @@ export default function ReceitaComMedicamentos({ receita }) {
 
       {/* Imagem da Receita */}
       <div className="card shadow-sm border-0 mb-4">
-        <div className="card-body text-center">
-          {receita.imagem ? (
-            <img
-              src={`http://localhost:7070/api/receitas/imagem/${receita.id}`}
-              alt="Imagem da Receita"
-              className="img-fluid rounded"
+  <div className="card-body text-center" style={{ height: '300px', position: 'relative' }}>
+    {receita.imagem ? (
+      <TransformWrapper
+        initialScale={1.1}
+        minScale={1}
+        maxScale={5}
+        wheel={{ step: 0.1 }}
+      >
+        {({ zoomIn, zoomOut, resetTransform }) => (
+          <>
+            <div
+              className="tools"
               style={{
-                maxHeight: "300px",
-                objectFit: "contain",
-                transform: "scale(1.1)",
-                transition: "transform 0.3s ease",
-                margin: "0 auto",
-                display: "block",
+                position: "absolute",
+                zIndex: 10,
+                top: "10px",
+                left: "10px",
               }}
-            />
-          ) : (
-            <p className="text-muted">Imagem não disponível</p>
-          )}
-        </div>
-      </div>
+            >
+              {/* Adicione controles aqui, se quiser */}
+              {/* <button onClick={zoomIn}>+</button> */}
+              {/* <button onClick={zoomOut}>-</button> */}
+              {/* <button onClick={resetTransform}>Reset</button> */}
+            </div>
+            <TransformComponent
+              wrapperStyle={{
+                width: "100%",
+                height: "100%",
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+              contentStyle={{
+                width: "100%",
+                height: "100%",
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+            >
+              <img
+                src={`http://localhost:7070/api/receitas/imagem/${receita.id}`}
+                alt="Imagem da Receita"
+                className="img-fluid rounded shadow"
+                style={{
+                  maxHeight: "100%",
+                  maxWidth: "100%",
+                  objectFit: "contain",
+                  cursor: "grab",
+                }}
+              />
+            </TransformComponent>
+          </>
+        )}
+      </TransformWrapper>
+    ) : (
+      <p className="text-muted">Imagem não disponível</p>
+    )}
+  </div>
+</div>
+
 
       {/* Informações da Receita */}
       <div className="card shadow-sm border-0 mb-4">

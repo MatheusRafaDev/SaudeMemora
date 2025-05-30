@@ -64,7 +64,8 @@ export async function ocrSpace2(file) {
 
   } catch (err) {
     handleError(err, 'ocrSpace');
-    throw err; // Permite fallback para Tesseract
+    console.error(err);
+    return '';
   }
 }
 

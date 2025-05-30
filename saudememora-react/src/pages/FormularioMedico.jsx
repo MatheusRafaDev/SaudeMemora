@@ -340,6 +340,8 @@ const FormularioMedico = () => {
             ? "Ficha atualizada com sucesso!"
             : "Ficha cadastrada com sucesso!"
         );
+        window.location.reload();
+        navigate(0);
 
       } else {
         setMensagem(response.message || "Erro ao processar a ficha.");

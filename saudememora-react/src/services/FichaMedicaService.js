@@ -1,14 +1,11 @@
 import axiosInstance from "../axiosConfig";
 
 export const cadastrarFichaMedica = async (formData) => {
-  try {
-    const file = formData.get("imagem");
+  try {;
     const paciente = JSON.parse(localStorage.getItem("paciente")) || {};
     const respostas = formData.has("respostas") ? JSON.parse(formData.get("respostas")) : {};
     const ocrTexto = formData.has("textoOCR") ? formData.get("textoOCR") : "";
 
-    // Convert image to base64 if exists
-    const imagemBase64 = file ? await convertFileToBase64(file) : "";
 
     const fichaMedicaData = {
       paciente: {
@@ -18,7 +15,7 @@ export const cadastrarFichaMedica = async (formData) => {
         email: paciente.email,
         telefone: paciente.telefone
       },
-      imagem: imagemBase64,
+      imagem: "",
       ocrTexto,
       pressao: respostas.pressao || "",
       tratamentoMedico: respostas.tratamento_medico === 'SIM',
@@ -77,13 +74,12 @@ export const cadastrarFichaMedica = async (formData) => {
 
 export const atualizarFichaMedica = async (id, formData) => {
   try {
-    const file = formData?.get("imagem") || null;
+
     const paciente = JSON.parse(localStorage.getItem("paciente")) || {};
     const respostas = formData.has("respostas") ? JSON.parse(formData.get("respostas")) : {};
     const ocrTexto = formData.has("textoOCR") ? formData.get("textoOCR") : "";
 
-    // Convert image to base64 if exists
-    const imagemBase64 = file ? await convertFileToBase64(file) : "";
+
 
     const fichaMedicaData = {
       paciente: {
@@ -93,7 +89,7 @@ export const atualizarFichaMedica = async (id, formData) => {
         email: paciente.email,
         telefone: paciente.telefone
       },
-      imagem: imagemBase64,
+      imagem: "",
       ocrTexto,
       pressao: respostas.pressao || "",
       tratamentoMedico: respostas.tratamento_medico === 'SIM',
