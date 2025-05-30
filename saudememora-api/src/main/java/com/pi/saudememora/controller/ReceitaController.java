@@ -1,5 +1,6 @@
 package com.pi.saudememora.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pi.saudememora.model.Medicamento;
 import com.pi.saudememora.model.Receita;
@@ -42,17 +43,15 @@ public class ReceitaController {
             @RequestParam("receitaData") String receitaData,
             @RequestParam(value = "imagem", required = false) MultipartFile imagem) {
         try {
-            // Desserializa JSON para objeto Receita (com lista de medicamentos dentro)
             Receita receita = objectMapper.readValue(receitaData, Receita.class);
+            logger.info("Recebido receita JSON: {}", receitaData);
 
-            // Associa receita nos medicamentos para manter o relacionamento
             if (receita.getMedicamentos() != null) {
                 for (Medicamento med : receita.getMedicamentos()) {
                     med.setReceita(receita);
                 }
             }
 
-            // Se imagem existir e não estiver vazia, salva no disco
             if (imagem != null && !imagem.isEmpty()) {
                 String contentType = imagem.getContentType();
                 if (contentType == null ||
@@ -64,26 +63,20 @@ public class ReceitaController {
                 Path caminhoArquivo = Paths.get("uploads/receitas", nomeArquivo);
                 Files.createDirectories(caminhoArquivo.getParent());
                 Files.write(caminhoArquivo, imagem.getBytes());
-
-                // Guarda o caminho relativo (ou absoluto) na receita
                 receita.setImagem(caminhoArquivo.toString());
             }
 
-            // Salva receita (com cascade salva medicamentos)
             Receita novaReceita = receitaService.createReceita(receita);
-
             return ResponseEntity.status(HttpStatus.CREATED).body(novaReceita);
 
+        } catch (JsonProcessingException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("JSON inválido em 'receitaData': " + e.getOriginalMessage());
         } catch (IOException e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Erro ao salvar a imagem: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Erro ao salvar imagem: " + e.getMessage());
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Erro ao criar receita: " + e.getMessage());
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Erro ao criar receita: " + e.getMessage());
         }
     }
-
-
 
     @GetMapping("/imagem/{id}")
     public ResponseEntity<byte[]> getImagemPorId(@PathVariable Long id) {

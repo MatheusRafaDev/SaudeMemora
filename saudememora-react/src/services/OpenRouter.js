@@ -503,7 +503,6 @@ ${textoTratado}`;
   }
 }
 
-
 export async function extrairMedicamentosDoOCR(textoOCR) {
   try {
     if (
@@ -565,8 +564,6 @@ export async function extrairMedicamentosDoOCR(textoOCR) {
 
     const data = await res.json();
 
-
-
     let jsonReceita;
     try {
       jsonReceita = JSON.parse(data.choices?.[0]?.message?.content || "{}");
@@ -590,16 +587,15 @@ export async function extrairMedicamentosDoOCR(textoOCR) {
   }
 }
 
-
-export async function formatarTextoOCR(textoOCR) {
+export async function formatarTextoOCR2(textoOCR) {
   try {
     // Pré-processamento inteligente para qualquer tipo de texto
     let textoTratado = textoOCR
-      .replace(/([a-z])([A-Z0-9])/g, '$1 $2')  // Separa palavras coladas (ex: "HospitalDaLuz" → "Hospital Da Luz")
-      .replace(/([0-9])([A-Za-z])/g, '$1 $2')  // Separa números de letras (ex: "G55" → "G 55")
-      .replace(/_/g, ' ')                       // Remove underscores
-      .replace(/\s+/g, ' ')                     // Normaliza espaços
-      .replace(/(\d)([A-Za-z])/g, '$1 $2')      // Separa letras de números (ex: "2ml" → "2 ml")
+      .replace(/([a-z])([A-Z0-9])/g, "$1 $2") // Separa palavras coladas (ex: "HospitalDaLuz" → "Hospital Da Luz")
+      .replace(/([0-9])([A-Za-z])/g, "$1 $2") // Separa números de letras (ex: "G55" → "G 55")
+      .replace(/_/g, " ") // Remove underscores
+      .replace(/\s+/g, " ") // Normaliza espaços
+      .replace(/(\d)([A-Za-z])/g, "$1 $2") // Separa letras de números (ex: "2ml" → "2 ml")
       .trim();
 
     const promptUniversal = `
@@ -610,29 +606,33 @@ export async function formatarTextoOCR(textoOCR) {
     const controller = new AbortController();
     setTimeout(() => controller.abort(), 20000); // Timeout de 20s
 
-    const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${OPENROUTER_API_KEY}`
-      },
-      body: JSON.stringify({
-        model:  "openai/gpt-3.5-turbo", // Modelo mais preciso para textos variados
-        messages: [
-          {
-            role: "system",
-            content: "Você é um especialista em correção de textos extraídos por OCR. Sua tarefa é melhorar a legibilidade sem alterar o significado original."
-          },
-          {
-            role: "user",
-            content: promptUniversal
-          }
-        ],
-        temperature: 0.3, // Equilíbrio entre correção e criatividade
-        max_tokens: 2000
-      }),
-      signal: controller.signal
-    });
+    const response = await fetch(
+      "https://openrouter.ai/api/v1/chat/completions",
+      {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${OPENROUTER_API_KEY}`,
+        },
+        body: JSON.stringify({
+          model: "openai/gpt-3.5-turbo", // Modelo mais preciso para textos variados
+          messages: [
+            {
+              role: "system",
+              content:
+                "Você é um especialista em correção de textos extraídos por OCR. Sua tarefa é melhorar a legibilidade sem alterar o significado original.",
+            },
+            {
+              role: "user",
+              content: promptUniversal,
+            },
+          ],
+          temperature: 0.3, // Equilíbrio entre correção e criatividade
+          max_tokens: 2000,
+        }),
+        signal: controller.signal,
+      }
+    );
 
     if (!response.ok) throw new Error(`Erro na API: ${response.status}`);
 
@@ -642,15 +642,68 @@ export async function formatarTextoOCR(textoOCR) {
     // Pós-processamento para garantir consistência
     if (textoFormatado) {
       textoFormatado = textoFormatado
-        .replace(/(\d)\s*([mg])\s*\/\s*([ml])/gi, '$1$2/$3')  // Padroniza mg/ml
-        .replace(/\b(\d+)\s*([a-z]{2})\b/gi, '$1 $2')         // Espaço entre número e unidade (ex: "2ml" → "2 ml")
-        .replace(/\s{2,}/g, '\n\n');                          // Quebras de linha para parágrafos
+        .replace(/(\d)\s*([mg])\s*\/\s*([ml])/gi, "$1$2/$3") // Padroniza mg/ml
+        .replace(/\b(\d+)\s*([a-z]{2})\b/gi, "$1 $2") // Espaço entre número e unidade (ex: "2ml" → "2 ml")
+        .replace(/\s{2,}/g, "\n\n"); // Quebras de linha para parágrafos
     }
 
     return textoFormatado || textoOCR; // Fallback para o original se falhar
-
   } catch (error) {
     console.error("Erro ao formatar texto OCR:", error.message);
     return textoOCR; // Retorna o original em caso de erro
   }
 }
+
+export async function formatarTextoOCR(textoOCR, TextoOCR2) {
+  try {
+    const textoUnificado = `${textoOCR}\n\n${TextoOCR2}`;
+
+    const prompt = `
+Corrija os erros ortográficos e unifique as informações dos dois textos. Mantenha a estrutura, sem tira o telefone e etc. e fazendo dasagem correta dos medicamentos.
+
+Texto a processar:
+${textoUnificado}
+`;
+
+    const controller = new AbortController();
+    setTimeout(() => controller.abort(), 20000);
+
+    const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${OPENROUTER_API_KEY}`,
+      },
+      body: JSON.stringify({
+        model: "openai/gpt-3.5-turbo",
+        messages: [
+          {
+            role: "system",
+            content: "Você é um filtro de texto OCR médico. Corrija erros ortográficos, una informações duplicadas e preserve a estrutura clínica.",
+          },
+          {
+            role: "user",
+            content: prompt,
+          },
+        ],
+        temperature: 0.1,
+        max_tokens: 3000,
+      }),
+      signal: controller.signal,
+    });
+
+    if (!response.ok) throw new Error(`Erro na API: ${response.status}`);
+
+    const data = await response.json();
+    let textoCorrigido = data.choices?.[0]?.message?.content;
+
+    console.log( textoCorrigido);
+    return textoCorrigido;
+  } catch (error) {
+    console.error("Erro ao processar texto:", error.message);
+    return (textoOCR + "\n\n" + TextoOCR2)
+      .replace(/[^a-zA-Z0-9\u00C0-\u017F\s\/\-\.,:()0-9mg%]/g, "")
+      .replace(/\n\s*\n/g, "\n");
+  }
+}
+

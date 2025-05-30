@@ -1,5 +1,6 @@
 package com.pi.saudememora.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.pi.saudememora.model.Medicamento;
 import com.pi.saudememora.repository.MedicamentoRepository;
 import org.slf4j.Logger;
@@ -8,6 +9,7 @@ import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 @RestController
 @RequestMapping("/api/medicamentos")
@@ -23,7 +25,11 @@ public class MedicamentoController {
 
     // 1) Criar um novo medicamento
     @PostMapping
-    public ResponseEntity<?> createMedicamento(@RequestBody Medicamento medicamento) {
+    public ResponseEntity<?> createMedicamento(@RequestBody Medicamento medicamento) throws JsonProcessingException {
+        ObjectMapper mapper = new ObjectMapper();
+        String json = mapper.writeValueAsString(medicamento);
+        logger.info("Recebido medicamento JSON: {}", json);
+
         try {
             Medicamento novoMedicamento = medicamentoRepository.save(medicamento);
             return ResponseEntity.status(HttpStatus.CREATED).body(novoMedicamento);

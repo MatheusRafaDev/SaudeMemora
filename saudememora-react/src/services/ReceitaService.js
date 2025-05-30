@@ -46,6 +46,8 @@ const ReceitaService = {
   // Criar uma nova receita
   create: async (receita) => {
     try {
+      
+
       const response = await axiosInstance.post("/api/receitas", receita, {
         headers: {
           "Content-Type": "application/json",

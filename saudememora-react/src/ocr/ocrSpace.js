@@ -57,7 +57,7 @@ export async function ocrSpace2(file) {
     clearTimeout(timeoutId);
 
     if (!res.data.ParsedResults?.[0]?.ParsedText) {
-      throw new Error('OCR.space retornou resultado vazio');
+       return '';
     }
 
     return getParsedText(res.data);

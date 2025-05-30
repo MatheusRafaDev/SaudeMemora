@@ -3,7 +3,7 @@ import { FiUpload, FiCamera, FiFileText, FiCheckCircle } from "react-icons/fi";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "../../styles/UploadDocumento.css";
 import Nav from "../../components/Nav";
-import { ocrSpace } from "../../ocr/ocrSpace";
+import { ocrSpace,ocrSpace2 } from "../../ocr/ocrSpace";
 import { formatarTextoOCR } from "../../services/OpenRouter";
 import { useNavigate } from "react-router-dom";
 import { AdicionarDocumento } from "../../documentos/AdicionarDocumento";
@@ -78,9 +78,11 @@ export default function UploadDocumentos() {
 
     try {
       const textoOriginal = await ocrSpace(documento);
+      const textoOriginal2 = await ocrSpace2(documento);
+
       setTextoOCR(textoOriginal);
 
-      const formatado = await formatarTextoOCR(textoOriginal);
+      const formatado = await formatarTextoOCR(textoOriginal,textoOriginal2);
       setTextoExibicao(formatado);
 
       const medicamentos = await extrairMedicamentosDoOCR(formatado);
@@ -174,17 +176,21 @@ export default function UploadDocumentos() {
 
     for (const remedio of remedios) {
       if (!quantidades[remedio] || !quantidades[remedio].trim()) {
-        setMensagemErro(
-          `Informe a quantidade válida para o remédio: ${remedio}`
-        );
+        setMensagemErro(`Informe a quantidade válida para o remédio: ${remedio}`);
         setErrosQuantidade((prev) => ({
           ...prev,
           [remedio]: "Quantidade é obrigatória",
         }));
         return;
       }
-
     }
+
+    const medicamentosAtualizados = medicamentos.map(med => ({
+      ...med,
+      quantidade: quantidades[med.nome] || med.quantidade,
+      formaDeUso: formasDeUso[med.nome] || med.formaDeUso
+    }));
+
 
     setAdicionandoDocumento(true);
     setStatus("Adicionando documento...");
@@ -196,7 +202,7 @@ export default function UploadDocumentos() {
         paciente,
         documento,
         navigate,
-        medicamentos
+        medicamentosAtualizados 
       );
 
       if (response.success) {
