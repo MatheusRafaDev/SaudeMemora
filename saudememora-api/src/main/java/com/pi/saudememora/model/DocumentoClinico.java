@@ -19,6 +19,9 @@ public class DocumentoClinico {
     @Column(name = "ds_especialidade")
     private String especialidade;
 
+    @Column(name = "ds_tipo")
+    private String tipo;
+
     @Temporal(TemporalType.DATE)
     @Column(name = "dt_data", nullable = false)
     private Date data;
@@ -89,6 +92,14 @@ public class DocumentoClinico {
 
     public void setEspecialidade(String especialidade) {
         this.especialidade = especialidade;
+    }
+
+    public String getTipo() {
+        return tipo;
+    }
+
+    public void setTipo(String tipo) {
+        this.tipo = tipo;
     }
 
     public Date getData() {

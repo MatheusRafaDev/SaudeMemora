@@ -139,8 +139,9 @@ export async function processarDocumentoClinicoComImagem(
         documentoJSON.especialidade || "Especialidade não informada",
       observacoes: documentoJSON.observacoes || "Sem observações",
       conclusoes: documentoJSON.conclusoes || "Sem conclusões",
-      resumo: documentoJSON.resumo || textoOCR || "Sem resumo",
+      resumo: documentoJSON.resumo || "Sem resumo",
       conteudo: documentoJSON.conteudo || textoOCR || "Sem conteúdo original",
+      tipo: documentoJSON.tipo ||  "Sem tipo",
       paciente: { id: paciente.id },
       documento: { id: documentoId },
     };

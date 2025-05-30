@@ -8,6 +8,7 @@ import {
   FaFileMedical,
   FaInfoCircle,
   FaArrowLeft,
+  FaStickyNote
 } from "react-icons/fa";
 
 export default function VisualizadorExame({ exame }) {
@@ -114,6 +115,26 @@ export default function VisualizadorExame({ exame }) {
           </p>
         </div>
       </div>
+
+       <div className="card shadow-sm border-0">
+            <div className="card-body" style={{ textAlign: "justify" }}>
+              <h4 className="text-primary">
+                <FaStickyNote /> Resumo
+              </h4>
+              <textarea
+                className="form-control mt-3 border border-info rounded"
+                value={exame.resumo || ""}
+                rows={5}
+                readOnly
+                style={{
+                  backgroundColor: "#f8f9fa",
+                  fontSize: "1rem",
+                  padding: "10px",
+                  textAlign: "justify",
+                }}
+              ></textarea>
+            </div>
+          </div>
 
       {/* Botão voltar */}
       <div className="mt-4">

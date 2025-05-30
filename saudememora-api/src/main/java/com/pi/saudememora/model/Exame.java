@@ -34,6 +34,10 @@ public class Exame {
     @Column(name = "ds_imagem")
     private String imagem;
 
+    @Lob
+    @Column(name = "ds_resumo", columnDefinition = "CLOB")
+    private String resumo;
+
     @Column(name = "nome_exame")
     private String nomeExame;
 
@@ -71,4 +75,11 @@ public class Exame {
 
     public Documentos getDocumento() { return documento; }
     public void setDocumento(Documentos documento) { this.documento = documento; }
+
+    public String getResumo() {
+        return resumo;
+    }
+    public void setResumo(String resumo) {
+        this.resumo = resumo;
+    }
 }

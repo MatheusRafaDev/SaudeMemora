@@ -231,6 +231,8 @@ Leia o texto abaixo e extraia os campos:
 - "observacoes": observações adicionais,
 - "resumo": "Reescreva este texto corrigindo a ortografia, melhorando a formatação e a idetação textual.
 
+IMPORTANTE: Se algum dos campos acima não estiver presente no texto ou estiver vazio, preencha com um texto padrão explicativo para evitar valores vazios ou nulos.
+
 Retorne apenas o JSON com os dados extraídos, no seguinte formato:
 {
   "data": "YYYY-MM-DD",
@@ -348,6 +350,8 @@ Leia o texto abaixo e extraia os campos:
 - "observacoes": observações adicionais,
 - "resumo": o mesmo texto abaixo, mas reescrito com ortografia corrigida e identado bom para leitura.
 
+IMPORTANTE: Se algum dos campos acima não estiver presente no texto ou estiver vazio, preencha com um texto padrão explicativo para evitar valores vazios ou nulos.
+
 Retorne apenas o JSON com os dados extraídos, no seguinte formato:
 {
   "data": "YYYY-MM-DD",
@@ -380,7 +384,7 @@ ${textoTratado}`;
             content: prompt,
           },
         ],
-        temperature: 0.0,
+        temperature: 0.2,
       }),
       timeout: 15000,
     });
@@ -399,13 +403,14 @@ ${textoTratado}`;
       throw new Error("A resposta da API está incompleta.");
     }
 
+    console.log(jsonExame);
     return {
       data: jsonExame.data || "",
       tipo: jsonExame.tipo || "",
       laboratorio: jsonExame.laboratorio || "",
       resultado: jsonExame.resultado || "",
-      observacoes: normalizarTexto(jsonExame.observacoes),
-      resumo: normalizarTexto(jsonExame.resumo),
+      observacoes: jsonExame.observacoes,
+      resumo: jsonExame.resumo,
     };
   } catch (error) {
     console.error("❌ Erro ao tratar OCR para Exames:", error.message);
@@ -423,7 +428,7 @@ export async function tratarOCRParaDocumentoClinico(textoOCR) {
       throw new Error("Texto OCR inválido ou muito curto.");
     }
 
-    const textoTratado = textoOCR.replace(/[^a-zA-Z0-9.,\s]/g, "").trim();
+    const textoTratado = textoOCR
 
     const prompt = `Você é um assistente que interpreta textos extraídos via OCR e transforma os dados em JSON estruturado para documentos clínicos.
 
@@ -433,7 +438,14 @@ Leia o texto abaixo e extraia os campos:
 - "especialidade": especialidade médica do profissional,
 - "observacoes": observações,
 - "conclusoes": conclusões do médico geral,
-- "resumo": o mesmo texto abaixo, mas reescrito com ortografia corrigida, pontuação adequada e espaçamento correto e faça uma identação textual.
+- "resumo": o mesmo texto abaixo, mas reescrito com ortografia corrigida, pontuação adequada e espaçamento correto e faça uma identação textual,
+- "tipo": tipo do documento (laudo, atestado, receita, relatório, exame, entre outros), que deve ser identificado sempre com base no conteúdo, mesmo que o texto não tenha título explícito.
+
+Se o texto contiver palavras como "LAUDO MÉDICO", "ATESTADO", "RECEITA", "RELATÓRIO", ou termos similares, utilize o tipo correspondente.  
+Se não houver título claro, inferir o tipo com base no conteúdo.
+
+
+IMPORTANTE: Se algum dos campos acima não estiver presente ou estiver vazio, preencha com um texto padrão explicativo para evitar valores vazios ou nulos.
 
 Retorne apenas o JSON com os dados extraídos, no seguinte formato:
 {
@@ -442,11 +454,13 @@ Retorne apenas o JSON com os dados extraídos, no seguinte formato:
   "especialidade": "Especialidade médica",
   "observacoes": "observações",
   "conclusoes": "conclusões",
-  "resumo": "reformatar textos extraídos via OCR para melhorar a legibilidade."
+  "resumo": "reformatar textos extraídos via OCR para melhorar a legibilidade.",
+  "tipo": "tipo do documento ou titulo dado (laudo, atestado, receita, relatório, exame, etc.) com base no que está escrito"
 }
 
 Texto do OCR:
-${textoTratado}`;
+${textoTratado}
+`;
 
     const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
       method: "POST",
@@ -475,6 +489,7 @@ ${textoTratado}`;
     if (!res.ok) throw new Error(`Erro na API: ${res.statusText}`);
     const data = await res.json();
 
+    console.log(data);
     let jsonDocumento;
     try {
       jsonDocumento = JSON.parse(data.choices[0].message.content);
@@ -490,6 +505,7 @@ ${textoTratado}`;
       data: jsonDocumento.data || "",
       medico: jsonDocumento.medico || "",
       especialidade: jsonDocumento.especialidade || "",
+      tipo: jsonDocumento.tipo || "documento clínico",
       observacoes: normalizarTexto(jsonDocumento.observacoes),
       conclusoes: normalizarTexto(jsonDocumento.conclusoes),
       resumo: normalizarTexto(jsonDocumento.resumo),
@@ -555,7 +571,7 @@ export async function extrairMedicamentosDoOCR(textoOCR) {
             content: prompt,
           },
         ],
-        temperature: 0.3,
+        temperature: 0.1,
       }),
       timeout: 15000,
     });
@@ -686,8 +702,8 @@ ${textoUnificado}
             content: prompt,
           },
         ],
-        temperature: 0.1,
-        max_tokens: 3000,
+        temperature: 0,
+        max_tokens: 2000,
       }),
       signal: controller.signal,
     });
@@ -696,8 +712,6 @@ ${textoUnificado}
 
     const data = await response.json();
     let textoCorrigido = data.choices?.[0]?.message?.content;
-
-    console.log( textoCorrigido);
     return textoCorrigido;
   } catch (error) {
     console.error("Erro ao processar texto:", error.message);

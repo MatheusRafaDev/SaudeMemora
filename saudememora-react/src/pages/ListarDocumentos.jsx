@@ -108,6 +108,7 @@ export default function ListarDocumentos() {
                   ...dados,
                   ...doc,
                   tipo: "D",
+                  tipoDoc: detalhes.data[0]?.tipo  || "Documento Clínico",
                   titulo: `Consulta ${formatarData(doc.dataUpload)}`,
                 };
               })
@@ -401,11 +402,14 @@ export default function ListarDocumentos() {
                   </span>
                 </h2>
                 <ul className="documentos-list">
+
                   {documentosDetalhados.DocumentosClinicos.map((doc) => (
+
+
                     <li key={`D-${doc.id}`} className="documento-item">
                       <div className="documento-info">
                         <div className="documento-header">
-                          <span className="documento-tipo">Consulta</span>
+                          <span className="documento-tipo">{doc.tipoDoc}</span>
                           <span className="documento-id">ID: {doc.id}</span>
                           <span className="documento-data">
                             {formatarData(doc.dataUpload)}
