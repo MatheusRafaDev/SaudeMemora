@@ -12,6 +12,7 @@ import EditarPerfil from "./pages/EditarPerfil";
 import RelatorioDocumentos from "./pages/RelatorioDocumentos";
 import VisualizadorDocumento from "./pages/VisualizadorDocumento";
 import VisualizarFichaMedica from "./pages/VisualizarFichaMedica";
+import AlterarDocumento from "./pages/AlterarDocumento";
 import "bootstrap/dist/js/bootstrap.bundle.min.js";
 import "./styles/global.css";
 
@@ -56,6 +57,8 @@ function App() {
         <Route path="/ocr" element={<OCRLeituraCursiva />} />
 
         <Route path="/upload-documentos" element={<UploadDocumentos />} />
+        
+        <Route path="/editar-documento" element={<AlterarDocumento />} />
 
         <Route path="/alterar-perfil" element={<EditarPerfil />}/>
 

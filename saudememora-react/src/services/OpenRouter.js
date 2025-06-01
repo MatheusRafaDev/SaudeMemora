@@ -537,6 +537,10 @@ export async function extrairMedicamentosDoOCR(textoOCR) {
 
     const prompt = `Extraia apenas os medicamentos do texto OCR abaixo, retornando um JSON no formato:
 
+    
+
+    sem ter nomes iguais de medicamentos, e sem repetir medicamentos.
+
       {
         "medicamentos": [
           {

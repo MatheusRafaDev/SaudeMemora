@@ -8,13 +8,15 @@ import {
   FaFileMedical,
   FaInfoCircle,
   FaArrowLeft,
-  FaStickyNote
+  FaStickyNote,
 } from "react-icons/fa";
 
 export default function VisualizadorExame({ exame }) {
   const navigate = useNavigate();
 
-  const dataFormatada = exame.data ? new Date(exame.data).toLocaleDateString("pt-BR") : "Não informado";
+  const dataFormatada = exame.data
+    ? new Date(exame.data).toLocaleDateString("pt-BR")
+    : "Não informado";
 
   return (
     <div
@@ -27,13 +29,21 @@ export default function VisualizadorExame({ exame }) {
         paddingRight: "10px",
       }}
     >
-
       <div className="text-center mb-4">
         <h3 className="text-secondary">Visualizar documento - Exame</h3>
-      </div>
 
+        <button
+          className="btn btn-outline-primary w-100"
+          onClick={() => navigate(-1)}
+        >
+          <FaArrowLeft /> Voltar
+        </button>
+      </div>
       <div className="card shadow-sm border-0 mb-4">
-        <div className="card-body text-center" style={{ height: '300px', position: 'relative' }}>
+        <div
+          className="card-body text-center"
+          style={{ height: "300px", position: "relative" }}
+        >
           {exame.imagem ? (
             <TransformWrapper
               initialScale={1}
@@ -51,9 +61,7 @@ export default function VisualizadorExame({ exame }) {
                       top: "10px",
                       left: "10px",
                     }}
-                  >
-
-                  </div>
+                  ></div>
                   <TransformComponent
                     wrapperStyle={{
                       width: "100%",
@@ -91,7 +99,6 @@ export default function VisualizadorExame({ exame }) {
         </div>
       </div>
 
-
       {/* Dados do exame */}
       <div className="card shadow-sm border-0 mb-4">
         <div className="card-body" style={{ textAlign: "justify" }}>
@@ -105,46 +112,40 @@ export default function VisualizadorExame({ exame }) {
             <FaFlask /> <strong>Tipo:</strong> {exame.tipo || "Não informado"}
           </p>
           <p>
-            <FaInfoCircle /> <strong>Laboratório:</strong> {exame.laboratorio || "Não informado"}
+            <FaInfoCircle /> <strong>Laboratório:</strong>{" "}
+            {exame.laboratorio || "Não informado"}
           </p>
           <p>
-            <FaNotesMedical /> <strong>Resultado:</strong> {exame.resultado || "Sem resultado disponível"}
+            <FaNotesMedical /> <strong>Resultado:</strong>{" "}
+            {exame.resultado || "Sem resultado disponível"}
           </p>
           <p>
-            <strong>Observações:</strong> {exame.observacoes || "Nenhuma observação."}
+            <strong>Observações:</strong>{" "}
+            {exame.observacoes || "Nenhuma observação."}
           </p>
         </div>
       </div>
 
-       <div className="card shadow-sm border-0">
-            <div className="card-body" style={{ textAlign: "justify" }}>
-              <h4 className="text-primary">
-                <FaStickyNote /> Resumo
-              </h4>
-              <textarea
-                className="form-control mt-3 border border-info rounded"
-                value={exame.resumo || ""}
-                rows={5}
-                readOnly
-                style={{
-                  backgroundColor: "#f8f9fa",
-                  fontSize: "1rem",
-                  padding: "10px",
-                  textAlign: "justify",
-                }}
-              ></textarea>
-            </div>
-          </div>
-
-      {/* Botão voltar */}
-      <div className="mt-4">
-        <button
-          className="btn btn-outline-primary w-100"
-          onClick={() => navigate(-1)}
-        >
-          <FaArrowLeft /> Voltar
-        </button>
+      <div className="card shadow-sm border-0">
+        <div className="card-body" style={{ textAlign: "justify" }}>
+          <h4 className="text-primary">
+            <FaStickyNote /> Resumo
+          </h4>
+          <textarea
+            className="form-control mt-3 border border-info rounded"
+            value={exame.resumo || ""}
+            rows={5}
+            readOnly
+            style={{
+              backgroundColor: "#f8f9fa",
+              fontSize: "1rem",
+              padding: "10px",
+              textAlign: "justify",
+            }}
+          ></textarea>
+        </div>
       </div>
+
     </div>
   );
 }

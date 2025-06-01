@@ -101,25 +101,30 @@ public class ExameController {
 
     @PutMapping("/{id}")
     public ResponseEntity<Exame> atualizarExame(@PathVariable Long id, @RequestBody Exame exame) {
-        Optional<Exame> exameExistente = exameService.findById(id);
-        if (exameExistente.isEmpty()) {
-            return ResponseEntity.notFound().build();
+        try {
+            Optional<Exame> exameExistente = exameService.findById(id);
+            if (exameExistente.isEmpty()) {
+                return ResponseEntity.notFound().build();
+            }
+
+            Exame exameAtual = exameExistente.get();
+            exameAtual.setData(exame.getData());
+            exameAtual.setTipo(exame.getTipo());
+            exameAtual.setLaboratorio(exame.getLaboratorio());
+            exameAtual.setResultado(exame.getResultado());
+            exameAtual.setResumo(exame.getResumo());
+            exameAtual.setObservacoes(exame.getObservacoes());
+
+            if (exame.getDocumento() != null && exame.getDocumento().getId() != null) {
+                documentosService.findById(exame.getDocumento().getId()).ifPresent(exameAtual::setDocumento);
+            }
+
+            Exame atualizado = exameService.save(exameAtual);
+            return ResponseEntity.ok(atualizado);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
-
-        Exame e = exameExistente.get();
-        e.setData(exame.getData());
-        e.setTipo(exame.getTipo());
-        e.setLaboratorio(exame.getLaboratorio());
-        e.setResultado(exame.getResultado());
-        e.setObservacoes(exame.getObservacoes());
-
-        if (exame.getDocumento() != null && exame.getDocumento().getId() != null) {
-            documentosService.findById(exame.getDocumento().getId()).ifPresent(e::setDocumento);
-        }
-
-        return ResponseEntity.ok(exameService.save(e));
     }
-
     @DeleteMapping("/{id}")
     public ResponseEntity<?> excluirExame(@PathVariable Long id) {
         try {

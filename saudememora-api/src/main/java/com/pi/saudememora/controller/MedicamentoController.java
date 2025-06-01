@@ -9,6 +9,8 @@ import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @RestController
@@ -59,21 +61,30 @@ public class MedicamentoController {
     // 4) Atualizar um medicamento existente
     @PutMapping("/{id}")
     public ResponseEntity<Medicamento> updateMedicamento(@PathVariable Long id, @RequestBody Medicamento medicamentoDetails) {
-        return medicamentoRepository.findById(id)
-                .map(medicamento -> {
-                    // Atualiza os campos do medicamento existente
-                    medicamento.setNome(medicamentoDetails.getNome());
-                    medicamento.setQuantidade(medicamentoDetails.getQuantidade());
-                    medicamento.setFormaDeUso(medicamentoDetails.getFormaDeUso());
+        try {
+            Optional<Medicamento> medicamentoOpt = medicamentoRepository.findById(id);
+            if (medicamentoOpt.isEmpty()) {
+                return ResponseEntity.notFound().build();
+            }
 
-                    // Salva as alterações no banco de dados
-                    Medicamento atualizado = medicamentoRepository.save(medicamento);
-                    return ResponseEntity.ok(atualizado); // Retorna o medicamento atualizado
-                })
-                .orElse(ResponseEntity.status(HttpStatus.NOT_FOUND)
-                        .body(null)); // Mensagem clara de erro
+            Medicamento medicamento = medicamentoOpt.get();
+            if (medicamentoDetails.getNome() != null) {
+                medicamento.setNome(medicamentoDetails.getNome());
+            }
+            if (medicamentoDetails.getQuantidade() != null) {
+                medicamento.setQuantidade(medicamentoDetails.getQuantidade());
+            }
+            if (medicamentoDetails.getFormaDeUso() != null) {
+                medicamento.setFormaDeUso(medicamentoDetails.getFormaDeUso());
+            }
+
+            Medicamento atualizado = medicamentoRepository.save(medicamento);
+            return ResponseEntity.ok(atualizado);
+        } catch (Exception e) {
+            logger.error("Erro ao atualizar medicamento", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
     }
-
     // 5) Deletar um medicamento pelo ID
     @DeleteMapping("/{id}")
     public ResponseEntity<?> deleteMedicamento(@PathVariable Long id) {

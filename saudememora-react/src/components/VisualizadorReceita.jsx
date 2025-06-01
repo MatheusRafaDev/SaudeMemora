@@ -24,76 +24,77 @@ export default function ReceitaComMedicamentos({ receita }) {
         paddingRight: "10px",
       }}
     >
-      {/* Cabeçalho */}
       <div className="text-center mb-4">
-      <h3 className="text-secondary">Visualizar documento</h3>
+        <h3 className="text-secondary">Visualizar documento</h3>
+      
+        <button
+          className="btn btn-outline-primary w-100"
+          onClick={() => navigate(-1)}
+        >
+          <FaArrowLeft /> Voltar
+        </button>
       </div>
 
-      {/* Imagem da Receita */}
       <div className="card shadow-sm border-0 mb-4">
-  <div className="card-body text-center" style={{ height: '300px', position: 'relative' }}>
-    {receita.imagem ? (
-      <TransformWrapper
-        initialScale={1.1}
-        minScale={1}
-        maxScale={5}
-        wheel={{ step: 0.1 }}
-      >
-        {({ zoomIn, zoomOut, resetTransform }) => (
-          <>
-            <div
-              className="tools"
-              style={{
-                position: "absolute",
-                zIndex: 10,
-                top: "10px",
-                left: "10px",
-              }}
+        <div
+          className="card-body text-center"
+          style={{ height: "300px", position: "relative" }}
+        >
+          {receita.imagem ? (
+            <TransformWrapper
+              initialScale={1.1}
+              minScale={1}
+              maxScale={5}
+              wheel={{ step: 0.1 }}
             >
-              {/* Adicione controles aqui, se quiser */}
-              {/* <button onClick={zoomIn}>+</button> */}
-              {/* <button onClick={zoomOut}>-</button> */}
-              {/* <button onClick={resetTransform}>Reset</button> */}
-            </div>
-            <TransformComponent
-              wrapperStyle={{
-                width: "100%",
-                height: "100%",
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-              }}
-              contentStyle={{
-                width: "100%",
-                height: "100%",
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-              }}
-            >
-              <img
-                src={`http://localhost:7070/api/receitas/imagem/${receita.id}`}
-                alt="Imagem da Receita"
-                className="img-fluid rounded shadow"
-                style={{
-                  maxHeight: "100%",
-                  maxWidth: "100%",
-                  objectFit: "contain",
-                  cursor: "grab",
-                }}
-              />
-            </TransformComponent>
-          </>
-        )}
-      </TransformWrapper>
-    ) : (
-      <p className="text-muted">Imagem não disponível</p>
-    )}
-  </div>
-</div>
+              {({ zoomIn, zoomOut, resetTransform }) => (
+                <>
+                  <div
+                    className="tools"
+                    style={{
+                      position: "absolute",
+                      zIndex: 10,
+                      top: "10px",
+                      left: "10px",
+                    }}
+                  ></div>
+                  <TransformComponent
+                    wrapperStyle={{
+                      width: "100%",
+                      height: "100%",
+                      display: "flex",
+                      justifyContent: "center",
+                      alignItems: "center",
+                    }}
+                    contentStyle={{
+                      width: "100%",
+                      height: "100%",
+                      display: "flex",
+                      justifyContent: "center",
+                      alignItems: "center",
+                    }}
+                  >
+                    <img
+                      src={`http://localhost:7070/api/receitas/imagem/${receita.id}`}
+                      alt="Imagem da Receita"
+                      className="img-fluid rounded shadow"
+                      style={{
+                        maxHeight: "100%",
+                        maxWidth: "100%",
+                        objectFit: "contain",
+                        cursor: "grab",
+                      }}
+                    />
+                  </TransformComponent>
+                </>
+              )}
+            </TransformWrapper>
+          ) : (
+            <p className="text-muted">Imagem não disponível</p>
+          )}
+        </div>
+      </div>
 
-
-      {/* Informações da Receita */}
       <div className="card shadow-sm border-0 mb-4">
         <div className="card-body" style={{ textAlign: "justify" }}>
           <p>
@@ -115,7 +116,6 @@ export default function ReceitaComMedicamentos({ receita }) {
         </div>
       </div>
 
-      {/* Campo de Medicamentos */}
       <div className="card shadow-sm border-0 mb-4">
         <div className="card-body" style={{ textAlign: "justify" }}>
           <h4 className="text-primary">
@@ -161,15 +161,6 @@ export default function ReceitaComMedicamentos({ receita }) {
         </div>
       </div>
 
-      {/* Botão de Voltar */}
-      <div className="mt-4">
-        <button
-          className="btn btn-outline-primary w-100"
-          onClick={() => navigate(-1)}
-        >
-          <FaArrowLeft /> Voltar
-        </button>
-      </div>
     </div>
   );
 }

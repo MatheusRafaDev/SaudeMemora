@@ -66,6 +66,7 @@ const ReceitaService = {
   // Atualizar receita existente
   update: async (id, receita) => {
     try {
+      console.log( receita);
       const response = await axiosInstance.put(`/api/receitas/${id}`, receita);
       return { success: true, data: response.data };
     } catch (error) {

@@ -37,7 +37,6 @@ public class ReceitaController {
         this.objectMapper = objectMapper;
     }
 
-
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> createReceitaComImagem(
             @RequestParam("receitaData") String receitaData,
@@ -106,10 +105,66 @@ public class ReceitaController {
         }
     }
 
-
     @GetMapping("/documento/{id}")
     public List<Receita> listarPorDocumento(@PathVariable Long id) {
         return receitaRepository.findByDocumentoId(id);
     }
+    @PutMapping("/{id}")
+    public ResponseEntity<Receita> atualizarReceita(@PathVariable Long id, @RequestBody Receita receita) {
+        try {
+            Optional<Receita> receitaExistenteOpt = receitaService.buscarPorId(id);
+            if (receitaExistenteOpt.isEmpty()) {
+                return ResponseEntity.notFound().build();
+            }
 
+            Receita receitaExistente = receitaExistenteOpt.get();
+
+            // Atualiza apenas os campos que foram fornecidos
+            if (receita.getDataReceita() != null) {
+                receitaExistente.setDataReceita(receita.getDataReceita());
+            }
+            if (receita.getPosologia() != null) {
+                receitaExistente.setPosologia(receita.getPosologia());
+            }
+            if (receita.getObservacoes() != null) {
+                receitaExistente.setObservacoes(receita.getObservacoes());
+            }
+            if (receita.getResumo() != null) {
+                receitaExistente.setResumo(receita.getResumo());
+            }
+            if (receita.getMedico() != null) {
+                receitaExistente.setMedico(receita.getMedico());
+            }
+
+            // Atualiza medicamentos se fornecidos
+            if (receita.getMedicamentos() != null) {
+                receitaExistente.setMedicamentos(receita.getMedicamentos());
+                for (Medicamento med : receitaExistente.getMedicamentos()) {
+                    med.setReceita(receitaExistente);
+                }
+            }
+
+            Receita receitaAtualizada = receitaService.atualizarReceita(receitaExistente);
+            return ResponseEntity.ok(receitaAtualizada);
+        } catch (Exception e) {
+            logger.error("Erro ao atualizar receita", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+        }
+    }
+
+    @GetMapping("/{id}")
+    public ResponseEntity<?> getReceitaById(@PathVariable Long id) {
+        try {
+            Optional<Receita> receita = receitaService.getReceitaById(id);
+            if (receita.isPresent()) {
+                return ResponseEntity.ok(receita.get());
+            } else {
+                return ResponseEntity.notFound().build();
+            }
+        } catch (Exception e) {
+            logger.error("Erro ao buscar receita", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Erro ao buscar receita: " + e.getMessage());
+        }
+    }
 }

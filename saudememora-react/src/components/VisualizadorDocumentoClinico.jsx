@@ -14,11 +14,13 @@ import {
 export default function VisualizadorDocumentoClinico({ documentoClinico }) {
   const navigate = useNavigate();
 
-  const documento = documentoClinico
+  const documento = documentoClinico;
 
-  console.log(documento)
+  console.log(documento);
 
-  const dataFormatada = documento.data ? new Date(documento.data).toLocaleDateString("pt-BR") : "Não informado";
+  const dataFormatada = documento.data
+    ? new Date(documento.data).toLocaleDateString("pt-BR")
+    : "Não informado";
 
   return (
     <div
@@ -33,70 +35,75 @@ export default function VisualizadorDocumentoClinico({ documentoClinico }) {
     >
       <div className="text-center mb-4">
         <h3 className="text-secondary">Visualizar documento - Clínico</h3>
+
+        <button
+          className="btn btn-outline-primary w-100"
+          onClick={() => navigate(-1)}
+        >
+          <FaArrowLeft /> Voltar
+        </button>
+        
       </div>
 
       <div className="card shadow-sm border-0 mb-4">
-  <div className="card-body text-center" style={{ height: '300px', position: 'relative' }}>
-    {documento.imagem ? (
-      <TransformWrapper
-        initialScale={1}
-        minScale={1}
-        maxScale={5}
-        wheel={{ step: 0.1 }}
-      >
-        {({ zoomIn, zoomOut, resetTransform }) => (
-          <>
-            <div
-              className="tools"
-              style={{
-                position: "absolute",
-                zIndex: 10,
-                top: "10px",
-                left: "10px",
-              }}
+        <div
+          className="card-body text-center"
+          style={{ height: "300px", position: "relative" }}
+        >
+          {documento.imagem ? (
+            <TransformWrapper
+              initialScale={1}
+              minScale={1}
+              maxScale={5}
+              wheel={{ step: 0.1 }}
             >
-              {/* Aqui você pode adicionar botões para zoom in/out e reset */}
-              {/* <button onClick={zoomIn}>+</button> */}
-              {/* <button onClick={zoomOut}>-</button> */}
-              {/* <button onClick={resetTransform}>Reset</button> */}
-            </div>
-            <TransformComponent
-              wrapperStyle={{
-                width: "100%",
-                height: "100%",
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-              }}
-              contentStyle={{
-                width: "100%",
-                height: "100%",
-                display: "flex",
-                justifyContent: "center",
-                alignItems: "center",
-              }}
-            >
-              <img
-                src={`http://localhost:7070/api/documentosclinicos/imagem/${documento.id}`}
-                alt={`Documento ${documento.tipo}`}
-                className="img-fluid rounded shadow"
-                style={{
-                  maxHeight: "100%",
-                  maxWidth: "100%",
-                  objectFit: "contain",
-                  cursor: "grab",
-                }}
-              />
-            </TransformComponent>
-          </>
-        )}
-      </TransformWrapper>
-    ) : (
-      <p className="text-muted">Documento não disponível</p>
-    )}
-  </div>
-</div>
-
+              {({ zoomIn, zoomOut, resetTransform }) => (
+                <>
+                  <div
+                    className="tools"
+                    style={{
+                      position: "absolute",
+                      zIndex: 10,
+                      top: "10px",
+                      left: "10px",
+                    }}
+                  ></div>
+                  <TransformComponent
+                    wrapperStyle={{
+                      width: "100%",
+                      height: "100%",
+                      display: "flex",
+                      justifyContent: "center",
+                      alignItems: "center",
+                    }}
+                    contentStyle={{
+                      width: "100%",
+                      height: "100%",
+                      display: "flex",
+                      justifyContent: "center",
+                      alignItems: "center",
+                    }}
+                  >
+                    <img
+                      src={`http://localhost:7070/api/documentosclinicos/imagem/${documento.id}`}
+                      alt={`Documento ${documento.tipo}`}
+                      className="img-fluid rounded shadow"
+                      style={{
+                        maxHeight: "100%",
+                        maxWidth: "100%",
+                        objectFit: "contain",
+                        cursor: "grab",
+                      }}
+                    />
+                  </TransformComponent>
+                </>
+              )}
+            </TransformWrapper>
+          ) : (
+            <p className="text-muted">Documento não disponível</p>
+          )}
+        </div>
+      </div>
 
       {/* Dados do documento */}
       <div className="card shadow-sm border-0 mb-4">
@@ -108,54 +115,46 @@ export default function VisualizadorDocumentoClinico({ documentoClinico }) {
             <FaCalendarAlt /> <strong>Data:</strong> {dataFormatada}
           </p>
           <p>
-            <FaUserMd /> <strong>Médico:</strong> {documento.medico || "Não informado"}
+            <FaUserMd /> <strong>Médico:</strong>{" "}
+            {documento.medico || "Não informado"}
           </p>
           <p>
-            <FaHospital /> <strong>Instituição:</strong> {documento.instituicao || "Não informado"}
+            <FaHospital /> <strong>Instituição:</strong>{" "}
+            {documento.instituicao || "Não informado"}
           </p>
           <p>
-            <FaInfoCircle /> <strong>Especialidade:</strong> {documento.especialidade || "Não informado"}
+            <FaInfoCircle /> <strong>Especialidade:</strong>{" "}
+            {documento.especialidade || "Não informado"}
           </p>
           <p>
-            <strong>Descrição:</strong> {documento.descricao || "Nenhuma descrição disponível."}
+            <strong>Descrição:</strong>{" "}
+            {documento.descricao || "Nenhuma descrição disponível."}
           </p>
           <p>
-            <strong>Observações:</strong> {documento.observacoes || "Nenhuma observação."}
+            <strong>Observações:</strong>{" "}
+            {documento.observacoes || "Nenhuma observação."}
           </p>
         </div>
-
-        
       </div>
 
-
       <div className="card shadow-sm border-0">
-              <div className="card-body" style={{ textAlign: "justify" }}>
-                <h4 className="text-primary">
-                  <FaStickyNote /> Resumo
-                </h4>
-                <textarea
-                  className="form-control mt-3 border border-info rounded"
-                  value={documento.resumo || ""}
-                  rows={5}
-                  readOnly
-                  style={{
-                    backgroundColor: "#f8f9fa",
-                    fontSize: "1rem",
-                    padding: "10px",
-                    textAlign: "justify",
-                  }}
-                ></textarea>
-              </div>
-            </div>
-
-      {/* Botão voltar */}
-      <div className="mt-4">
-        <button
-          className="btn btn-outline-primary w-100"
-          onClick={() => navigate(-1)}
-        >
-          <FaArrowLeft /> Voltar
-        </button>
+        <div className="card-body" style={{ textAlign: "justify" }}>
+          <h4 className="text-primary">
+            <FaStickyNote /> Resumo
+          </h4>
+          <textarea
+            className="form-control mt-3 border border-info rounded"
+            value={documento.resumo || ""}
+            rows={5}
+            readOnly
+            style={{
+              backgroundColor: "#f8f9fa",
+              fontSize: "1rem",
+              padding: "10px",
+              textAlign: "justify",
+            }}
+          ></textarea>
+        </div>
       </div>
     </div>
   );

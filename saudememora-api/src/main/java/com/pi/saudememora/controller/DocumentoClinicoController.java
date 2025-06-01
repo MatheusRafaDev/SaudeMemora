@@ -80,11 +80,26 @@ public class DocumentoClinicoController {
 
     @PutMapping("/{id}")
     public ResponseEntity<DocumentoClinico> atualizar(@PathVariable Long id, @RequestBody DocumentoClinico documento) {
-        DocumentoClinico atualizado = service.atualizar(id, documento);
-        if (atualizado == null) {
-            return ResponseEntity.notFound().build();
+        try {
+            Optional<DocumentoClinico> documentoExistente = service.buscarPorId(id);
+            if (documentoExistente.isEmpty()) {
+                return ResponseEntity.notFound().build();
+            }
+
+            DocumentoClinico documentoAtual = documentoExistente.get();
+
+            if (documento.getTipo() != null) {
+                documentoAtual.setTipo(documento.getTipo());
+            }
+
+            if (documento.getData() != null) {
+                documentoAtual.setData(documento.getData());
+            }
+            DocumentoClinico atualizado = service.salvar(documentoAtual);
+            return ResponseEntity.ok(atualizado);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
-        return ResponseEntity.ok(atualizado);
     }
 
     @GetMapping("/imagem/{id}")
