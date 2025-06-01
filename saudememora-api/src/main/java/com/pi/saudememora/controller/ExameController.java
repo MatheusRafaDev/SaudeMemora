@@ -1,5 +1,6 @@
 package com.pi.saudememora.controller;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pi.saudememora.model.Documentos;
 import com.pi.saudememora.model.Exame;
@@ -16,6 +17,11 @@ import java.nio.file.*;
 import java.util.List;
 import java.util.Optional;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.web.server.ResponseStatusException;
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @RestController
 @RequestMapping("/api/exames")
 @CrossOrigin(origins = "*")
@@ -32,6 +38,8 @@ public class ExameController {
 
     @Autowired
     private ObjectMapper objectMapper;
+
+
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> salvarExameComImagem(
@@ -102,29 +110,39 @@ public class ExameController {
     @PutMapping("/{id}")
     public ResponseEntity<Exame> atualizarExame(@PathVariable Long id, @RequestBody Exame exame) {
         try {
-            Optional<Exame> exameExistente = exameService.findById(id);
-            if (exameExistente.isEmpty()) {
-                return ResponseEntity.notFound().build();
-            }
 
-            Exame exameAtual = exameExistente.get();
-            exameAtual.setData(exame.getData());
-            exameAtual.setTipo(exame.getTipo());
-            exameAtual.setLaboratorio(exame.getLaboratorio());
-            exameAtual.setResultado(exame.getResultado());
-            exameAtual.setResumo(exame.getResumo());
-            exameAtual.setObservacoes(exame.getObservacoes());
+            String jsonRecebido = objectMapper.writeValueAsString(exame);
+            log.info("JSON Recebido: {}", jsonRecebido);
 
-            if (exame.getDocumento() != null && exame.getDocumento().getId() != null) {
-                documentosService.findById(exame.getDocumento().getId()).ifPresent(exameAtual::setDocumento);
-            }
 
-            Exame atualizado = exameService.save(exameAtual);
-            return ResponseEntity.ok(atualizado);
+            Exame exameExistente = exameService.findById(id)
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Exame não encontrado"));
+
+            exameExistente.setData(exame.getData());
+            exameExistente.setTipo(exame.getTipo());
+            exameExistente.setLaboratorio(exame.getLaboratorio());
+            exameExistente.setResultado(exame.getResultado());
+            exameExistente.setResumo(exame.getResumo());
+            exameExistente.setObservacoes(exame.getObservacoes());
+            exameExistente.setNomeExame(exame.getNomeExame());
+            exameExistente.setTipo(exame.getTipo());
+
+            System.out.println(exame.getTipo());
+
+            Exame exameAtualizado = exameService.save(exameExistente);
+            return ResponseEntity.ok(exameAtualizado);
+
+        } catch (JsonProcessingException e) {
+            log.error("Erro ao processar JSON: {}", e.getMessage());
+            return ResponseEntity.badRequest().build();
+        } catch (ResponseStatusException e) {
+            throw e;
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
+            log.error("Erro interno: {}", e.getMessage());
+            return ResponseEntity.internalServerError().build();
         }
     }
+
     @DeleteMapping("/{id}")
     public ResponseEntity<?> excluirExame(@PathVariable Long id) {
         try {

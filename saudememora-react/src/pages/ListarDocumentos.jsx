@@ -142,7 +142,7 @@ export default function ListarDocumentos() {
                     nome: doc.paciente?.nome,
                     cpf: doc.paciente?.cpf,
                     dataNascimento: doc.paciente?.dataNascimento,
-                    sexo: doc.paciente?.sexo
+                    sexo: doc.paciente?.sexo,
                   },
                   documento: {
                     id: doc.id,
@@ -150,7 +150,7 @@ export default function ListarDocumentos() {
                     tipoDocumento: doc.tipoDocumento,
                     status: doc.status,
                     dataUpload: doc.dataUpload,
-                    data: new Date(doc.dataUpload)
+                    data: new Date(doc.dataUpload),
                   },
                   clinico: {
                     id: dados?.id,
@@ -162,9 +162,9 @@ export default function ListarDocumentos() {
                     observacoes: dados?.observacoes,
                     imagem: dados?.imagem,
                     resumo: dados?.resumo,
-                    conclusoes: dados?.conclusoes
+                    conclusoes: dados?.conclusoes,
                   },
-                  titulo: `Consulta ${formatarData(doc.dataUpload)}`
+                  titulo: `Consulta ${formatarData(doc.dataUpload)}`,
                 };
               })
           ),
@@ -186,7 +186,7 @@ export default function ListarDocumentos() {
                     nome: doc.paciente?.nome,
                     cpf: doc.paciente?.cpf,
                     dataNascimento: doc.paciente?.dataNascimento,
-                    sexo: doc.paciente?.sexo
+                    sexo: doc.paciente?.sexo,
                   },
                   documento: {
                     id: doc.id,
@@ -194,7 +194,7 @@ export default function ListarDocumentos() {
                     tipoDocumento: doc.tipoDocumento,
                     status: doc.status,
                     dataUpload: doc.dataUpload,
-                    data: new Date(doc.dataUpload)
+                    data: new Date(doc.dataUpload),
                   },
                   exame: {
                     id: dados?.id,
@@ -203,9 +203,9 @@ export default function ListarDocumentos() {
                     dataExame: dados?.data,
                     resultado: dados?.resultado,
                     observacoes: dados?.observacoes,
-                    imagem: dados?.imagem
+                    imagem: dados?.imagem,
                   },
-                  titulo: dados?.nomeExame || "Exame Clínico"
+                  titulo: dados?.nomeExame || "Exame Clínico",
                 };
               })
           ),
@@ -227,7 +227,7 @@ export default function ListarDocumentos() {
                     nome: doc.paciente?.nome,
                     cpf: doc.paciente?.cpf,
                     dataNascimento: doc.paciente?.dataNascimento,
-                    sexo: doc.paciente?.sexo
+                    sexo: doc.paciente?.sexo,
                   },
                   documento: {
                     id: doc.id,
@@ -235,7 +235,7 @@ export default function ListarDocumentos() {
                     tipoDocumento: doc.tipoDocumento,
                     status: doc.status,
                     dataUpload: doc.dataUpload,
-                    data: new Date(doc.dataUpload)
+                    data: new Date(doc.dataUpload),
                   },
                   receita: {
                     id: dados?.id,
@@ -244,12 +244,12 @@ export default function ListarDocumentos() {
                     dataReceita: dados?.dataReceita,
                     medicamentos: dados?.medicamentos,
                     observacoes: dados?.observacoes,
-                    validade: dados?.validade
+                    validade: dados?.validade,
                   },
-                  titulo: `Receita ${formatarData(doc.dataUpload)}`
+                  titulo: `Receita ${formatarData(doc.dataUpload)}`,
                 };
               })
-          )
+          ),
         };
 
         setDocumentosDetalhados(docs);
@@ -278,10 +278,14 @@ export default function ListarDocumentos() {
       const searchText = texto.toLowerCase();
       return (
         (doc.titulo && doc.titulo.toLowerCase().includes(searchText)) ||
-        (doc.clinico?.medico && doc.clinico.medico.toLowerCase().includes(searchText)) ||
-        (doc.clinico?.tipoDoc && doc.clinico.tipoDoc.toLowerCase().includes(searchText)) ||
-        (doc.exame?.laboratorio && doc.exame.laboratorio.toLowerCase().includes(searchText)) ||
-        (doc.receita?.medico && doc.receita.medico.toLowerCase().includes(searchText))
+        (doc.clinico?.medico &&
+          doc.clinico.medico.toLowerCase().includes(searchText)) ||
+        (doc.clinico?.tipoDoc &&
+          doc.clinico.tipoDoc.toLowerCase().includes(searchText)) ||
+        (doc.exame?.laboratorio &&
+          doc.exame.laboratorio.toLowerCase().includes(searchText)) ||
+        (doc.receita?.medico &&
+          doc.receita.medico.toLowerCase().includes(searchText))
       );
     };
 
@@ -292,26 +296,27 @@ export default function ListarDocumentos() {
 
     const filtrarPorData = (doc) => {
       if (!dataInicio && !dataFim) return true;
-      
+
       const docDate = new Date(doc.documento.dataUpload);
-      
+
       if (dataInicio && !dataFim) {
         return docDate >= dataInicio;
       }
-      
+
       if (!dataInicio && dataFim) {
         return docDate <= dataFim;
       }
-      
+
       return docDate >= dataInicio && docDate <= dataFim;
     };
 
     const ordenarDocumentos = (documentos) => {
       return [...documentos].sort((a, b) => {
         let comparacao = 0;
-        
+
         if (ordenacao.campo === "dataUpload") {
-          comparacao = new Date(a.documento.dataUpload) - new Date(b.documento.dataUpload);
+          comparacao =
+            new Date(a.documento.dataUpload) - new Date(b.documento.dataUpload);
         } else if (ordenacao.campo === "tipo") {
           comparacao = a.documento.tipo.localeCompare(b.documento.tipo);
         } else if (ordenacao.campo === "medico") {
@@ -319,7 +324,7 @@ export default function ListarDocumentos() {
           const medicoB = b.clinico?.medico || b.receita?.medico || "";
           comparacao = medicoA.localeCompare(medicoB);
         }
-        
+
         return ordenacao.direcao === "asc" ? comparacao : -comparacao;
       });
     };
@@ -327,17 +332,20 @@ export default function ListarDocumentos() {
     const documentosFiltrados = {
       DocumentosClinicos: ordenarDocumentos(
         documentosDetalhados.DocumentosClinicos.filter(
-          (doc) => filtrarPorTexto(doc) && filtrarPorTipo(doc) && filtrarPorData(doc)
+          (doc) =>
+            filtrarPorTexto(doc) && filtrarPorTipo(doc) && filtrarPorData(doc)
         )
       ),
       Exames: ordenarDocumentos(
         documentosDetalhados.Exames.filter(
-          (doc) => filtrarPorTexto(doc) && filtrarPorTipo(doc) && filtrarPorData(doc)
+          (doc) =>
+            filtrarPorTexto(doc) && filtrarPorTipo(doc) && filtrarPorData(doc)
         )
       ),
       Receitas: ordenarDocumentos(
         documentosDetalhados.Receitas.filter(
-          (doc) => filtrarPorTexto(doc) && filtrarPorTipo(doc) && filtrarPorData(doc)
+          (doc) =>
+            filtrarPorTexto(doc) && filtrarPorTipo(doc) && filtrarPorData(doc)
         )
       ),
     };
@@ -349,7 +357,9 @@ export default function ListarDocumentos() {
     };
 
     setDocumentosFiltrados({
-      DocumentosClinicos: aplicarPaginacao(documentosFiltrados.DocumentosClinicos),
+      DocumentosClinicos: aplicarPaginacao(
+        documentosFiltrados.DocumentosClinicos
+      ),
       Exames: aplicarPaginacao(documentosFiltrados.Exames),
       Receitas: aplicarPaginacao(documentosFiltrados.Receitas),
     });
@@ -367,7 +377,6 @@ export default function ListarDocumentos() {
 
   const handleVisualizar = async (documentoId, tipo) => {
     try {
-
       console.log("Visualizando documento:", documentoId, tipo);
       let documento;
 
@@ -394,9 +403,13 @@ export default function ListarDocumentos() {
     }
   };
 
-  const handleAlterar = (doc, tipo,documentoId) => {
+  const handleAlterar = (tipo, documentoId) => {
+
     navigate("/editar-documento", {
-        state: { doc,tipo, documentoId },
+      state: {
+        tipo,
+        documentoId,
+      },
     });
   };
 
@@ -415,12 +428,19 @@ export default function ListarDocumentos() {
               DocumentosClinicos: prev.DocumentosClinicos.filter(
                 (doc) => doc.documento.id !== documentoId
               ),
-              Exames: prev.Exames.filter((doc) => doc.documento.id !== documentoId),
-              Receitas: prev.Receitas.filter((doc) => doc.documento.id !== documentoId),
+              Exames: prev.Exames.filter(
+                (doc) => doc.documento.id !== documentoId
+              ),
+              Receitas: prev.Receitas.filter(
+                (doc) => doc.documento.id !== documentoId
+              ),
             }));
 
             closeModal();
-            showNotification(`${getTipoNome(tipo)} deletado com sucesso`, "success");
+            showNotification(
+              `${getTipoNome(tipo)} deletado com sucesso`,
+              "success"
+            );
           } else {
             showNotification(
               response.message || `Erro ao deletar ${getTipoNome(tipo)}`,
@@ -533,7 +553,9 @@ export default function ListarDocumentos() {
       >
         <div className="modal-inner">
           <div className="flex justify-between items-start mb-4">
-            <h3 className="text-lg font-semibold text-gray-800">Confirmar ação</h3>
+            <h3 className="text-lg font-semibold text-gray-800">
+              Confirmar ação
+            </h3>
             <button
               onClick={onClose}
               className="text-gray-500 hover:text-gray-700 transition"
@@ -576,14 +598,14 @@ export default function ListarDocumentos() {
 
   const totalDocumentosFiltrados = () => {
     return (
-      documentosDetalhados.DocumentosClinicos.filter(doc => 
-        filtros.tipo === "todos" || doc.documento.tipo === filtros.tipo
+      documentosDetalhados.DocumentosClinicos.filter(
+        (doc) => filtros.tipo === "todos" || doc.documento.tipo === filtros.tipo
       ).length +
-      documentosDetalhados.Exames.filter(doc => 
-        filtros.tipo === "todos" || doc.documento.tipo === filtros.tipo
+      documentosDetalhados.Exames.filter(
+        (doc) => filtros.tipo === "todos" || doc.documento.tipo === filtros.tipo
       ).length +
-      documentosDetalhados.Receitas.filter(doc => 
-        filtros.tipo === "todos" || doc.documento.tipo === filtros.tipo
+      documentosDetalhados.Receitas.filter(
+        (doc) => filtros.tipo === "todos" || doc.documento.tipo === filtros.tipo
       ).length
     );
   };
@@ -612,7 +634,8 @@ export default function ListarDocumentos() {
                 className="btn-filter"
                 onClick={() => setMostrarFiltros(!mostrarFiltros)}
               >
-                <FaFilter /> {mostrarFiltros ? "Ocultar Filtros" : "Mostrar Filtros"}
+                <FaFilter />{" "}
+                {mostrarFiltros ? "Ocultar Filtros" : "Mostrar Filtros"}
               </button>
             </div>
           </div>
@@ -705,17 +728,21 @@ export default function ListarDocumentos() {
               <label>Ordenar por:</label>
               <select
                 value={ordenacao.campo}
-                onChange={(e) => setOrdenacao({...ordenacao, campo: e.target.value})}
+                onChange={(e) =>
+                  setOrdenacao({ ...ordenacao, campo: e.target.value })
+                }
               >
                 <option value="dataUpload">Data</option>
                 <option value="tipo">Tipo</option>
                 <option value="medico">Médico</option>
               </select>
-              <button 
-                onClick={() => setOrdenacao({
-                  ...ordenacao, 
-                  direcao: ordenacao.direcao === "asc" ? "desc" : "asc"
-                })}
+              <button
+                onClick={() =>
+                  setOrdenacao({
+                    ...ordenacao,
+                    direcao: ordenacao.direcao === "asc" ? "desc" : "asc",
+                  })
+                }
                 className="btn-ordenacao"
               >
                 {ordenacao.direcao === "asc" ? <FaSortUp /> : <FaSortDown />}
@@ -725,17 +752,27 @@ export default function ListarDocumentos() {
             <div className="paginacao">
               <button
                 disabled={paginacao.paginaAtual === 1}
-                onClick={() => setPaginacao({...paginacao, paginaAtual: paginacao.paginaAtual - 1})}
+                onClick={() =>
+                  setPaginacao({
+                    ...paginacao,
+                    paginaAtual: paginacao.paginaAtual - 1,
+                  })
+                }
                 className="btn-paginacao"
               >
                 Anterior
               </button>
               <span>Página {paginacao.paginaAtual}</span>
               <button
-                onClick={() => setPaginacao({...paginacao, paginaAtual: paginacao.paginaAtual + 1})}
+                onClick={() =>
+                  setPaginacao({
+                    ...paginacao,
+                    paginaAtual: paginacao.paginaAtual + 1,
+                  })
+                }
                 className="btn-paginacao"
                 disabled={
-                  paginacao.paginaAtual * paginacao.itensPorPagina >= 
+                  paginacao.paginaAtual * paginacao.itensPorPagina >=
                   totalDocumentosFiltrados()
                 }
               >
@@ -772,7 +809,10 @@ export default function ListarDocumentos() {
                     : "Nenhum documento corresponde aos filtros aplicados."}
                 </p>
                 {totalDocumentos() > 0 && (
-                  <button onClick={limparFiltros} className="btn-limpar-filtros">
+                  <button
+                    onClick={limparFiltros}
+                    className="btn-limpar-filtros"
+                  >
                     Limpar filtros
                   </button>
                 )}
@@ -790,11 +830,18 @@ export default function ListarDocumentos() {
                 </h2>
                 <ul className="documentos-list">
                   {documentosFiltrados.DocumentosClinicos.map((doc) => (
-                    <li key={`D-${doc.documento.id}`} className="documento-item">
+                    <li
+                      key={`D-${doc.documento.id}`}
+                      className="documento-item"
+                    >
                       <div className="documento-info">
                         <div className="documento-header">
-                          <span className="documento-tipo">{doc.clinico.tipoDoc}</span>
-                          <span className="documento-id">ID: {doc.documento.id}</span>
+                          <span className="documento-tipo">
+                            {doc.clinico.tipoDoc}
+                          </span>
+                          <span className="documento-id">
+                            ID: {doc.documento.id}
+                          </span>
                           <span className="documento-data">
                             {formatarData(doc.documento.dataUpload)}
                           </span>
@@ -804,7 +851,9 @@ export default function ListarDocumentos() {
                             <FaUserMd className="meta-icon" />
                             <span>{doc.clinico.medico}</span>
                             {doc.clinico.crm && (
-                              <span className="crm">CRM: {doc.clinico.crm}</span>
+                              <span className="crm">
+                                CRM: {doc.clinico.crm}
+                              </span>
                             )}
                           </div>
                         )}
@@ -812,15 +861,22 @@ export default function ListarDocumentos() {
                       <div className="documento-actions">
                         <button
                           className="btn-action"
-                          onClick={() => handleVisualizar(doc.documento.id, doc.documento.tipo)}
+                          onClick={() =>
+                            handleVisualizar(
+                              doc.documento.id,
+                              doc.documento.tipo
+                            )
+                          }
                           title="Visualizar"
                         >
                           <FaEye />
                         </button>
-                        
+
                         <button
                           className="btn-action primary"
-                          onClick={() => handleAlterar(doc, doc.documento.tipo,doc.clinico.id)}
+                          onClick={() =>
+                            handleAlterar(doc.documento.tipo, doc.clinico.id)
+                          }
                           title="Alterar"
                         >
                           <FaEdit />
@@ -828,7 +884,9 @@ export default function ListarDocumentos() {
 
                         <button
                           className="btn-action danger"
-                          onClick={() => handleDeletar(doc.documento.id, doc.documento.tipo)}
+                          onClick={() =>
+                            handleDeletar(doc.documento.id, doc.documento.tipo)
+                          }
                           title="Deletar"
                         >
                           <FaTrash />
@@ -850,17 +908,26 @@ export default function ListarDocumentos() {
                 </h2>
                 <ul className="documentos-list">
                   {documentosFiltrados.Exames.map((doc) => (
-                    <li key={`E-${doc.documento.id}`} className="documento-item">
+                    <li
+                      key={`E-${doc.documento.id}`}
+                      className="documento-item"
+                    >
                       <div className="documento-info">
                         <div className="documento-header">
                           <span className="documento-tipo">{doc.titulo}</span>
-                          <span className="documento-id">ID: {doc.documento.id}</span>
+                          <span className="documento-id">
+                            ID: {doc.documento.id}
+                          </span>
                           <div
                             className="documento-data"
                             style={{ display: "flex", flexDirection: "column" }}
                           >
-                            <span>Upload: {formatarData(doc.documento.dataUpload)}</span>
-                            <span>Data do exame: {formatarData(doc.exame.dataExame)}</span>
+                            <span>
+                              Upload: {formatarData(doc.documento.dataUpload)}
+                            </span>
+                            <span>
+                              Data do exame: {formatarData(doc.exame.dataExame)}
+                            </span>
                           </div>
                         </div>
                         {doc.exame.laboratorio && (
@@ -872,21 +939,30 @@ export default function ListarDocumentos() {
                       <div className="documento-actions">
                         <button
                           className="btn-action"
-                          onClick={() => handleVisualizar(doc.documento.id, doc.documento.tipo)}
+                          onClick={() =>
+                            handleVisualizar(
+                              doc.documento.id,
+                              doc.documento.tipo
+                            )
+                          }
                           title="Visualizar"
                         >
                           <FaEye />
                         </button>
                         <button
                           className="btn-action primary"
-                          onClick={() => handleAlterar(doc, doc.documento.tipo,doc.exame.id)}
+                          onClick={() =>
+                            handleAlterar(doc.documento.tipo, doc.exame.id)
+                          }
                           title="Alterar"
                         >
                           <FaEdit />
                         </button>
                         <button
                           className="btn-action danger"
-                          onClick={() => handleDeletar(doc.documento.id, doc.documento.tipo)}
+                          onClick={() =>
+                            handleDeletar(doc.documento.id, doc.documento.tipo)
+                          }
                           title="Deletar"
                         >
                           <FaTrash />
@@ -908,17 +984,27 @@ export default function ListarDocumentos() {
                 </h2>
                 <ul className="documentos-list">
                   {documentosFiltrados.Receitas.map((doc) => (
-                    <li key={`R-${doc.documento.id}`} className="documento-item">
+                    <li
+                      key={`R-${doc.documento.id}`}
+                      className="documento-item"
+                    >
                       <div className="documento-info">
                         <div className="documento-header">
                           <span className="documento-tipo">Receita</span>
-                          <span className="documento-id">ID: {doc.documento.id}</span>
+                          <span className="documento-id">
+                            ID: {doc.documento.id}
+                          </span>
                           <div
                             className="documento-data"
                             style={{ display: "flex", flexDirection: "column" }}
                           >
-                            <span>Upload: {formatarData(doc.documento.dataUpload)}</span>
-                            <span>Data da receita: {formatarData(doc.receita.dataReceita)}</span>
+                            <span>
+                              Upload: {formatarData(doc.documento.dataUpload)}
+                            </span>
+                            <span>
+                              Data da receita:{" "}
+                              {formatarData(doc.receita.dataReceita)}
+                            </span>
                           </div>
                         </div>
                         {doc.receita.medico && (
@@ -926,7 +1012,9 @@ export default function ListarDocumentos() {
                             <FaUserMd className="meta-icon" />
                             <span>{doc.receita.medico}</span>
                             {doc.receita.crm && (
-                              <span className="crm">CRM: {doc.receita.crm}</span>
+                              <span className="crm">
+                                CRM: {doc.receita.crm}
+                              </span>
                             )}
                           </div>
                         )}
@@ -934,21 +1022,30 @@ export default function ListarDocumentos() {
                       <div className="documento-actions">
                         <button
                           className="btn-action"
-                          onClick={() => handleVisualizar(doc.documento.id, doc.documento.tipo)}
+                          onClick={() =>
+                            handleVisualizar(
+                              doc.documento.id,
+                              doc.documento.tipo
+                            )
+                          }
                           title="Visualizar"
                         >
                           <FaEye />
                         </button>
                         <button
                           className="btn-action primary"
-                          onClick={() => handleAlterar(doc, doc.documento.tipo,doc.receita.id)}
+                          onClick={() =>
+                            handleAlterar(doc.documento.tipo, doc.receita.id)
+                          }
                           title="Alterar"
                         >
                           <FaEdit />
                         </button>
                         <button
                           className="btn-action danger"
-                          onClick={() => handleDeletar(doc.documento.id, doc.documento.tipo)}
+                          onClick={() =>
+                            handleDeletar(doc.documento.id, doc.documento.tipo)
+                          }
                           title="Deletar"
                         >
                           <FaTrash />
@@ -963,7 +1060,7 @@ export default function ListarDocumentos() {
         </div>
       </div>
 
-            <style jsx>{`
+      <style jsx>{`
         .prontuario-container {
           display: flex;
           flex-direction: column;
@@ -1330,7 +1427,8 @@ export default function ListarDocumentos() {
           gap: 15px;
         }
 
-        .ordenacao, .paginacao {
+        .ordenacao,
+        .paginacao {
           display: flex;
           align-items: center;
           gap: 10px;
