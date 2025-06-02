@@ -1,8 +1,4 @@
-
-FROM ubuntu:latest AS build
-
-RUN apt-get update && \
-    apt-get install -y openjdk-17-jdk maven
+FROM maven:3.9.6-eclipse-temurin-21 AS build
 
 WORKDIR /app
 COPY . .
@@ -10,7 +6,7 @@ COPY . .
 RUN mvn clean install -DskipTests
 
 # Etapa final
-FROM openjdk:17-jdk-slim
+FROM eclipse-temurin:21-jdk-jammy
 
 EXPOSE 7070
 
