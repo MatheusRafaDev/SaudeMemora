@@ -2,7 +2,6 @@ import React, { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { loginPaciente } from "../services/pacienteService";
 import "bootstrap/dist/css/bootstrap.min.css";
-// import "@fortawesome/fontawesome-free/css/all.min.css";
 
 export default function Login() {
   const [email, setEmail] = useState("");
@@ -40,7 +39,11 @@ export default function Login() {
       className="d-flex flex-column min-vh-100"
       style={{ background: "#e9f7fc" }}
     >
-      <header className="text-center py-4 bg-white shadow-sm">
+      <header
+        className="text-center py-4 bg-white shadow-sm"
+        style={{ cursor: "pointer" }}
+        onClick={() => navigate("/home")}
+      >
         <h1 className="text-primary mb-0">
           <i className="fas fa-heartbeat me-2"></i>Saúde Memora
         </h1>
@@ -55,7 +58,9 @@ export default function Login() {
           <h4 className="text-center mb-4 text-primary">Login do Paciente</h4>
           <form onSubmit={handleLogin}>
             <div className="mb-3">
-              <label className="form-label" htmlFor="email">Email</label>
+              <label className="form-label" htmlFor="email">
+                Email
+              </label>
               <input
                 className="form-control"
                 type="email"
@@ -67,7 +72,9 @@ export default function Login() {
             </div>
 
             <div className="mb-3">
-              <label className="form-label" htmlFor="senha">Senha</label>
+              <label className="form-label" htmlFor="senha">
+                Senha
+              </label>
               <input
                 className="form-control"
                 type="password"
@@ -99,7 +106,6 @@ export default function Login() {
             >
               Esqueci a senha
             </button>
-
           </div>
         </div>
       </main>

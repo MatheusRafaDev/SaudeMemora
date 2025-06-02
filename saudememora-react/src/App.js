@@ -16,9 +16,6 @@ import AlterarDocumento from "./pages/AlterarDocumento";
 import "bootstrap/dist/js/bootstrap.bundle.min.js";
 import "./styles/global.css";
 
-
-
-
 const isPacienteLoggedIn = () => {
   const data = localStorage.getItem("paciente");
   if (!data) return false;
@@ -32,45 +29,49 @@ const isPacienteLoggedIn = () => {
   }
 };
 
-
 function App() {
   return (
     <Router>
       <Routes>
-
-        <Route path="/login" element={<Login />} />
-        
-    
-        <Route 
-          path="/home" 
-          element={isPacienteLoggedIn() ? <Home /> : <Navigate to="/login" />} 
+        {/* Rota raiz redireciona direto conforme login */}
+        <Route
+          path="/"
+          element={
+            isPacienteLoggedIn() ? <Navigate to="/home" /> : <Navigate to="/login" />
+          }
         />
 
-        <Route path="/relatorio-documentos" element={<RelatorioDocumentos />}/>
-         <Route path="/visualizar-ficha" element={<VisualizarFichaMedica />}/>
+        <Route path="/login" element={<Login />} />
+
+        <Route
+          path="/home"
+          element={isPacienteLoggedIn() ? <Home /> : <Navigate to="/login" />}
+        />
+
+        <Route path="/relatorio-documentos" element={<RelatorioDocumentos />} />
+        <Route path="/visualizar-ficha" element={<VisualizarFichaMedica />} />
 
         <Route path="/criar-conta" element={<CadastroPaciente />} />
         <Route path="/perfil" element={<Perfil />} />
 
         <Route path="/formulario-medico" element={<FormularioMedico />} />
-        <Route path="/relatorios" element={<RelatorioDocumentos />}/>
+        <Route path="/relatorios" element={<RelatorioDocumentos />} />
         <Route path="/ocr" element={<OCRLeituraCursiva />} />
 
         <Route path="/upload-documentos" element={<UploadDocumentos />} />
-        
+
         <Route path="/editar-documento" element={<AlterarDocumento />} />
 
-        <Route path="/alterar-perfil" element={<EditarPerfil />}/>
+        <Route path="/alterar-perfil" element={<EditarPerfil />} />
 
-        <Route path="/meus-documentos" element={<ListarDocumentos />}/>
+        <Route path="/meus-documentos" element={<ListarDocumentos />} />
 
-        <Route path="/visualizar-documento" element={<VisualizadorDocumento />}/>
+        <Route path="/visualizar-documento" element={<VisualizadorDocumento />} />
+
         <Route path="*" element={<Navigate to="/home" />} />
       </Routes>
     </Router>
   );
 }
-
-//<Route path="*" element={<Navigate to="/login" />} />
 
 export default App;
