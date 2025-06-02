@@ -3,7 +3,7 @@ import { FiUpload, FiCamera, FiFileText, FiCheckCircle } from "react-icons/fi";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "../styles/UploadDocumento.css";
 import Nav from "../components/Nav";
-import { ocrSpace,ocrSpace2 } from "../ocr/ocrSpace";
+import { ocrSpace, ocrSpace2 } from "../ocr/ocrSpace";
 import { formatarTextoOCR } from "../services/OpenRouter";
 import { useNavigate } from "react-router-dom";
 import { AdicionarDocumento } from "../documentos/AdicionarDocumento";
@@ -82,12 +82,10 @@ export default function UploadDocumentos() {
 
       setTextoOCR(textoOriginal);
 
-      const formatado = await formatarTextoOCR(textoOriginal,textoOriginal2);
+      const formatado = await formatarTextoOCR(textoOriginal, textoOriginal2);
 
       //const formatado = await formatarTextoOCR(textoOriginal);
       setTextoExibicao(formatado);
-
-
 
       if (tipoDocumento === "R") {
         const medicamentos = await extrairMedicamentosDoOCR(formatado);
@@ -179,7 +177,9 @@ export default function UploadDocumentos() {
 
     for (const remedio of remedios) {
       if (!quantidades[remedio] || !quantidades[remedio].trim()) {
-        setMensagemErro(`Informe a quantidade válida para o remédio: ${remedio}`);
+        setMensagemErro(
+          `Informe a quantidade válida para o remédio: ${remedio}`
+        );
         setErrosQuantidade((prev) => ({
           ...prev,
           [remedio]: "Quantidade é obrigatória",
@@ -188,12 +188,11 @@ export default function UploadDocumentos() {
       }
     }
 
-    const medicamentosAtualizados = medicamentos.map(med => ({
+    const medicamentosAtualizados = medicamentos.map((med) => ({
       ...med,
       quantidade: quantidades[med.nome] || med.quantidade,
-      formaDeUso: formasDeUso[med.nome] || med.formaDeUso
+      formaDeUso: formasDeUso[med.nome] || med.formaDeUso,
     }));
-
 
     setAdicionandoDocumento(true);
     setStatus("Adicionando documento...");
@@ -205,7 +204,7 @@ export default function UploadDocumentos() {
         paciente,
         documento,
         navigate,
-        medicamentosAtualizados 
+        medicamentosAtualizados
       );
 
       if (response.success) {
@@ -340,7 +339,6 @@ export default function UploadDocumentos() {
               id="cameraInput"
               type="file"
               accept="image/*"
-              capture="environment"
               onChange={handleFileChange}
               hidden
               disabled={processando || adicionandoDocumento}
@@ -395,15 +393,15 @@ export default function UploadDocumentos() {
 
         {textoExibicao && (
           <div className="mt-4">
-          <h5 className="mb-2">Texto extraído do documento:</h5>
-          <textarea
-            className="form-control"
-            rows="10"
-            value={textoExibicao}
-            onChange={(e) => setTextoExibicao(e.target.value)} 
-            style={{ whiteSpace: "pre-wrap" }}
-          />
-        </div>
+            <h5 className="mb-2">Texto extraído do documento:</h5>
+            <textarea
+              className="form-control"
+              rows="10"
+              value={textoExibicao}
+              onChange={(e) => setTextoExibicao(e.target.value)}
+              style={{ whiteSpace: "pre-wrap" }}
+            />
+          </div>
         )}
 
         {tipoDocumento === "R" && medicamentos.length > 0 && (
@@ -470,15 +468,13 @@ export default function UploadDocumentos() {
                   </React.Fragment>
                 ))}
               </tbody>
-
             </table>
-                <div className="alert alert-warning mt-3" role="alert">
-                  ⚠️ <strong>Atenção:</strong> Certifique-se de que a{" "}
-                  <strong>quantidade</strong> e a{" "}
-                  <strong>forma de uso dos medicamentos</strong> estejam corretas
-                  no documento enviado.
-              </div>
-
+            <div className="alert alert-warning mt-3" role="alert">
+              ⚠️ <strong>Atenção:</strong> Certifique-se de que a{" "}
+              <strong>quantidade</strong> e a{" "}
+              <strong>forma de uso dos medicamentos</strong> estejam corretas no
+              documento enviado.
+            </div>
           </div>
         )}
 
@@ -486,10 +482,7 @@ export default function UploadDocumentos() {
           <button
             className="btn btn-secondary w-100"
             onClick={handleAddDocument}
-            disabled={
-              !botaoHabilitado ||
-              adicionandoDocumento 
-            }
+            disabled={!botaoHabilitado || adicionandoDocumento}
           >
             {adicionandoDocumento ? (
               <>
