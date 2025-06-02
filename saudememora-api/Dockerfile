@@ -1,4 +1,4 @@
-# Etapa de build
+
 FROM ubuntu:latest AS build
 
 RUN apt-get update && \
