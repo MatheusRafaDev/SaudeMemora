@@ -21,9 +21,6 @@ public class Receita {
     @Column(name = "crm_medico", nullable = false)
     private String crmMedico;
 
-    @Column(name = "ds_posologia", nullable = false)
-    private String posologia;
-
     @Column(name = "ds_observacoes")
     private String observacoes;
 

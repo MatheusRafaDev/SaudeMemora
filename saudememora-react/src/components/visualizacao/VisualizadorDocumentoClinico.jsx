@@ -1,5 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
+import formatarData from '../../utils/formatarData';
 import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 import {
   FaCalendarAlt,
@@ -106,7 +107,7 @@ export default function VisualizadorDocumentoClinico({ documentoClinico }) {
             <FaFileAlt /> {documento.tipo || "Documento Clinico"}
           </h5>
           <p>
-            <FaCalendarAlt /> <strong>Data:</strong> {new Date(documento.dataDocumentoCli).toLocaleDateString("pt-BR")}
+            <FaCalendarAlt /> <strong>Data:</strong>{formatarData(documento.dataDocumentoCli)} 
           </p>
           <p>
             <FaUserMd /> <strong>Médico:</strong>{" "}

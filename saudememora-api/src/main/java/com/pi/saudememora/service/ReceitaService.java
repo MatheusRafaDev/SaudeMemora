@@ -9,6 +9,9 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.util.Date;
 import java.util.List;
 import java.util.Optional;
 
@@ -35,7 +38,8 @@ public class ReceitaService {
             Receita receitaOriginal = receitaRepository.findById(receitaAtualizada.getId())
                     .orElseThrow(() -> new RuntimeException("Receita não encontrada"));
 
-            receitaOriginal.setDataReceita(receitaAtualizada.getDataReceita());
+            LocalDate localDate = receitaAtualizada.getDataReceita();
+            receitaOriginal.setDataReceita(localDate);
             receitaOriginal.setCrmMedico(receitaAtualizada.getCrmMedico());
             receitaOriginal.setMedico(receitaAtualizada.getMedico());
             receitaOriginal.setObservacoes(receitaAtualizada.getObservacoes());

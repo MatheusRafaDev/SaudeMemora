@@ -18,9 +18,6 @@ public class Exame {
     @Column(name = "id_exame")
     private Long id;
 
-    @Temporal(TemporalType.DATE)
-    @Column(name = "dt_data")
-    private Date data;
 
     @Column(name = "ds_tipo")
     private String tipo;
@@ -54,14 +51,6 @@ public class Exame {
     @Column(name = "dt_exame", nullable = false)
     private LocalDate dataExame;
 
-    public LocalDate getDataExame() {
-        return dataExame;
-    }
-
-    public void setDataExame(LocalDate dataExame) {
-        this.dataExame = dataExame;
-    }
-
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     @Column(name = "dt_inclusao", nullable = false, updatable = false)
     private LocalDate dataInclusao;
@@ -75,8 +64,13 @@ public class Exame {
     public Long getId() { return id; }
     public void setId(Long id) { this.id = id; }
 
-    public Date getData() { return data; }
-    public void setData(Date data) { this.data = data; }
+    public LocalDate getDataExame() {
+        return dataExame;
+    }
+    public void setDataExame(LocalDate dataExame) {
+        this.dataExame = dataExame;
+    }
+
 
     public String getTipo() { return tipo; }
     public void setTipo(String tipo) { this.tipo = tipo; }

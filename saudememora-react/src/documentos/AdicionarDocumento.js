@@ -21,7 +21,7 @@ export async function AdicionarDocumento(
     const documentoData = {
       tipoDocumento: tipo,
       status: "Processado",
-      dataUpload: new Date().toISOString().split("T")[0],
+      dataUpload: new Date(),
       paciente: { id: paciente.id }
     };
 

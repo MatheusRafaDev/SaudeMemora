@@ -1,13 +1,13 @@
 import React, { useState, useEffect } from "react";
 import { FiUpload, FiCamera, FiFileText, FiCheckCircle } from "react-icons/fi";
 import "bootstrap/dist/css/bootstrap.min.css";
-import "../../styles/UploadDocumento.css";
-import Nav from "../../components/Nav";
-import { ocrSpace,ocrSpace2 } from "../../ocr/ocrSpace";
-import { formatarTextoOCR } from "../../services/OpenRouter";
+import "../styles/UploadDocumento.css";
+import Nav from "../components/Nav";
+import { ocrSpace,ocrSpace2 } from "../ocr/ocrSpace";
+import { formatarTextoOCR } from "../services/OpenRouter";
 import { useNavigate } from "react-router-dom";
-import { AdicionarDocumento } from "../../documentos/AdicionarDocumento";
-import { extrairMedicamentosDoOCR } from "../../services/OpenRouter";
+import { AdicionarDocumento } from "../documentos/AdicionarDocumento";
+import { extrairMedicamentosDoOCR } from "../services/OpenRouter";
 import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 
 export default function UploadDocumentos() {

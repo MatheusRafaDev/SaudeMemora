@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import DocumentoService from "../services/DocumentoService";
+import formatarData from "../utils/formatarData";
+
 import ReceitaService from "../services/ReceitaService";
 import ExameService from "../services/ExameService";
 import DocumentoClinicoService from "../services/DocumentoClinicoService";
@@ -13,6 +15,7 @@ import {
   FaPrescriptionBottle,
   FaVials,
   FaFileAlt,
+  FaFileUpload,
   FaTrash,
   FaEye,
   FaUserMd,
@@ -381,20 +384,17 @@ export default function ListarDocumentos() {
       let documento;
 
       if (tipo === "R") {
-
         const res = await ReceitaService.getReceitaByDocumentoId(documentoId);
         documento = Array.isArray(res.data) ? res.data[0] : res.data;
-
       } else if (tipo === "E") {
-
         const res = await ExameService.getExameByDocumentoId(documentoId);
         documento = Array.isArray(res.data) ? res.data[0] : res.data;
-
       } else {
-
-        const res = await DocumentoClinicoService.getDocumentoClinicoByDocumentoId(documentoId);
+        const res =
+          await DocumentoClinicoService.getDocumentoClinicoByDocumentoId(
+            documentoId
+          );
         documento = Array.isArray(res.data) ? res.data[0] : res.data;
-
       }
 
       navigate("/visualizar-documento", {
@@ -471,32 +471,6 @@ export default function ListarDocumentos() {
     }
   };
 
-  const formatarData = (dataString) => {
-    try {
-      const data = new Date(dataString);
-      const dia = data.getDate().toString().padStart(2, "0");
-      const meses = [
-        "Jan",
-        "Fev",
-        "Mar",
-        "Abr",
-        "Mai",
-        "Jun",
-        "Jul",
-        "Ago",
-        "Set",
-        "Out",
-        "Nov",
-        "Dez",
-      ];
-      const mes = meses[data.getMonth()];
-      const ano = data.getFullYear();
-      return `${dia} ${mes} ${ano}`;
-    } catch {
-      return "Data inválida";
-    }
-  };
-
   const toggleOrdenacao = (campo) => {
     if (ordenacao.campo === campo) {
       setOrdenacao({
@@ -514,34 +488,6 @@ export default function ListarDocumentos() {
   const getIconeOrdenacao = (campo) => {
     if (ordenacao.campo !== campo) return <FaSort />;
     return ordenacao.direcao === "asc" ? <FaSortUp /> : <FaSortDown />;
-  };
-
-  const Notification = () => {
-    if (!notification.show) return null;
-
-    const bgColor =
-      notification.type === "error"
-        ? "bg-red-100 border-red-400 text-red-700"
-        : notification.type === "success"
-        ? "bg-green-100 border-green-400 text-green-700"
-        : "bg-blue-100 border-blue-400 text-blue-700";
-
-    return (
-      <div
-        className={`fixed top-4 right-4 border-l-4 p-4 ${bgColor} rounded shadow-lg z-50`}
-      >
-        <div className="flex items-center">
-          <span className="mr-2">
-            {notification.type === "error"
-              ? "❌"
-              : notification.type === "success"
-              ? "✅"
-              : "ℹ️"}
-          </span>
-          <span>{notification.message}</span>
-        </div>
-      </div>
-    );
   };
 
   const ConfirmationModal = ({ show, message, onConfirm, onClose }) => {
@@ -569,18 +515,14 @@ export default function ListarDocumentos() {
           <div className="flex justify-end gap-3">
             <button
               onClick={onClose}
-              className="px-4 py-2 border border-gray-300 rounded-md text-gray-700 hover:bg-gray-100 transition"
+              className="px-4 py-2 border rounded-md text-gray-700 hover:bg-gray-100 transition"
             >
               Cancelar
             </button>
             <button
               onClick={onConfirm}
               disabled={loading}
-              className={`px-4 py-2 rounded-md flex items-center gap-2 transition ${
-                loading
-                  ? "bg-gray-300 cursor-not-allowed"
-                  : "bg-red-600 hover:bg-red-700 text-white"
-              }`}
+              className={`px-4 py-2 rounded-md flex items-center gap-2 transition ${"text-black"}`}
             >
               <FaCheck /> Confirmar
             </button>
@@ -615,7 +557,6 @@ export default function ListarDocumentos() {
   return (
     <div>
       <Nav />
-      <Notification />
 
       <ConfirmationModal
         show={confirmationModal.show}
@@ -632,13 +573,23 @@ export default function ListarDocumentos() {
               <span className="text-sm text-gray-600">
                 {totalDocumentosFiltrados()} de {totalDocumentos()} documentos
               </span>
-              <button
-                className="btn-filter"
-                onClick={() => setMostrarFiltros(!mostrarFiltros)}
-              >
-                <FaFilter />{" "}
-                {mostrarFiltros ? "Ocultar Filtros" : "Mostrar Filtros"}
-              </button>
+
+              <div className="flex gap-2">
+                <button
+                  className="btn-processar"
+                  onClick={() => navigate("/upload-documentos")}
+                >
+                  <FaFileUpload /> Processar Novo Documento
+                </button>
+
+                <button
+                  className="btn-filter"
+                  onClick={() => setMostrarFiltros(!mostrarFiltros)}
+                >
+                  <FaFilter />{" "}
+                  {mostrarFiltros ? "Ocultar Filtros" : "Mostrar Filtros"}
+                </button>
+              </div>
             </div>
           </div>
 
@@ -856,7 +807,6 @@ export default function ListarDocumentos() {
                               Data do documento Clinico:{" "}
                               {formatarData(doc.clinico.dataDocumentoCli)}
                             </span>
-
                           </div>
                         </div>
                         {doc.clinico.medico && (
@@ -1089,6 +1039,49 @@ export default function ListarDocumentos() {
           max-width: 1200px;
           margin: 0 auto;
           width: 100%;
+        }
+
+        .btn-processar {
+          background-color: #2a7fba; /* Azul */
+          color: white;
+          border: none;
+          padding: 8px 16px;
+          border-radius: 4px;
+          cursor: pointer;
+          font-size: 0.9rem;
+          transition: background-color 0.2s;
+          display: flex;
+          align-items: center;
+          gap: 8px;
+        }
+
+        .btn-processar:hover {
+          background-color: #1e6fa8; /* Azul mais escuro no hover */
+        }
+
+        /* Botão "Filtros" (mantém o estilo original) */
+        .btn-filter {
+          background-color: #6c757d; /* Cinza */
+          color: white;
+          border: none;
+          padding: 8px 16px;
+          border-radius: 4px;
+          cursor: pointer;
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          font-size: 0.9rem;
+          transition: background-color 0.2s;
+        }
+
+        .btn-filter:hover {
+          background-color: #5a6268; /* Cinza mais escuro no hover */
+        }
+
+        /* Container dos botões (garante que fiquem alinhados) */
+        .flex.gap-2 {
+          display: flex;
+          gap: 8px;
         }
 
         .title {

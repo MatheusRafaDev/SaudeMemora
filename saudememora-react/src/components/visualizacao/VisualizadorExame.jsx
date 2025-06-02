@@ -1,6 +1,7 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
+import formatarData from '../../utils/formatarData';
 import {
   FaCalendarAlt,
   FaFlask,
@@ -102,7 +103,7 @@ export default function VisualizadorExame({ exame }) {
             <FaFileMedical /> {exame.nomeExame || "Exame sem nome"}
           </h5>
           <p>
-            <FaCalendarAlt /> <strong>Data:</strong> {new Date(exame.dataExame).toLocaleDateString("pt-BR")}
+            <FaCalendarAlt /> <strong>Data:</strong> {formatarData(exame.dataExame)}
           </p>
           <p>
             <FaFlask /> <strong>Tipo:</strong> {exame.tipo || "Não informado"}

@@ -1,6 +1,7 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
+import formatarData from '../../utils/formatarData';
 import {
   FaCalendarAlt,
   FaUserMd,
@@ -99,7 +100,7 @@ export default function ReceitaComMedicamentos({ receita }) {
         <div className="card-body" style={{ textAlign: "justify" }}>
           <p>
             <FaCalendarAlt /> <strong>Data: </strong>
-                {new Date(receita.dataReceita).toLocaleDateString("pt-BR")}
+                {formatarData(receita.dataReceita)}
           </p>
           <p>
             <FaUserMd /> <strong>Doutor(a): </strong>

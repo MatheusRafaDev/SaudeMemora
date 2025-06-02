@@ -1,14 +1,9 @@
 import React, { useState, useEffect } from "react";
 import { Form, Spinner, Row, Col, Button } from "react-bootstrap";
-import DatePicker from "react-datepicker";
 import { useNavigate } from "react-router-dom";
-import { format, parseISO } from "date-fns";
-import ptBR from "date-fns/locale/pt-BR";
-import { registerLocale } from "react-datepicker";
 import ReceitaService from "../../services/ReceitaService";
+import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
-import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
-
 import {
   FaPills,
   FaCalendarAlt,
@@ -17,14 +12,11 @@ import {
   FaArrowLeft,
   FaStickyNote,
 } from "react-icons/fa";
-
-
-registerLocale('pt-BR', ptBR);
+import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 
 const ReceitaForm = ({ data: initialData, isLoading = false }) => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
-  const [dateInputValue, setDateInputValue] = useState('');
   const [idLoaded, setIdLoaded] = useState(false);
 
   const [data, setData] = useState({
@@ -32,11 +24,10 @@ const ReceitaForm = ({ data: initialData, isLoading = false }) => {
     dataReceita: null,
     medico: "",
     crmMedico: "",
-    posologia: "",
     observacoes: "",
     medicamentos: [],
     resumo: "",
-    imamgem: null,
+    imagem: null,
     tipo: "receitas",
   });
 
@@ -46,30 +37,74 @@ const ReceitaForm = ({ data: initialData, isLoading = false }) => {
     formaDeUso: "",
   });
 
+  // Função para converter string de data em objeto Date
+  const parseDateString = (dateString) => {
+    if (!dateString) return null;
+    
+    // Se já for um objeto Date, retorna diretamente
+    if (dateString instanceof Date) {
+      // Ajusta para o timezone local
+      return new Date(
+        dateString.getTime() + dateString.getTimezoneOffset() * 60000
+      );
+    }
+    
+    // Se estiver no formato DD/MM/YYYY
+    if (/^\d{2}\/\d{2}\/\d{4}$/.test(dateString)) {
+      const [day, month, year] = dateString.split('/');
+      const date = new Date(`${year}-${month}-${day}`);
+      // Ajuste para evitar problemas de timezone
+      return new Date(date.getTime() + date.getTimezoneOffset() * 60000);
+    }
+    
+    // Se estiver no formato YYYY-MM-DD
+    if (/^\d{4}-\d{2}-\d{2}$/.test(dateString)) {
+      const date = new Date(dateString);
+      return new Date(date.getTime() + date.getTimezoneOffset() * 60000);
+    }
+    
+    return null;
+  };
+
+  // Formata a data para exibição (DD/MM/YYYY)
+  const formatDateForDisplay = (date) => {
+    const d = parseDateString(date);
+    if (!d) return "";
+    
+    const day = d.getDate().toString().padStart(2, '0');
+    const month = (d.getMonth() + 1).toString().padStart(2, '0');
+    const year = d.getFullYear();
+    
+    return `${day}/${month}/${year}`;
+  };
+
+  // Formata a data para o backend (YYYY-MM-DD)
+  const formatDateForBackend = (date) => {
+    const d = parseDateString(date);
+    if (!d) return "";
+    
+    const year = d.getFullYear();
+    const month = (d.getMonth() + 1).toString().padStart(2, '0');
+    const day = d.getDate().toString().padStart(2, '0');
+    
+    return `${year}-${month}-${day}`;
+  };
+
+  // Carrega os dados iniciais
   useEffect(() => {
     const loadData = async () => {
       if (initialData) {
         try {
-          const dataReceita = initialData.dataReceita 
-            ? new Date(initialData.dataReceita) 
-            : null;
-
           setData({
             id: initialData.id || null,
-            dataReceita,
+            dataReceita: parseDateString(initialData.dataReceita),
             imagem: initialData.imagem || null,
             medico: initialData.medico || "",
             crmMedico: initialData.crmMedico || "",
-            posologia: initialData.posologia || "",
             observacoes: initialData.observacoes || "",
             medicamentos: initialData.medicamentos || [],
             resumo: initialData.resumo || "",
           });
-
-          if (dataReceita) {
-            setDateInputValue(format(dataReceita, 'dd/MM/yyyy', { locale: ptBR }));
-          }
-
           setIdLoaded(true);
         } catch (error) {
           console.error("Erro ao carregar dados:", error);
@@ -80,41 +115,32 @@ const ReceitaForm = ({ data: initialData, isLoading = false }) => {
     loadData();
   }, [initialData]);
 
+  // Manipulador genérico de mudanças nos campos
   const handleChange = (e) => {
     const { name, value } = e.target;
     setData(prev => ({ ...prev, [name]: value }));
   };
 
+  // Manipulador específico para mudanças na data
   const handleDateChange = (date) => {
     setData(prev => ({ ...prev, dataReceita: date }));
-    setDateInputValue(date ? format(date, 'dd/MM/yyyy', { locale: ptBR }) : '');
   };
 
-  const handleDateInputChange = (e) => {
-    const value = e.target.value;
-    setDateInputValue(value);
-    if (value.length === 10) {
-      const [day, month, year] = value.split('/');
-      const parsedDate = new Date(`${year}-${month}-${day}`);
-      
-      if (!isNaN(parsedDate.getTime())) {
-        setData(prev => ({ ...prev, dataReceita: parsedDate }));
-      }
-    }
-  };
-
+  // Manipulador para campos de medicamento
   const handleMedicamentoChange = (e) => {
     const { name, value } = e.target;
     setMedicamentoEdit(prev => ({ ...prev, [name]: value }));
   };
 
+  // Remove um medicamento da lista
   const onRemoveMedicamento = (id) => {
     setData(prev => ({
       ...prev,
-      medicamentos: prev.medicamentos.filter(m => m.id !== id),
+      medicamentos: prev.medicamentos.filter((m) => m.id !== id),
     }));
   };
 
+  // Salva as alterações
   const handleUpdate = async (e) => {
     e.preventDefault();
     setLoading(true);
@@ -122,14 +148,13 @@ const ReceitaForm = ({ data: initialData, isLoading = false }) => {
     try {
       const dataToSend = {
         ...data,
-
-        dataReceita: data.dataReceita ? format(data.dataReceita, 'yyyy-MM-dd') : null,
-        medicamentos: data.medicamentos.map(med => ({
+        dataReceita: formatDateForBackend(data.dataReceita),
+        medicamentos: data.medicamentos.map((med) => ({
           id: med.id || null,
           nome: med.nome || "",
           quantidade: med.quantidade || "",
-          formaDeUso: med.formaDeUso || ""
-        }))
+          formaDeUso: med.formaDeUso || "",
+        })),
       };
 
       await ReceitaService.update(dataToSend.id, dataToSend);
@@ -146,9 +171,7 @@ const ReceitaForm = ({ data: initialData, isLoading = false }) => {
     <div className="mx-auto px-3" style={{ maxWidth: "900px" }}>
       <div className="card shadow-sm border-0 mb-4">
         <div className="card-header d-flex align-items-center justify-content-between bg-white border-bottom py-3">
-          <h2 className="mb-0 fs-5 fw-bold">
-            Receita Médica
-          </h2>
+          <h2 className="mb-0 fs-5 fw-bold">Receita Médica</h2>
           <Button
             variant="outline-secondary"
             size="sm"
@@ -159,8 +182,6 @@ const ReceitaForm = ({ data: initialData, isLoading = false }) => {
           </Button>
         </div>
 
-        
-
         <div className="card-body py-3">
           {isLoading && (
             <div className="text-center py-4">
@@ -170,39 +191,45 @@ const ReceitaForm = ({ data: initialData, isLoading = false }) => {
           )}
 
           {data.imagem && (
-          <div className="border-top bg-light" style={{ height: "350px", overflow: "hidden" }}>
-            <TransformWrapper initialScale={1} minScale={1} maxScale={5} wheel={{ step: 0.1 }}>
-              <TransformComponent
-                wrapperStyle={{ width: "100%", height: "100%" }}
-                contentStyle={{
-                  width: "100%",
-                  height: "100%",
-                  display: "flex",
-                  justifyContent: "center",
-                  alignItems: "center",
-                }}
+            <div
+              className="border-top bg-light"
+              style={{ height: "350px", overflow: "hidden" }}
+            >
+              <TransformWrapper
+                initialScale={1}
+                minScale={1}
+                maxScale={5}
+                wheel={{ step: 0.1 }}
               >
-                <img
-                  src={`http://localhost:7070/api/receitas/imagem/${data.id}`}
-                  alt="Imagem do documento"
-                  className="img-fluid rounded shadow"
-                  style={{
-                    maxHeight: "100%",
-                    maxWidth: "100%",
-                    objectFit: "contain",
-                    cursor: "grab",
+                <TransformComponent
+                  wrapperStyle={{ width: "100%", height: "100%" }}
+                  contentStyle={{
+                    width: "100%",
+                    height: "100%",
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
                   }}
-                  onError={(e) => {
-                    e.target.onerror = null;
-                    e.target.src = "/imagem-padrao.png";
-                  }}
-                />
-              </TransformComponent>
-            </TransformWrapper>
-          </div>
-        )}
-
-
+                >
+                  <img
+                    src={`http://localhost:7070/api/receitas/imagem/${data.id}`}
+                    alt="Imagem do documento"
+                    className="img-fluid rounded shadow"
+                    style={{
+                      maxHeight: "100%",
+                      maxWidth: "100%",
+                      objectFit: "contain",
+                      cursor: "grab",
+                    }}
+                    onError={(e) => {
+                      e.target.onerror = null;
+                      e.target.src = "/imagem-padrao.png";
+                    }}
+                  />
+                </TransformComponent>
+              </TransformWrapper>
+            </div>
+          )}
 
           <Form onSubmit={handleUpdate}>
             <div style={{ opacity: isLoading ? 0.5 : 1 }}>
@@ -229,20 +256,19 @@ const ReceitaForm = ({ data: initialData, isLoading = false }) => {
                     <Form.Label className="fw-semibold small">
                       <FaCalendarAlt className="me-2 text-primary" /> Data
                     </Form.Label>
+
                     <DatePicker
                       selected={data.dataReceita}
                       onChange={handleDateChange}
-                      onChangeRaw={handleDateInputChange}
-                      value={dateInputValue}
-                      className="form-control"
                       dateFormat="dd/MM/yyyy"
-                      placeholderText="DD/MM/AAAA"
-                      required
                       disabled={isLoading || loading}
-                      locale="pt-BR"
+                      required
+                      className="form-control"
+                      placeholderText="Selecione a data"
                       showYearDropdown
                       dropdownMode="select"
                     />
+                    
                   </Form.Group>
                 </Col>
 
@@ -392,7 +418,7 @@ const ReceitaForm = ({ data: initialData, isLoading = false }) => {
               <div className="d-flex justify-content-center mt-4 pt-3 border-top">
                 <Button
                   type="button"
-                  className="btn btn-primary"
+                  variant="primary"
                   onClick={handleUpdate}
                   disabled={loading || isLoading}
                   style={{ minWidth: "200px" }}

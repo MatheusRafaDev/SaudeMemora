@@ -69,7 +69,7 @@ export const atualizarPaciente = async (id, formData) => {
 
 export const deletarPaciente = async (id) => {
   try {
-    const response = await axiosInstance.delete(`/api/paciente/deletar/${id}`);
+    const response = await axiosInstance.delete(`/api/paciente/${id}`);
     if (response.status === 200) {
       return { success: true, message: "Paciente deletado com sucesso!" };
     }

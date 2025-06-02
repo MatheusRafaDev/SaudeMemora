@@ -55,9 +55,9 @@ public class DocumentoClinico {
     @Column(name = "dt_inclusao", nullable = false, updatable = false)
     private LocalDate dataInclusao;
 
-    @Temporal(TemporalType.DATE)
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     @Column(name = "dt_documentocli", nullable = false)
-    private Date dataDocumentoCli;
+    private LocalDate dataDocumentoCli;
 
     @PrePersist
     protected void onCreate() {
@@ -112,11 +112,11 @@ public class DocumentoClinico {
         this.tipo = tipo;
     }
 
-    public Date getDataDocumentoCli() {
+    public LocalDate getDataDocumentoCli() {
         return dataDocumentoCli;
     }
 
-    public void setDataDocumentoCli(Date dataDocumentoCli) {
+    public void setDataDocumentoCli(LocalDate dataDocumentoCli) {
         this.dataDocumentoCli = dataDocumentoCli;
     }
 

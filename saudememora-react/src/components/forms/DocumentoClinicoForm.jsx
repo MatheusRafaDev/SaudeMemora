@@ -34,10 +34,50 @@ const documentoClinicoModel = {
   especialidade: "",
 };
 
+// Função para converter string de data em objeto Date
+const parseDateString = (dateString) => {
+  if (!dateString) return null;
+  
+  // Se já for um objeto Date, retorna diretamente
+  if (dateString instanceof Date) {
+    // Ajusta para o timezone local
+    return new Date(
+      dateString.getTime() + dateString.getTimezoneOffset() * 60000
+    );
+  }
+  
+  // Se estiver no formato DD/MM/YYYY
+  if (/^\d{2}\/\d{2}\/\d{4}$/.test(dateString)) {
+    const [day, month, year] = dateString.split('/');
+    const date = new Date(`${year}-${month}-${day}`);
+    // Ajuste para evitar problemas de timezone
+    return new Date(date.getTime() + date.getTimezoneOffset() * 60000);
+  }
+  
+  // Se estiver no formato YYYY-MM-DD
+  if (/^\d{4}-\d{2}-\d{2}$/.test(dateString)) {
+    const date = new Date(dateString);
+    return new Date(date.getTime() + date.getTimezoneOffset() * 60000);
+  }
+  
+  return null;
+};
+
+// Formata a data para o backend (YYYY-MM-DD)
+const formatDateForBackend = (date) => {
+  const d = parseDateString(date);
+  if (!d) return "";
+  
+  const year = d.getFullYear();
+  const month = (d.getMonth() + 1).toString().padStart(2, '0');
+  const day = d.getDate().toString().padStart(2, '0');
+  
+  return `${year}-${month}-${day}`;
+};
+
 const DocumentoClinicoForm = ({ data: initialData, isLoading = false }) => {
   const [data, setData] = useState(documentoClinicoModel);
   const [loading, setLoading] = useState(false);
-  const [dateInputValue, setDateInputValue] = useState('');
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -45,12 +85,11 @@ const DocumentoClinicoForm = ({ data: initialData, isLoading = false }) => {
       const mappedData = {
         ...documentoClinicoModel,
         ...initialData,
-        dataDocumentoCli: initialData.dataDocumentoCli ? new Date(initialData.dataDocumentoCli) : null
+        dataDocumentoCli: initialData.dataDocumentoCli 
+          ? parseDateString(initialData.dataDocumentoCli) 
+          : null
       };
       setData(mappedData);
-      if (mappedData.dataDocumentoCli) {
-        setDateInputValue(mappedData.dataDocumentoCli.toLocaleDateString('pt-BR'));
-      }
     }
   }, [initialData]);
 
@@ -61,31 +100,6 @@ const DocumentoClinicoForm = ({ data: initialData, isLoading = false }) => {
 
   const handleDateChange = (date) => {
     setData(prev => ({ ...prev, dataDocumentoCli: date }));
-    setDateInputValue(date ? date.toLocaleDateString('pt-BR') : '');
-  };
-
-  const handleDateInputChange = (e) => {
-    const value = e.target.value;
-    setDateInputValue(value);
-    
-    const parts = value.split('/');
-    if (parts.length === 3) {
-      const day = parseInt(parts[0], 10);
-      const month = parseInt(parts[1], 10) - 1;
-      const year = parseInt(parts[2], 10);
-      
-      if (!isNaN(day) && !isNaN(month) && !isNaN(year)) {
-        const newDate = new Date(year, month, day);
-        if (!isNaN(newDate.getTime())) {
-          setData(prev => ({ ...prev, dataDocumentoCli: newDate }));
-          return;
-        }
-      }
-    }
-    
-    if (value === '') {
-      setData(prev => ({ ...prev, dataDocumentoCli: null }));
-    }
   };
 
   const handleSubmit = async (e) => {
@@ -95,10 +109,11 @@ const DocumentoClinicoForm = ({ data: initialData, isLoading = false }) => {
     try {
       const documentoToSave = {
         ...data,
-        dataDocumentoCli: data.dataDocumentoCli ? data.dataDocumentoCli.toISOString() : null
+        dataDocumentoCli: data.dataDocumentoCli 
+          ? formatDateForBackend(data.dataDocumentoCli) 
+          : null
       };
 
-      console.log("Documento a ser salvo:", documentoToSave);
       await DocumentoClinicoService.update(documentoToSave.id, documentoToSave);
       
       navigate("/meus-documentos");
@@ -118,14 +133,13 @@ const DocumentoClinicoForm = ({ data: initialData, isLoading = false }) => {
           <h2 className="mb-0 fs-5 fw-bold">
             {data.id ? "Editar Documento" : "Novo Documento Clínico"}
           </h2>
-          <Button
-            variant="outline-secondary"
-            size="sm"
+          <button
+            className="btn btn-outline-secondary btn-sm"
             onClick={() => navigate("/meus-documentos")}
             disabled={loading}
           >
             <FaArrowLeft className="me-1" /> Voltar
-          </Button>
+          </button>
         </div>
 
         {data.imagem && (
@@ -174,7 +188,7 @@ const DocumentoClinicoForm = ({ data: initialData, isLoading = false }) => {
 
               <div className="col-md-6">
                 <Form.Group controlId="tipo">
-                  <Form.Label>
+                  <Form.Label className="fw-semibold">
                     <FaFileMedical className="me-1 text-primary" /> Tipo de Documento
                   </Form.Label>
                   <Form.Control
@@ -190,7 +204,7 @@ const DocumentoClinicoForm = ({ data: initialData, isLoading = false }) => {
 
               <div className="col-md-6">
                 <Form.Group controlId="medico">
-                  <Form.Label>
+                  <Form.Label className="fw-semibold">
                     <FaUserMd className="me-1 text-primary" /> Médico
                   </Form.Label>
                   <Form.Control
@@ -205,7 +219,7 @@ const DocumentoClinicoForm = ({ data: initialData, isLoading = false }) => {
 
               <div className="col-md-6">
                 <Form.Group controlId="especialidade">
-                  <Form.Label>
+                  <Form.Label className="fw-semibold">
                     <FaInfoCircle className="me-1 text-primary" /> Especialidade
                   </Form.Label>
                   <Form.Control
@@ -220,14 +234,14 @@ const DocumentoClinicoForm = ({ data: initialData, isLoading = false }) => {
 
               <div className="col-md-6">
                 <Form.Group controlId="dataDocumentoCli">
-                  <Form.Label>
-                    <FaCalendarAlt className="me-1 text-primary" /> Data
+
+                  <Form.Label className="fw-semibold small">
+                    <FaCalendarAlt className="me-2 text-primary" /> Data
                   </Form.Label>
+
                   <DatePicker
                     selected={data.dataDocumentoCli}
                     onChange={handleDateChange}
-                    onChangeRaw={handleDateInputChange}
-                    value={dateInputValue}
                     className="form-control"
                     dateFormat="dd/MM/yyyy"
                     placeholderText="DD/MM/AAAA"
@@ -240,9 +254,12 @@ const DocumentoClinicoForm = ({ data: initialData, isLoading = false }) => {
                 </Form.Group>
               </div>
 
+
+              
+
               <div className="col-12">
                 <Form.Group controlId="conclusoes">
-                  <Form.Label>Conclusões</Form.Label>
+                  <Form.Label className="fw-semibold">Conclusões</Form.Label>
                   <Form.Control
                     as="textarea"
                     rows={3}
@@ -256,7 +273,7 @@ const DocumentoClinicoForm = ({ data: initialData, isLoading = false }) => {
 
               <div className="col-12">
                 <Form.Group controlId="observacoes">
-                  <Form.Label>Observações</Form.Label>
+                  <Form.Label className="fw-semibold">Observações</Form.Label>
                   <Form.Control
                     as="textarea"
                     rows={3}
@@ -270,7 +287,7 @@ const DocumentoClinicoForm = ({ data: initialData, isLoading = false }) => {
 
               <div className="col-12">
                 <Form.Group controlId="resumo">
-                  <Form.Label>Resumo</Form.Label>
+                  <Form.Label className="fw-semibold">Resumo</Form.Label>
                   <Form.Control
                     as="textarea"
                     rows={5}
@@ -284,27 +301,24 @@ const DocumentoClinicoForm = ({ data: initialData, isLoading = false }) => {
             </div>
 
             <div className="d-flex justify-content-center mt-4">
-              <Button
+              <button
                 type="button"
                 className="btn btn-primary"
                 onClick={handleSubmit}
                 disabled={loading || isLoading}
-                style={{ minWidth: "200px" }}
               >
                 {loading ? (
-                  <>
-                    <Spinner as="span" size="sm" animation="border" role="status" />
-                    <span className="ms-2">Salvando...</span>
-                  </>
+                  <span
+                    className="spinner-border spinner-border-sm me-2"
+                    role="status"
+                    aria-hidden="true"
+                  ></span>
                 ) : (
-                  <>
-                    <FaSave className="me-2" />
-                    Salvar
-                  </>
+                  <FaSave className="me-2" />
                 )}
-              </Button>
+                {loading ? "Salvando..." : "Salvar Alterações"}
+              </button>
             </div>
-
           </Form>
         </div>
       </div>

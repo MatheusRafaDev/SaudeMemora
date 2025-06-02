@@ -5,7 +5,7 @@ import Home from "./pages/Home";
 import CadastroPaciente from "./pages/CadastroPaciente";
 import FormularioMedico from "./pages/FormularioMedico";
 import OCRLeituraCursiva from "./pages/OCRLeituraCursiva";
-import UploadDocumentos from "./pages/UploadDocumentos/UploadDocumentos";
+import UploadDocumentos from "./pages/UploadDocumentos";
 import Perfil from "./pages/Perfil";
 import ListarDocumentos from "./pages/ListarDocumentos";
 import EditarPerfil from "./pages/EditarPerfil";

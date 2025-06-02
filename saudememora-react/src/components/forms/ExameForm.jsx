@@ -38,19 +38,59 @@ const ExameForm = ({ data: initialData, isLoading = false }) => {
 
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
-  const [dateInputValue, setDateInputValue] = useState('');
+
+  // Função para converter string de data em objeto Date
+  const parseDateString = (dateString) => {
+    if (!dateString) return null;
+    
+    // Se já for um objeto Date, retorna diretamente
+    if (dateString instanceof Date) {
+      // Ajusta para o timezone local
+      return new Date(
+        dateString.getTime() + dateString.getTimezoneOffset() * 60000
+      );
+    }
+    
+    // Se estiver no formato DD/MM/YYYY
+    if (/^\d{2}\/\d{2}\/\d{4}$/.test(dateString)) {
+      const [day, month, year] = dateString.split('/');
+      const date = new Date(`${year}-${month}-${day}`);
+      // Ajuste para evitar problemas de timezone
+      return new Date(date.getTime() + date.getTimezoneOffset() * 60000);
+    }
+    
+    // Se estiver no formato YYYY-MM-DD
+    if (/^\d{4}-\d{2}-\d{2}$/.test(dateString)) {
+      const date = new Date(dateString);
+      return new Date(date.getTime() + date.getTimezoneOffset() * 60000);
+    }
+    
+    return null;
+  };
+
+  // Formata a data para o backend (YYYY-MM-DD)
+  const formatDateForBackend = (date) => {
+    const d = parseDateString(date);
+    if (!d) return "";
+    
+    const year = d.getFullYear();
+    const month = (d.getMonth() + 1).toString().padStart(2, '0');
+    const day = d.getDate().toString().padStart(2, '0');
+    
+    return `${year}-${month}-${day}`;
+  };
 
   useEffect(() => {
     if (initialData) {
       const dataExame = initialData.dataExame 
-        ? new Date(initialData.dataExame) 
+        ? parseDateString(initialData.dataExame)
         : null;
 
       setData({
         nomeExame: initialData.nomeExame || "",
         tipo: initialData.tipo || "",
         laboratorio: initialData.laboratorio || "",
-        data: initialData.data ? new Date(initialData.data) : null,
+        data: initialData.data ? parseDateString(initialData.data) : null,
         observacoes: initialData.observacoes || "",
         resultado: initialData.resultado || "",
         resumo: initialData.resumo || "",
@@ -58,10 +98,6 @@ const ExameForm = ({ data: initialData, isLoading = false }) => {
         imagem: initialData.imagem || null,
         dataExame
       });
-
-      if (dataExame) {
-        setDateInputValue(format(dataExame, 'dd/MM/yyyy', { locale: ptBR }));
-      }
     }
   }, [initialData]);
 
@@ -72,45 +108,29 @@ const ExameForm = ({ data: initialData, isLoading = false }) => {
 
   const handleDateChange = (date) => {
     setData(prev => ({ ...prev, dataExame: date }));
-    setDateInputValue(date ? format(date, 'dd/MM/yyyy', { locale: ptBR }) : '');
-  };
-
-  const handleDateInputChange = (e) => {
-    const value = e.target.value;
-    setDateInputValue(value);
-    if (value.length === 10) {
-      const [day, month, year] = value.split('/');
-      const parsedDate = new Date(`${year}-${month}-${day}`);
-      
-      if (!isNaN(parsedDate.getTime())) {
-        setData(prev => ({ ...prev, dataExame: parsedDate }));
-      }
-    }
   };
 
   const handleUpdate = async (e) => {
-  e.preventDefault();
-  setLoading(true);
+    e.preventDefault();
+    setLoading(true);
 
-  try {
-    const { id, imagem, ...dados } = data;
+    try {
+      const { id, imagem, ...dados } = data;
 
-    if (dados.dataExame) {
-      const year = dados.dataExame.getFullYear();
-      const month = String(dados.dataExame.getMonth() + 1).padStart(2, '0');
-      const day = String(dados.dataExame.getDate()).padStart(2, '0');
-      dados.dataExame = `${year}-${month}-${day}`;
+      // Formata a data para o formato do backend
+      if (dados.dataExame) {
+        dados.dataExame = formatDateForBackend(dados.dataExame);
+      }
+
+      await ExameService.update(id, dados);
+      navigate("/meus-documentos");
+    } catch (error) {
+      console.error("Falha na atualização:", error);
+      alert(`Erro ao atualizar: ${error.message}`);
+    } finally {
+      setLoading(false);
     }
-
-    await ExameService.update(id, dados);
-    navigate("/meus-documentos");
-  } catch (error) {
-    console.error("Falha na atualização:", error);
-    alert(`Erro ao atualizar: ${error.message}`);
-  } finally {
-    setLoading(false);
-  }
-};
+  };
 
   return (
     <div className="mx-auto px-3" style={{ maxWidth: "900px" }}>
@@ -242,8 +262,6 @@ const ExameForm = ({ data: initialData, isLoading = false }) => {
                   <DatePicker
                     selected={data.dataExame}
                     onChange={handleDateChange}
-                    onChangeRaw={handleDateInputChange}
-                    value={dateInputValue}
                     className="form-control"
                     dateFormat="dd/MM/yyyy"
                     placeholderText="DD/MM/AAAA"

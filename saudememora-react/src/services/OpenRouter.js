@@ -4,6 +4,12 @@ if (!OPENROUTER_API_KEY) {
   console.error("⚠️ REACT_APP_OPENROUTER_API_KEY não definida em .env");
 }
 
+function removeMarkdown(texto) {
+  return texto
+    .replace(/```json\s*/i, '')  
+    .replace(/```$/, '');       
+}
+
 function normalizarTexto(texto) {
   if (!texto || typeof texto !== "string") return "";
   return texto
@@ -221,7 +227,7 @@ export async function tratarOCRParaReceitas(textoOCR) {
     const prompt = `Você é um assistente que interpreta textos médicos extraídos via OCR e transforma os dados em JSON estruturado para serem incluídos em um sistema de receitas médicas.
 
     Leia o texto abaixo e extraia os campos:
-    - "dataReceita" (formato YYYY-MM-DD ou DD/MM/YYYY),
+    - "dataReceita" (formato YYYY-MM-DD) ou formato DD/MM/YYYY, se não houver data, deixe vazio,,
     - "medico" "Formate o nome do médico com a capitalização correta, usando maiúscula só nas primeiras letras de cada palavra, sem deixar tudo em maiúsculo ou tudo minúsculo.",
     - "crm" (registro do médico),
     - "medicamentos" (uma lista de medicamentos, onde cada medicamento deve ter os seguintes campos):
@@ -235,7 +241,7 @@ export async function tratarOCRParaReceitas(textoOCR) {
 
     Retorne apenas o JSON com os dados extraídos, no seguinte formato:
     {
-      "dataReceita": "YYYY-MM-DD",
+      "dataReceita": "YYYY-MM-DD" data da receita, se não houver data, deixe vazio,
       "medico": "Nome do médico",
       "crm": "CRM do médico",
       "medicamentos": [
@@ -283,7 +289,7 @@ export async function tratarOCRParaReceitas(textoOCR) {
 
     let jsonReceita;
     try {
-      jsonReceita = JSON.parse(data.choices[0].message.content);
+      jsonReceita = JSON.parse(removeMarkdown(data.choices[0].message.content));
     } catch (e) {
       throw new Error("Resposta da API não é um JSON válido.");
     }
@@ -344,7 +350,7 @@ export async function tratarOCRParaExames(textoOCR) {
     const prompt = `Você é um assistente que interpreta textos extraídos via OCR e transforma os dados em JSON estruturado para exames médicos.
 
     Leia o texto abaixo e extraia os campos:
-    - "dataExame" (formato YYYY-MM-DD ou DD/MM/YYYY),
+    - "dataExame" (formato YYYY-MM-DD) ou formato DD/MM/YYYY, se não houver data, deixe vazio,
     - "tipo": tipo do exame,
     - "laboratorio": nome do laboratório que realizou o exame,
     - "resultado": resultado do exame,
@@ -362,7 +368,7 @@ export async function tratarOCRParaExames(textoOCR) {
       "laboratorio": "Nome do laboratório",
       "resultado": "Resultado do exame",
       "observacoes": "Texto das observações",
-      "resumo": "Texto do OCR reescrito e normalizado. Corrija a ortografia, padronize os termos médicos e organize como se fosse o resultado de um exame laboratorial".
+      "resumo": "Texto do OCR reescrito e normalizado. Corrija a ortografia, padronize os termos médicos e organize como se fosse o resultado de um exame laboratorial",
       "nomeExame": "Nome do exame, se houver"
     }
 
@@ -396,12 +402,10 @@ export async function tratarOCRParaExames(textoOCR) {
     if (!res.ok) throw new Error(`Erro na API: ${res.statusText}`);
     const data = await res.json();
 
-    console.log("Resposta da API:", data);
     let jsonExame;
     try {
-      jsonExame = JSON.parse(data.choices[0].message.content);
+      jsonExame = JSON.parse(removeMarkdown(data.choices[0].message.content));
     } catch (e) {
-      jsonExame = JSON.parse(data.choices[0].message.content);
       throw new Error("Resposta da API não é um JSON válido.");
     }
 
@@ -455,7 +459,7 @@ export async function tratarOCRParaDocumentoClinico(textoOCR) {
     const prompt = `Você é um assistente que interpreta textos extraídos via OCR e transforma os dados em JSON estruturado para documentos clínicos.
 
     Leia o texto abaixo e extraia os campos:
-    - "dataDocumentoCli" (formato YYYY-MM-DD ou DD/MM/YYYY),
+    - "dataDocumentoCli" (formato YYYY-MM-DD) ou formato DD/MM/YYYY, se não houver data, deixe vazio,
     - "medico": nome do médico,
     - "especialidade": especialidade médica,
     - "observacoes": observações do documento gerais,
@@ -513,7 +517,7 @@ export async function tratarOCRParaDocumentoClinico(textoOCR) {
 
     let jsonDocumento;
     try {
-      jsonDocumento = JSON.parse(data.choices[0].message.content);
+      jsonDocumento = JSON.parse(removeMarkdown(data.choices[0].message.content));
     } catch (e) {
       throw new Error("Resposta da API não é um JSON válido.");
     }
@@ -521,24 +525,6 @@ export async function tratarOCRParaDocumentoClinico(textoOCR) {
     if (!jsonDocumento || typeof jsonDocumento !== "object") {
       throw new Error("A resposta da API está incompleta.");
     }
-
-    let dataFormatada = "";
-    if (jsonDocumento.dataDocumentoCli) {
-      const d = jsonDocumento.dataDocumentoCli.trim();
-      if (d.includes("/")) {
-        const partes = d.split("/");
-        if (partes.length === 3) {
-          dataFormatada = `${partes[2]}-${partes[1].padStart(
-            2,
-            "0"
-          )}-${partes[0].padStart(2, "0")}`;
-        }
-      } else {
-        dataFormatada = d;
-      }
-    }
-
-
 
     return {
       dataDocumentoCli: jsonDocumento.dataDocumentoCli || "",
@@ -625,7 +611,7 @@ export async function extrairMedicamentosDoOCR(textoOCR) {
 
     let jsonReceita;
     try {
-      jsonReceita = JSON.parse(data.choices?.[0]?.message?.content || "{}");
+      jsonReceita = JSON.parse(removeMarkdown(data.choices?.[0]?.message?.content) || "{}");
     } catch (e) {
       throw new Error("Resposta da API não é um JSON válido.");
     }
