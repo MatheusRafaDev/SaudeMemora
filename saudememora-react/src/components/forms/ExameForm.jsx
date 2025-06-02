@@ -1,83 +1,299 @@
-import React from "react";
-import { FaFlask, FaCalendarAlt, FaClinicMedical } from "react-icons/fa";
+import React, { useState, useEffect } from "react";
+import { Form, Spinner } from "react-bootstrap";
 import DatePicker from "react-datepicker";
+import { useNavigate } from "react-router-dom";
 import "react-datepicker/dist/react-datepicker.css";
+import ExameService from "../../services/ExameService";
 
-const ExameForm = ({ data, onChange, onDateChange }) => {
+import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
+import {
+  FaCalendarAlt,
+  FaFlask,
+  FaFileMedical,
+  FaEdit,
+  FaArrowLeft,
+  FaMicroscope,
+  FaSave,
+  FaStickyNote,
+} from "react-icons/fa";
+
+const ExameForm = ({ data: initialData, isLoading = false }) => {
+  const [data, setData] = useState({
+    nomeExame: "",
+    tipo: "",
+    laboratorio: "",
+    data: null,
+    observacoes: "",
+    resultado: "",
+    resumo: "",
+    id: null,
+    imagem: null,
+  });
+
+  const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    if (initialData) {
+      setData({
+        nomeExame: initialData.nomeExame || "",
+        tipo: initialData.tipo || "",
+        laboratorio: initialData.laboratorio || "",
+        data: initialData.data ? new Date(initialData.data) : null,
+        observacoes: initialData.observacoes || "",
+        resultado: initialData.resultado || "",
+        resumo: initialData.resumo || "",
+        id: initialData.id || null,
+        imagem: initialData.imagem || null,
+      });
+    }
+  }, [initialData]);
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setData((prev) => ({ ...prev, [name]: value }));
+  };
+
+  const handleDateChange = (date) => {
+    setData((prev) => ({ ...prev, data: date }));
+  };
+
+  const handleUpdate = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+
+    try {
+      const { id, imagem, ...dados } = data;
+
+      if (dados.data) {
+        dados.data = dados.data.toISOString();
+      }
+
+      await ExameService.update(id, dados);
+
+      navigate("/meus-documentos");
+    } catch (error) {
+      console.error("Falha na atualização:", error);
+      alert(`Erro ao atualizar: ${error.message}`);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
-    <div className="card mb-4">
-      <div className="card-header bg-light">
-        <h5 className="mb-0"><FaFlask /> Exame Médico</h5>
-      </div>
-      <div className="card-body">
-        <div className="row g-3">
-          <div className="col-md-6">
-            <label className="form-label">Nome do Exame</label>
-            <input
-              type="text"
-              className="form-control"
-              name="nomeExame"
-              value={data.nomeExame}
-              onChange={onChange}
-              required
-            />
-          </div>
+    <div className="mx-auto px-3" style={{ maxWidth: "900px" }}>
+      <div className="card shadow-sm border-0 mb-4">
+        <div className="card-header d-flex align-items-center justify-content-between bg-white border-bottom py-3">
+          <h2 className="mb-0 fs-5 fw-bold">Exame</h2>
 
-          <div className="col-md-6">
-            <label className="form-label">Tipo de Exame</label>
-            <select
-              className="form-select"
-              name="tipoExame"
-              value={data.tipoExame}
-              onChange={onChange}
-              required
+          <button
+            className="btn btn-outline-secondary btn-sm"
+            onClick={() => navigate("/meus-documentos")}
+            disabled={loading}
+          >
+            <FaArrowLeft className="me-1" /> Voltar
+          </button>
+        </div>
+
+        {data.imagem && (
+          <div
+            className="border-top bg-light"
+            style={{
+              height: "350px",
+              overflow: "hidden",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+            }}
+          >
+            <TransformWrapper
+              initialScale={1}
+              minScale={1}
+              maxScale={5}
+              wheel={{ step: 0.1 }}
+              doubleClick={{ disabled: true }}
             >
-              <option value="">Selecione...</option>
-              <option value="Laboratorial">Laboratorial</option>
-              <option value="Imagem">Imagem</option>
-              <option value="Físico">Físico</option>
-              <option value="Genético">Genético</option>
-            </select>
+              <TransformComponent
+                wrapperStyle={{ width: "100%", height: "100%" }}
+                contentStyle={{
+                  width: "100%",
+                  height: "100%",
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              >
+                <img
+                  src={`http://localhost:7070/api/exames/imagem/${data.id}`}
+                  alt="Imagem do exame"
+                  className="img-fluid rounded shadow"
+                  style={{
+                    maxHeight: "100%",
+                    maxWidth: "100%",
+                    objectFit: "contain",
+                    cursor: "grab",
+                  }}
+                />
+              </TransformComponent>
+            </TransformWrapper>
           </div>
+        )}
 
-          <div className="col-md-6">
-            <label className="form-label">
-              <FaClinicMedical className="me-1" /> Laboratório/Clínica
-            </label>
-            <input
-              type="text"
-              className="form-control"
-              name="laboratorio"
-              value={data.laboratorio}
-              onChange={onChange}
-              required
-            />
-          </div>
+        <div className="card-body">
+          {isLoading && (
+            <div className="text-center py-4">
+              <Spinner animation="border" role="status" variant="primary" />
+              <p className="mt-2 mb-0 fs-5">Carregando exame...</p>
+            </div>
+          )}
 
-          <div className="col-md-6">
-            <label className="form-label">
-              <FaCalendarAlt className="me-1" /> Data do Exame
-            </label>
-            <DatePicker
-              selected={data.data}
-              onChange={(date) => onDateChange(date, "data")}
-              className="form-control"
-              dateFormat="dd/MM/yyyy"
-              required
-            />
-          </div>
+          <Form onSubmit={handleUpdate}>
+            <div className="row g-3" style={{ opacity: isLoading ? 0.5 : 1 }}>
+              <div className="col-md-6">
+                <Form.Group controlId="nomeExame">
+                  <Form.Label className="fw-semibold">
+                    <FaFileMedical className="me-1 text-primary" /> Nome do
+                    Exame
+                  </Form.Label>
+                  <Form.Control
+                    type="text"
+                    name="nomeExame"
+                    value={data.nomeExame}
+                    onChange={handleChange}
+                    required
+                    disabled={isLoading || loading}
+                    placeholder="Digite o nome do exame"
+                  />
+                </Form.Group>
+              </div>
 
-          <div className="col-12">
-            <label className="form-label">Resultado</label>
-            <textarea
-              className="form-control"
-              name="resultado"
-              value={data.resultado}
-              onChange={onChange}
-              rows="6"
-              required
-            />
-          </div>
+              <div className="col-md-6">
+                <Form.Group controlId="tipo">
+                  <Form.Label className="fw-semibold">
+                    <FaFlask className="me-1 text-primary" /> Tipo de Exame
+                  </Form.Label>
+                  <Form.Control
+                    type="text"
+                    name="tipo"
+                    value={data.tipo}
+                    onChange={handleChange}
+                    required
+                    disabled={isLoading || loading}
+                    placeholder="Informe o tipo do exame"
+                  />
+                </Form.Group>
+              </div>
+
+              <div className="col-md-6">
+                <Form.Group controlId="laboratorio">
+                  <Form.Label className="fw-semibold">
+                    <FaMicroscope className="me-1 text-primary" /> Laboratório
+                  </Form.Label>
+                  <Form.Control
+                    type="text"
+                    name="laboratorio"
+                    value={data.laboratorio}
+                    onChange={handleChange}
+                    required
+                    disabled={isLoading || loading}
+                    placeholder="Nome do laboratório"
+                  />
+                </Form.Group>
+              </div>
+
+              <div className="col-md-6">
+                <Form.Group controlId="data">
+                  <Form.Label className="fw-semibold">
+                    <FaCalendarAlt className="me-1 text-primary" /> Data do
+                    Exame
+                  </Form.Label>
+                  <DatePicker
+                    selected={data.data}
+                    onChange={handleDateChange}
+                    className="form-control"
+                    dateFormat="dd/MM/yyyy"
+                    required
+                    disabled={isLoading || loading}
+                    wrapperClassName="w-100"
+                    placeholderText="Selecione a data"
+                  />
+                </Form.Group>
+              </div>
+
+              <div className="col-12">
+                <Form.Group controlId="observacoes">
+                  <Form.Label className="fw-semibold">
+                    <FaStickyNote className="me-1 text-primary" /> Observações
+                  </Form.Label>
+                  <Form.Control
+                    as="textarea"
+                    rows={3}
+                    name="observacoes"
+                    value={data.observacoes}
+                    onChange={handleChange}
+                    disabled={isLoading || loading}
+                    placeholder="Adicione observações relevantes..."
+                  />
+                </Form.Group>
+              </div>
+
+              <div className="col-12">
+                <Form.Group controlId="resultado">
+                  <Form.Label className="fw-semibold">
+                    <FaFlask className="me-1 text-primary" /> Resultado
+                  </Form.Label>
+                  <Form.Control
+                    as="textarea"
+                    rows={6}
+                    name="resultado"
+                    value={data.resultado}
+                    onChange={handleChange}
+                    required
+                    disabled={isLoading || loading}
+                    style={{ minHeight: "150px" }}
+                    placeholder="Informe o resultado do exame"
+                  />
+                </Form.Group>
+              </div>
+
+              <div className="col-12">
+                <Form.Group controlId="resumo">
+                  <Form.Label className="fw-semibold">
+                    <FaStickyNote className="me-1 text-primary" /> Resumo
+                  </Form.Label>
+                  <Form.Control
+                    as="textarea"
+                    rows={4}
+                    name="resumo"
+                    value={data.resumo}
+                    onChange={handleChange}
+                    disabled={isLoading || loading}
+                    placeholder="Resumo geral do exame..."
+                  />
+                </Form.Group>
+              </div>
+            </div>
+
+            <div className="d-flex justify-content-center mt-4">
+              <button
+                type="button"
+                className="btn btn-primary"
+                disabled={loading || isLoading}
+                onClick={handleUpdate}
+              >
+                {loading ? (
+                  <span
+                    className="spinner-border spinner-border-sm me-2"
+                    role="status"
+                    aria-hidden="true"
+                  ></span>
+                ) : (
+                  <FaSave className="me-2" />
+                )}
+                {loading ? "Salvando..." : "Salvar Alterações"}
+              </button>
+            </div>
+          </Form>
         </div>
       </div>
     </div>

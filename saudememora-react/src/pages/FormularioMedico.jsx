@@ -204,7 +204,7 @@ const FormularioMedico = () => {
       }
     } catch (error) {
       console.error("Erro ao buscar ficha:", error);
-      //setMensagem("Erro ao carregar ficha médica existente");
+
     } finally {
       setCarregando(false);
     }
@@ -340,8 +340,14 @@ const FormularioMedico = () => {
             ? "Ficha atualizada com sucesso!"
             : "Ficha cadastrada com sucesso!"
         );
-        window.location.reload();
-        navigate(0);
+
+        if (!isAtualizar) {                
+          navigate("/home");
+         } else {
+          window.location.reload();
+          navigate(0);
+
+        }
 
       } else {
         setMensagem(response.message || "Erro ao processar a ficha.");

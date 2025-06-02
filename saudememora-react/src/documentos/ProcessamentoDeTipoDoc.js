@@ -75,10 +75,9 @@ export async function processarExameComImagem(
       throw new Error(`Erro no OCR do exame: ${exameJSON.error}`);
 
     const exameData = {
-      nomeExame:
-        exameJSON.nomeExame || exameJSON.tipo || "Exame importado via OCR",
+      nomeExame: exameJSON.nomeExame || "Exame importado via OCR",
       tipo: exameJSON.tipo || "Tipo não informado",
-      data: exameJSON.data || new Date().toISOString().split("T")[0],
+      dataExame: exameJSON.dataExame || new Date().toISOString().split("T")[0],
       laboratorio: exameJSON.laboratorio || "Laboratório não informado",
       resultado: exameJSON.resultado || textoOCR || "Resultado não informado",
       observacoes: exameJSON.observacoes || "Sem observações",
@@ -127,16 +126,16 @@ export async function processarDocumentoClinicoComImagem(
 ) {
   try {
     const documentoJSON = await tratarOCRParaDocumentoClinico(textoOCR);
+
     if (documentoJSON.error)
       throw new Error(
         `Erro no OCR do documento clínico: ${documentoJSON.error}`
       );
 
     const documentoData = {
-      data: documentoJSON.data || new Date().toISOString().split("T")[0],
+      dataDocumentoCli: documentoJSON.dataDocumentoCli,
       medico: documentoJSON.medico || "Médico não informado",
-      especialidade:
-        documentoJSON.especialidade || "Especialidade não informada",
+      especialidade: documentoJSON.especialidade || "Especialidade não informada",
       observacoes: documentoJSON.observacoes || "Sem observações",
       conclusoes: documentoJSON.conclusoes || "Sem conclusões",
       resumo: documentoJSON.resumo || "Sem resumo",
@@ -151,6 +150,7 @@ export async function processarDocumentoClinicoComImagem(
     formData.append("imagem", imagem);
 
     let documentoDados;
+
     const response = await DocumentoClinicoService.create(formData);
     documentoDados = response.data;
 

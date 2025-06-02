@@ -30,8 +30,8 @@ const DocumentoClinicoService = {
     }
   },
 
+  
   create: async (documentoClinico) => {
-
     try {
       const response = await axiosInstance.post("/api/documentosclinicos",documentoClinico);
       return { success: true, data: response.data };
@@ -85,6 +85,7 @@ const DocumentoClinicoService = {
       const response = await axiosInstance.get(
         `/api/documentosclinicos/documento/${documentoId}`
       );
+
       return { success: true, data: response.data };
     } catch (error) {
       console.error(

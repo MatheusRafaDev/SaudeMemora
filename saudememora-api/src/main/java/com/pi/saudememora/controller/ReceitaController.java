@@ -4,12 +4,14 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.pi.saudememora.model.Medicamento;
 import com.pi.saudememora.model.Receita;
+import com.pi.saudememora.repository.MedicamentoRepository;
 import com.pi.saudememora.repository.ReceitaRepository;
 import com.pi.saudememora.service.ReceitaService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.*;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -17,6 +19,7 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -31,10 +34,16 @@ public class ReceitaController {
     private final ObjectMapper objectMapper;
     @Autowired
     private ReceitaRepository receitaRepository;
+    private MedicamentoRepository medicamentoRepository;
 
-    public ReceitaController(ReceitaService receitaService, ObjectMapper objectMapper) {
+    public ReceitaController(ReceitaService receitaService,
+                             ObjectMapper objectMapper,
+                             MedicamentoRepository medicamentoRepository,
+                             ReceitaRepository receitaRepository) {
         this.receitaService = receitaService;
         this.objectMapper = objectMapper;
+        this.medicamentoRepository = medicamentoRepository;
+        this.receitaRepository = receitaRepository;
     }
 
     @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
@@ -109,48 +118,17 @@ public class ReceitaController {
     public List<Receita> listarPorDocumento(@PathVariable Long id) {
         return receitaRepository.findByDocumentoId(id);
     }
+
     @PutMapping("/{id}")
     public ResponseEntity<Receita> atualizarReceita(@PathVariable Long id, @RequestBody Receita receita) {
         try {
-            Optional<Receita> receitaExistenteOpt = receitaService.buscarPorId(id);
-            if (receitaExistenteOpt.isEmpty()) {
-                return ResponseEntity.notFound().build();
-            }
-
-            Receita receitaExistente = receitaExistenteOpt.get();
-
-            // Atualiza apenas os campos que foram fornecidos
-            if (receita.getDataReceita() != null) {
-                receitaExistente.setDataReceita(receita.getDataReceita());
-            }
-            if (receita.getPosologia() != null) {
-                receitaExistente.setPosologia(receita.getPosologia());
-            }
-            if (receita.getObservacoes() != null) {
-                receitaExistente.setObservacoes(receita.getObservacoes());
-            }
-            if (receita.getResumo() != null) {
-                receitaExistente.setResumo(receita.getResumo());
-            }
-            if (receita.getMedico() != null) {
-                receitaExistente.setMedico(receita.getMedico());
-            }
-
-            // Atualiza medicamentos se fornecidos
-            if (receita.getMedicamentos() != null) {
-                receitaExistente.setMedicamentos(receita.getMedicamentos());
-                for (Medicamento med : receitaExistente.getMedicamentos()) {
-                    med.setReceita(receitaExistente);
-                }
-            }
-
-            Receita receitaAtualizada = receitaService.atualizarReceita(receitaExistente);
-            return ResponseEntity.ok(receitaAtualizada);
+            return ResponseEntity.ok(receitaService.atualizarReceitaComMedicamentos(receita));
         } catch (Exception e) {
             logger.error("Erro ao atualizar receita", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).build();
         }
     }
+
 
     @GetMapping("/{id}")
     public ResponseEntity<?> getReceitaById(@PathVariable Long id) {

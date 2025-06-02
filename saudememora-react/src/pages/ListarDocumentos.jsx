@@ -155,6 +155,7 @@ export default function ListarDocumentos() {
                   clinico: {
                     id: dados?.id,
                     tipoDoc: dados?.tipo || "Documento Clínico",
+                    dataDocumentoCli: dados?.dataDocumentoCli,
                     medico: dados?.medico,
                     crm: dados?.crmMedico,
                     especialidade: dados?.especialidade,
@@ -200,7 +201,7 @@ export default function ListarDocumentos() {
                     id: dados?.id,
                     nomeExame: dados?.nomeExame,
                     laboratorio: dados?.laboratorio,
-                    dataExame: dados?.data,
+                    dataExame: dados?.dataExame,
                     resultado: dados?.resultado,
                     observacoes: dados?.observacoes,
                     imagem: dados?.imagem,
@@ -377,21 +378,23 @@ export default function ListarDocumentos() {
 
   const handleVisualizar = async (documentoId, tipo) => {
     try {
-      console.log("Visualizando documento:", documentoId, tipo);
       let documento;
 
       if (tipo === "R") {
+
         const res = await ReceitaService.getReceitaByDocumentoId(documentoId);
         documento = Array.isArray(res.data) ? res.data[0] : res.data;
+
       } else if (tipo === "E") {
+
         const res = await ExameService.getExameByDocumentoId(documentoId);
         documento = Array.isArray(res.data) ? res.data[0] : res.data;
+
       } else {
-        const res =
-          await DocumentoClinicoService.getDocumentoClinicoByDocumentoId(
-            documentoId
-          );
+
+        const res = await DocumentoClinicoService.getDocumentoClinicoByDocumentoId(documentoId);
         documento = Array.isArray(res.data) ? res.data[0] : res.data;
+
       }
 
       navigate("/visualizar-documento", {
@@ -403,12 +406,11 @@ export default function ListarDocumentos() {
     }
   };
 
-  const handleAlterar = (tipo, documentoId) => {
-
+  const handleAlterar = (tipo, id) => {
     navigate("/editar-documento", {
       state: {
         tipo,
-        documentoId,
+        id,
       },
     });
   };
@@ -842,9 +844,20 @@ export default function ListarDocumentos() {
                           <span className="documento-id">
                             ID: {doc.documento.id}
                           </span>
-                          <span className="documento-data">
-                            {formatarData(doc.documento.dataUpload)}
-                          </span>
+                          <div
+                            className="documento-data"
+                            style={{ display: "flex", flexDirection: "column" }}
+                          >
+                            <span className="documento-data">
+                              Upload: {formatarData(doc.documento.dataUpload)}
+                            </span>
+
+                            <span className="documento-data">
+                              Data do documento Clinico:{" "}
+                              {formatarData(doc.clinico.dataDocumentoCli)}
+                            </span>
+
+                          </div>
                         </div>
                         {doc.clinico.medico && (
                           <div className="documento-meta">
@@ -918,6 +931,7 @@ export default function ListarDocumentos() {
                           <span className="documento-id">
                             ID: {doc.documento.id}
                           </span>
+
                           <div
                             className="documento-data"
                             style={{ display: "flex", flexDirection: "column" }}

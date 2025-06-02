@@ -3,15 +3,19 @@ import { useNavigate } from "react-router-dom";
 import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 import {
   FaCalendarAlt,
+  FaFileAlt,
   FaUserMd,
-  FaAward,
-  FaPills,
+  FaHospital,
+  FaInfoCircle,
   FaStickyNote,
   FaArrowLeft,
 } from "react-icons/fa";
 
-export default function ReceitaComMedicamentos({ receita }) {
+export default function VisualizadorDocumentoClinico({ documentoClinico }) {
   const navigate = useNavigate();
+
+  const documento = documentoClinico;
+
 
   return (
     <div
@@ -25,14 +29,15 @@ export default function ReceitaComMedicamentos({ receita }) {
       }}
     >
       <div className="text-center mb-4">
-        <h3 className="text-secondary">Visualizar documento</h3>
-      
+        <h3 className="text-secondary">Visualizar documento - Clínico</h3>
+
         <button
           className="btn btn-outline-primary w-100"
           onClick={() => navigate(-1)}
         >
           <FaArrowLeft /> Voltar
         </button>
+        
       </div>
 
       <div className="card shadow-sm border-0 mb-4">
@@ -40,9 +45,9 @@ export default function ReceitaComMedicamentos({ receita }) {
           className="card-body text-center"
           style={{ height: "300px", position: "relative" }}
         >
-          {receita.imagem ? (
+          {documento.imagem ? (
             <TransformWrapper
-              initialScale={1.1}
+              initialScale={1}
               minScale={1}
               maxScale={5}
               wheel={{ step: 0.1 }}
@@ -75,8 +80,8 @@ export default function ReceitaComMedicamentos({ receita }) {
                     }}
                   >
                     <img
-                      src={`http://localhost:7070/api/receitas/imagem/${receita.id}`}
-                      alt="Imagem da Receita"
+                      src={`http://localhost:7070/api/documentosclinicos/imagem/${documento.id}`}
+                      alt={`Documento ${documento.tipo}`}
                       className="img-fluid rounded shadow"
                       style={{
                         maxHeight: "100%",
@@ -90,54 +95,36 @@ export default function ReceitaComMedicamentos({ receita }) {
               )}
             </TransformWrapper>
           ) : (
-            <p className="text-muted">Imagem não disponível</p>
+            <p className="text-muted">Documento não disponível</p>
           )}
         </div>
       </div>
 
       <div className="card shadow-sm border-0 mb-4">
         <div className="card-body" style={{ textAlign: "justify" }}>
+          <h5>
+            <FaFileAlt /> {documento.tipo || "Documento Clinico"}
+          </h5>
           <p>
-            <FaCalendarAlt /> <strong>Data: </strong>
-            {new Date(receita.dataReceita).toLocaleDateString("pt-BR")}
+            <FaCalendarAlt /> <strong>Data:</strong> {new Date(documento.dataDocumentoCli).toLocaleDateString("pt-BR")}
           </p>
           <p>
-            <FaUserMd /> <strong>Doutor(a): </strong>
-            {receita.medico}
+            <FaUserMd /> <strong>Médico:</strong>{" "}
+            {documento.medico || "Não informado"}
           </p>
-          <p>
-            <FaAward /> <strong>CRM/MS: </strong>
-            {receita.crmMedico}
-          </p>
-          <p>
-            <FaStickyNote /> <strong>Notas: </strong>
-            {receita.observacoes || "Nenhuma observação."}
-          </p>
-        </div>
-      </div>
 
-      <div className="card shadow-sm border-0 mb-4">
-        <div className="card-body" style={{ textAlign: "justify" }}>
-          <h4 className="text-primary">
-            <FaPills /> Medicamentos
-          </h4>
-          <ul className="list-group mt-3">
-            {receita.medicamentos.map((med) => (
-              <li
-                key={med.id}
-                className="list-group-item d-flex justify-content-between align-items-start"
-                style={{ textAlign: "justify" }}
-              >
-                <div>
-                  <strong>{med.nome}</strong>
-                  <p className="mb-0 text-muted">
-                    <strong>Posologia: </strong>
-                    {med.quantidade} — {med.formaDeUso}
-                  </p>
-                </div>
-              </li>
-            ))}
-          </ul>
+          <p>
+            <FaInfoCircle /> <strong>Especialidade:</strong>{" "}
+            {documento.especialidade || "Não informado"}
+          </p>
+          <p>
+            <strong>Conclusões:</strong>{" "}
+            {documento.conclusoes || "Nenhuma descrição disponível."}
+          </p>
+          <p>
+            <strong>Observações:</strong>{" "}
+            {documento.observacoes || "Nenhuma observação."}
+          </p>
         </div>
       </div>
 
@@ -148,7 +135,7 @@ export default function ReceitaComMedicamentos({ receita }) {
           </h4>
           <textarea
             className="form-control mt-3 border border-info rounded"
-            value={receita.resumo || ""}
+            value={documento.resumo || ""}
             rows={5}
             readOnly
             style={{
@@ -160,7 +147,6 @@ export default function ReceitaComMedicamentos({ receita }) {
           ></textarea>
         </div>
       </div>
-
     </div>
   );
 }

@@ -1,8 +1,8 @@
 import React from "react";
 import { useLocation } from "react-router-dom";
-import ReceitaComMedicamentos from "../components/VisualizadorReceita";
-import VisualizadorExame from "../components/VisualizadorExame"; 
-import VisualizadorDocumentoClinico from "../components/VisualizadorDocumentoClinico"; 
+import ReceitaComMedicamentos from "../components/visualizacao/VisualizadorReceita";
+import VisualizadorExame from "../components/visualizacao/VisualizadorExame"; 
+import VisualizadorDocumentoClinico from "../components/visualizacao/VisualizadorDocumentoClinico"; 
 import Nav from "../components/Nav";
 
 const VisualizadorDocumento = () => {
@@ -10,12 +10,11 @@ const VisualizadorDocumento = () => {
 
   const documentoArray = location.state?.documento;
   const tipoDocumento = location.state?.tipo; 
-
-
-
+  
   const documento = Array.isArray(documentoArray)
     ? documentoArray[0]
     : documentoArray;
+
 
   if (!documento) {
     return (

@@ -1,174 +1,424 @@
-import React from "react";
-import { FaPills, FaCalendarAlt, FaUserMd, FaPlus, FaEdit, FaCheck, FaTimes } from "react-icons/fa";
+import React, { useState, useEffect } from "react";
+import { Form, Spinner, Row, Col, Button } from "react-bootstrap";
 import DatePicker from "react-datepicker";
+import { useNavigate } from "react-router-dom";
+import { format, parseISO } from "date-fns";
+import ptBR from "date-fns/locale/pt-BR";
+import { registerLocale } from "react-datepicker";
+import ReceitaService from "../../services/ReceitaService";
 import "react-datepicker/dist/react-datepicker.css";
+import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 
-const ReceitaForm = ({
-  data,
-  medicamentoEdit,
-  editingMedId,
-  onChange,
-  onDateChange,
-  onMedicamentoChange,
-  onAddMedicamento,
-  onRemoveMedicamento,
-  onStartEdit,
-  onSaveEdit,
-  onCancelEdit
-}) => {
+import {
+  FaPills,
+  FaCalendarAlt,
+  FaUserMd,
+  FaSave,
+  FaArrowLeft,
+  FaStickyNote,
+} from "react-icons/fa";
+
+
+registerLocale('pt-BR', ptBR);
+
+const ReceitaForm = ({ data: initialData, isLoading = false }) => {
+  const navigate = useNavigate();
+  const [loading, setLoading] = useState(false);
+  const [dateInputValue, setDateInputValue] = useState('');
+  const [idLoaded, setIdLoaded] = useState(false);
+
+  const [data, setData] = useState({
+    id: null,
+    dataReceita: null,
+    medico: "",
+    crmMedico: "",
+    posologia: "",
+    observacoes: "",
+    medicamentos: [],
+    resumo: "",
+    imamgem: null,
+    tipo: "receitas",
+  });
+
+  const [medicamentoEdit, setMedicamentoEdit] = useState({
+    nome: "",
+    quantidade: "",
+    formaDeUso: "",
+  });
+
+  useEffect(() => {
+    const loadData = async () => {
+      if (initialData) {
+        try {
+          const dataReceita = initialData.dataReceita 
+            ? new Date(initialData.dataReceita) 
+            : null;
+
+          setData({
+            id: initialData.id || null,
+            dataReceita,
+            imagem: initialData.imagem || null,
+            medico: initialData.medico || "",
+            crmMedico: initialData.crmMedico || "",
+            posologia: initialData.posologia || "",
+            observacoes: initialData.observacoes || "",
+            medicamentos: initialData.medicamentos || [],
+            resumo: initialData.resumo || "",
+          });
+
+          if (dataReceita) {
+            setDateInputValue(format(dataReceita, 'dd/MM/yyyy', { locale: ptBR }));
+          }
+
+          setIdLoaded(true);
+        } catch (error) {
+          console.error("Erro ao carregar dados:", error);
+        }
+      }
+    };
+
+    loadData();
+  }, [initialData]);
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setData(prev => ({ ...prev, [name]: value }));
+  };
+
+  const handleDateChange = (date) => {
+    setData(prev => ({ ...prev, dataReceita: date }));
+    setDateInputValue(date ? format(date, 'dd/MM/yyyy', { locale: ptBR }) : '');
+  };
+
+  const handleDateInputChange = (e) => {
+    const value = e.target.value;
+    setDateInputValue(value);
+    if (value.length === 10) {
+      const [day, month, year] = value.split('/');
+      const parsedDate = new Date(`${year}-${month}-${day}`);
+      
+      if (!isNaN(parsedDate.getTime())) {
+        setData(prev => ({ ...prev, dataReceita: parsedDate }));
+      }
+    }
+  };
+
+  const handleMedicamentoChange = (e) => {
+    const { name, value } = e.target;
+    setMedicamentoEdit(prev => ({ ...prev, [name]: value }));
+  };
+
+  const onRemoveMedicamento = (id) => {
+    setData(prev => ({
+      ...prev,
+      medicamentos: prev.medicamentos.filter(m => m.id !== id),
+    }));
+  };
+
+  const handleUpdate = async (e) => {
+    e.preventDefault();
+    setLoading(true);
+
+    try {
+      const dataToSend = {
+        ...data,
+
+        dataReceita: data.dataReceita ? format(data.dataReceita, 'yyyy-MM-dd') : null,
+        medicamentos: data.medicamentos.map(med => ({
+          id: med.id || null,
+          nome: med.nome || "",
+          quantidade: med.quantidade || "",
+          formaDeUso: med.formaDeUso || ""
+        }))
+      };
+
+      await ReceitaService.update(dataToSend.id, dataToSend);
+      navigate("/meus-documentos");
+    } catch (error) {
+      console.error("Erro ao salvar receita:", error);
+      alert("Erro ao salvar receita. Por favor, tente novamente.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
-    <div className="card mb-4">
-      <div className="card-header bg-light">
-        <h5 className="mb-0"><FaPills /> Receita Médica</h5>
-      </div>
-      <div className="card-body">
-        <div className="row g-3 mb-4">
-          <div className="col-md-6">
-            <label className="form-label">
-              <FaCalendarAlt className="me-1" /> Data da Receita
-            </label>
-            <DatePicker
-              selected={data.dataReceita}
-              onChange={(date) => onDateChange(date, "dataReceita")}
-              className="form-control"
-              dateFormat="dd/MM/yyyy"
-              required
-            />
-          </div>
-
-          <div className="col-md-6">
-            <label className="form-label">
-              <FaUserMd className="me-1" /> Médico
-            </label>
-            <input
-              type="text"
-              className="form-control"
-              name="medico"
-              value={data.medico}
-              onChange={onChange}
-              required
-            />
-          </div>
-
-          <div className="col-md-6">
-            <label className="form-label">CRM do Médico</label>
-            <input
-              type="text"
-              className="form-control"
-              name="crmMedico"
-              value={data.crmMedico}
-              onChange={onChange}
-              required
-            />
-          </div>
+    <div className="mx-auto px-3" style={{ maxWidth: "900px" }}>
+      <div className="card shadow-sm border-0 mb-4">
+        <div className="card-header d-flex align-items-center justify-content-between bg-white border-bottom py-3">
+          <h2 className="mb-0 fs-5 fw-bold">
+            Receita Médica
+          </h2>
+          <Button
+            variant="outline-secondary"
+            size="sm"
+            onClick={() => navigate("/meus-documentos")}
+            disabled={loading}
+          >
+            <FaArrowLeft className="me-1" /> Voltar
+          </Button>
         </div>
 
-        <div className="border-top pt-3">
-          <h5 className="mb-3"><FaPills /> Medicamentos</h5>
-          
-          <div className="row g-3 mb-3">
-            <div className="col-md-4">
-              <label className="form-label">Nome</label>
-              <input
-                type="text"
-                className="form-control"
-                name="nome"
-                value={medicamentoEdit.nome}
-                onChange={onMedicamentoChange}
-                placeholder="Nome do medicamento"
-              />
-            </div>
-            <div className="col-md-3">
-              <label className="form-label">Quantidade</label>
-              <input
-                type="text"
-                className="form-control"
-                name="quantidade"
-                value={medicamentoEdit.quantidade}
-                onChange={onMedicamentoChange}
-                placeholder="Ex: 1 caixa, 30 comprimidos"
-              />
-            </div>
-            <div className="col-md-4">
-              <label className="form-label">Forma de Uso</label>
-              <input
-                type="text"
-                className="form-control"
-                name="formaDeUso"
-                value={medicamentoEdit.formaDeUso}
-                onChange={onMedicamentoChange}
-                placeholder="Ex: 1x ao dia"
-              />
-            </div>
-            <div className="col-md-1 d-flex align-items-end">
-              {editingMedId === null ? (
-                <button
-                  type="button"
-                  className="btn btn-primary"
-                  onClick={onAddMedicamento}
-                >
-                  <FaPlus />
-                </button>
-              ) : (
-                <div className="d-flex gap-1">
-                  <button
-                    type="button"
-                    className="btn btn-success"
-                    onClick={onSaveEdit}
-                  >
-                    <FaCheck />
-                  </button>
-                  <button
-                    type="button"
-                    className="btn btn-danger"
-                    onClick={onCancelEdit}
-                  >
-                    <FaTimes />
-                  </button>
-                </div>
-              )}
-            </div>
-          </div>
+        
 
-          {data.medicamentos.length > 0 && (
-            <div className="table-responsive">
-              <table className="table table-striped">
-                <thead>
-                  <tr>
-                    <th>Nome</th>
-                    <th>Quantidade</th>
-                    <th>Forma de Uso</th>
-                    <th>Ações</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {data.medicamentos.map((med) => (
-                    <tr key={med.id}>
-                      <td>{med.nome}</td>
-                      <td>{med.quantidade}</td>
-                      <td>{med.formaDeUso}</td>
-                      <td>
-                        <button
-                          type="button"
-                          className="btn btn-sm btn-outline-primary me-2"
-                          onClick={() => onStartEdit(med)}
-                        >
-                          <FaEdit />
-                        </button>
-                        <button
-                          type="button"
-                          className="btn btn-sm btn-outline-danger"
-                          onClick={() => onRemoveMedicamento(med.id)}
-                        >
-                          <FaTimes />
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+        <div className="card-body py-3">
+          {isLoading && (
+            <div className="text-center py-4">
+              <Spinner animation="border" role="status" variant="primary" />
+              <p className="mt-2 mb-0">Carregando receita...</p>
             </div>
           )}
+
+          {data.imagem && (
+          <div className="border-top bg-light" style={{ height: "350px", overflow: "hidden" }}>
+            <TransformWrapper initialScale={1} minScale={1} maxScale={5} wheel={{ step: 0.1 }}>
+              <TransformComponent
+                wrapperStyle={{ width: "100%", height: "100%" }}
+                contentStyle={{
+                  width: "100%",
+                  height: "100%",
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              >
+                <img
+                  src={`http://localhost:7070/api/receitas/imagem/${data.id}`}
+                  alt="Imagem do documento"
+                  className="img-fluid rounded shadow"
+                  style={{
+                    maxHeight: "100%",
+                    maxWidth: "100%",
+                    objectFit: "contain",
+                    cursor: "grab",
+                  }}
+                  onError={(e) => {
+                    e.target.onerror = null;
+                    e.target.src = "/imagem-padrao.png";
+                  }}
+                />
+              </TransformComponent>
+            </TransformWrapper>
+          </div>
+        )}
+
+
+
+          <Form onSubmit={handleUpdate}>
+            <div style={{ opacity: isLoading ? 0.5 : 1 }}>
+              <Row className="g-3 mb-3">
+                <Col md={4}>
+                  <Form.Group controlId="medico">
+                    <Form.Label className="fw-semibold small">
+                      <FaUserMd className="me-2 text-primary" /> Médico
+                    </Form.Label>
+                    <Form.Control
+                      type="text"
+                      name="medico"
+                      value={data.medico}
+                      onChange={handleChange}
+                      required
+                      disabled={isLoading || loading}
+                      placeholder="Nome do médico"
+                    />
+                  </Form.Group>
+                </Col>
+
+                <Col md={4}>
+                  <Form.Group controlId="dataReceita">
+                    <Form.Label className="fw-semibold small">
+                      <FaCalendarAlt className="me-2 text-primary" /> Data
+                    </Form.Label>
+                    <DatePicker
+                      selected={data.dataReceita}
+                      onChange={handleDateChange}
+                      onChangeRaw={handleDateInputChange}
+                      value={dateInputValue}
+                      className="form-control"
+                      dateFormat="dd/MM/yyyy"
+                      placeholderText="DD/MM/AAAA"
+                      required
+                      disabled={isLoading || loading}
+                      locale="pt-BR"
+                      showYearDropdown
+                      dropdownMode="select"
+                    />
+                  </Form.Group>
+                </Col>
+
+                <Col md={4}>
+                  <Form.Group controlId="crmMedico">
+                    <Form.Label className="fw-semibold small">CRM</Form.Label>
+                    <Form.Control
+                      type="text"
+                      name="crmMedico"
+                      value={data.crmMedico}
+                      onChange={handleChange}
+                      required
+                      disabled={isLoading || loading}
+                      placeholder="Número do CRM"
+                    />
+                  </Form.Group>
+                </Col>
+
+                <Col md={12}>
+                  <Form.Group controlId="observacoes">
+                    <Form.Label className="fw-semibold small">
+                      <FaStickyNote className="me-2 text-primary" />
+                      Notas
+                    </Form.Label>
+                    <Form.Control
+                      as="textarea"
+                      rows={3}
+                      name="observacoes"
+                      value={data.observacoes}
+                      onChange={handleChange}
+                      disabled={isLoading || loading}
+                      placeholder="Observações adicionais"
+                    />
+                  </Form.Group>
+                </Col>
+
+                <Form.Group controlId="resumo">
+                  <Form.Label className="fw-semibold small">
+                    <FaStickyNote className="me-2 text-primary" /> Resumo
+                  </Form.Label>
+                  <Form.Control
+                    as="textarea"
+                    rows={7}
+                    name="resumo"
+                    value={data.resumo}
+                    onChange={handleChange}
+                    disabled={isLoading || loading}
+                    placeholder="Resumo da receita"
+                  />
+                </Form.Group>
+              </Row>
+
+              <div className="border-top pt-3 mt-2">
+                <h5 className="mb-3 fs-5 fw-bold">
+                  <FaPills className="me-2 text-primary" /> Medicamentos
+                </h5>
+
+                {data.medicamentos.length > 0 && (
+                  <div className="mb-3">
+                    {data.medicamentos.map((m) => (
+                      <div key={m.id} className="border rounded p-3 mb-3">
+                        <Row className="g-3 align-items-center">
+                          <Col md={5}>
+                            <Form.Group>
+                              <Form.Label className="small text-muted mb-1">
+                                Nome do Medicamento
+                              </Form.Label>
+                              <Form.Control
+                                type="text"
+                                name="nome"
+                                value={m.nome}
+                                onChange={(e) => {
+                                  const updatedMeds = data.medicamentos.map(
+                                    (med) =>
+                                      med.id === m.id
+                                        ? { ...med, nome: e.target.value }
+                                        : med
+                                  );
+                                  setData({
+                                    ...data,
+                                    medicamentos: updatedMeds,
+                                  });
+                                }}
+                                required
+                              />
+                            </Form.Group>
+                          </Col>
+
+                          <Col md={3}>
+                            <Form.Group>
+                              <Form.Label className="small text-muted mb-1">
+                                Quantidade
+                              </Form.Label>
+                              <Form.Control
+                                type="text"
+                                name="quantidade"
+                                value={m.quantidade}
+                                onChange={(e) => {
+                                  const updatedMeds = data.medicamentos.map(
+                                    (med) =>
+                                      med.id === m.id
+                                        ? { ...med, quantidade: e.target.value }
+                                        : med
+                                  );
+                                  setData({
+                                    ...data,
+                                    medicamentos: updatedMeds,
+                                  });
+                                }}
+                                required
+                              />
+                            </Form.Group>
+                          </Col>
+
+                          <Col md={4}>
+                            <Form.Group>
+                              <Form.Label className="small text-muted mb-1">
+                                Forma de Uso
+                              </Form.Label>
+                              <Form.Control
+                                type="text"
+                                name="formaDeUso"
+                                value={m.formaDeUso}
+                                onChange={(e) => {
+                                  const updatedMeds = data.medicamentos.map(
+                                    (med) =>
+                                      med.id === m.id
+                                        ? { ...med, formaDeUso: e.target.value }
+                                        : med
+                                  );
+                                  setData({
+                                    ...data,
+                                    medicamentos: updatedMeds,
+                                  });
+                                }}
+                                required
+                              />
+                            </Form.Group>
+                          </Col>
+                        </Row>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              <div className="d-flex justify-content-center mt-4 pt-3 border-top">
+                <Button
+                  type="button"
+                  className="btn btn-primary"
+                  onClick={handleUpdate}
+                  disabled={loading || isLoading}
+                  style={{ minWidth: "200px" }}
+                >
+                  {loading ? (
+                    <>
+                      <Spinner
+                        as="span"
+                        animation="border"
+                        size="sm"
+                        role="status"
+                        aria-hidden="true"
+                        className="me-2"
+                      />
+                      Salvando...
+                    </>
+                  ) : (
+                    <>
+                      <FaSave className="me-2" />
+                      Salvar Alterações
+                    </>
+                  )}
+                </Button>
+              </div>
+            </div>
+          </Form>
         </div>
       </div>
     </div>

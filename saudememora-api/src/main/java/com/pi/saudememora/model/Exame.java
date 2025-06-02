@@ -1,8 +1,11 @@
 package com.pi.saudememora.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.pi.saudememora.model.Documentos;
 import jakarta.persistence.*;
+
+import java.time.LocalDate;
 import java.util.Date;
 
 @JsonIgnoreProperties(ignoreUnknown = true)
@@ -41,12 +44,24 @@ public class Exame {
     @Column(name = "nome_exame")
     private String nomeExame;
 
-
-
     @ManyToOne
     @JoinColumn(name = "id_documento", nullable = false)
     @JsonIgnoreProperties("exames")
     private Documentos documento;
+
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+    @Column(name = "dt_exame", nullable = false)
+    private LocalDate dataExame;
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+    @Column(name = "dt_inclusao", nullable = false, updatable = false)
+    private LocalDate dataInclusao;
+
+    @PrePersist
+    protected void onCreate() {
+        this.dataInclusao = LocalDate.now();
+    }
 
     // Getters e Setters
     public Long getId() { return id; }

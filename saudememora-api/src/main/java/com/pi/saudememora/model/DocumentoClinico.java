@@ -1,7 +1,10 @@
 package com.pi.saudememora.model;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import jakarta.persistence.*;
+
+import java.time.LocalDate;
 import java.util.Date;
 
 @Entity
@@ -22,10 +25,6 @@ public class DocumentoClinico {
     @Column(name = "ds_tipo")
     private String tipo;
 
-    @Temporal(TemporalType.DATE)
-    @Column(name = "dt_data", nullable = false)
-    private Date data;
-
     @Column(name = "ds_observacoes", length = 2000)
     private String observacoes;
 
@@ -39,7 +38,6 @@ public class DocumentoClinico {
     @Column(name = "ds_resumo", columnDefinition = "CLOB")
     private String resumo;
 
-
     @ManyToOne
     @JoinColumn(name = "id_documento", nullable = false)
     private Documentos documento;
@@ -49,9 +47,23 @@ public class DocumentoClinico {
     private Paciente paciente;
 
     @Column(name = "ds_conteudo", length = 5000)
-    private String conteudo;  // adiciona este campo para armazenar o conteúdo original
+    private String conteudo;
 
-    // getter e setter
+
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+    @Column(name = "dt_inclusao", nullable = false, updatable = false)
+    private LocalDate dataInclusao;
+
+    @Temporal(TemporalType.DATE)
+    @Column(name = "dt_documentocli", nullable = false)
+    private Date dataDocumentoCli;
+
+    @PrePersist
+    protected void onCreate() {
+        this.dataInclusao = LocalDate.now();
+    }
+
     public String getConteudo() {
         return conteudo;
     }
@@ -59,8 +71,6 @@ public class DocumentoClinico {
     public void setConteudo(String conteudo) {
         this.conteudo = conteudo;
     }
-
-    // Getters e Setters
 
     public Long getId() {
         return id;
@@ -102,12 +112,12 @@ public class DocumentoClinico {
         this.tipo = tipo;
     }
 
-    public Date getData() {
-        return data;
+    public Date getDataDocumentoCli() {
+        return dataDocumentoCli;
     }
 
-    public void setData(Date data) {
-        this.data = data;
+    public void setDataDocumentoCli(Date dataDocumentoCli) {
+        this.dataDocumentoCli = dataDocumentoCli;
     }
 
 
@@ -150,5 +160,13 @@ public class DocumentoClinico {
 
     public void setPaciente(Paciente paciente) {
         this.paciente = paciente;
+    }
+
+    public LocalDate getDataInclusao() {
+        return dataInclusao;
+    }
+
+    public void setDataInclusao(LocalDate dataInclusao) {
+        this.dataInclusao = dataInclusao;
     }
 }

@@ -14,10 +14,6 @@ import {
 export default function VisualizadorExame({ exame }) {
   const navigate = useNavigate();
 
-  const dataFormatada = exame.data
-    ? new Date(exame.data).toLocaleDateString("pt-BR")
-    : "Não informado";
-
   return (
     <div
       className="mx-auto py-4"
@@ -106,7 +102,7 @@ export default function VisualizadorExame({ exame }) {
             <FaFileMedical /> {exame.nomeExame || "Exame sem nome"}
           </h5>
           <p>
-            <FaCalendarAlt /> <strong>Data:</strong> {dataFormatada}
+            <FaCalendarAlt /> <strong>Data:</strong> {new Date(exame.dataExame).toLocaleDateString("pt-BR")}
           </p>
           <p>
             <FaFlask /> <strong>Tipo:</strong> {exame.tipo || "Não informado"}

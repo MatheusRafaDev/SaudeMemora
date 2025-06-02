@@ -220,39 +220,39 @@ export async function tratarOCRParaReceitas(textoOCR) {
 
     const prompt = `Você é um assistente que interpreta textos médicos extraídos via OCR e transforma os dados em JSON estruturado para serem incluídos em um sistema de receitas médicas.
 
-Leia o texto abaixo e extraia os campos:
-- "data" (formato YYYY-MM-DD ou DD/MM/YYYY),
-- "medico" "Formate o nome do médico com a capitalização correta, usando maiúscula só nas primeiras letras de cada palavra, sem deixar tudo em maiúsculo ou tudo minúsculo.",
-- "crm" (registro do médico),
-- "medicamentos" (uma lista de medicamentos, onde cada medicamento deve ter os seguintes campos):
-  - "nome": nome do medicamento,
-  - "quantidade": quantidade do medicamento,
-  - "formaDeUso": instruções de uso do medicamento,
-- "observacoes": observações adicionais,
-- "resumo": "Reescreva este texto corrigindo a ortografia, melhorando a formatação e a idetação textual.
+    Leia o texto abaixo e extraia os campos:
+    - "dataReceita" (formato YYYY-MM-DD ou DD/MM/YYYY),
+    - "medico" "Formate o nome do médico com a capitalização correta, usando maiúscula só nas primeiras letras de cada palavra, sem deixar tudo em maiúsculo ou tudo minúsculo.",
+    - "crm" (registro do médico),
+    - "medicamentos" (uma lista de medicamentos, onde cada medicamento deve ter os seguintes campos):
+      - "nome": nome do medicamento,
+      - "quantidade": quantidade do medicamento,
+      - "formaDeUso": instruções de uso do medicamento,
+    - "observacoes": observações adicionais,
+    - "resumo": "Reescreva este texto corrigindo a ortografia, melhorando a formatação e a idetação textual.
 
-IMPORTANTE: Se algum dos campos acima não estiver presente no texto ou estiver vazio, preencha com um texto padrão explicativo para evitar valores vazios ou nulos.
+    IMPORTANTE: Se algum dos campos acima não estiver presente no texto ou estiver vazio, preencha com um texto padrão explicativo para evitar valores vazios ou nulos.
 
-Retorne apenas o JSON com os dados extraídos, no seguinte formato:
-{
-  "data": "YYYY-MM-DD",
-  "medico": "Nome do médico",
-  "crm": "CRM do médico",
-  "medicamentos": [
+    Retorne apenas o JSON com os dados extraídos, no seguinte formato:
     {
-      "nome": "Nome do medicamento",
-      "quantidade": "Quantidade do medicamento",
-      "formaDeUso": "Forma de uso"
+      "dataReceita": "YYYY-MM-DD",
+      "medico": "Nome do médico",
+      "crm": "CRM do médico",
+      "medicamentos": [
+        {
+          "nome": "Nome do medicamento",
+          "quantidade": "Quantidade do medicamento",
+          "formaDeUso": "Forma de uso"
+        }
+      ],
+      "observacoes": "Texto das observações",
+      "resumo": "Texto do OCR reescrito e normalizado. Corrija a ortografia, padronize os termos médicos e organize como se fosse uma receita".
     }
-  ],
-  "observacoes": "Texto das observações",
-  "resumo": "Texto do OCR reescrito e normalizado. Corrija a ortografia, padronize os termos médicos e organize como se fosse uma receita".
-}
 
-Não adicione comentários nem explicações.
+    Não adicione comentários nem explicações.
 
-Texto do OCR:
-${textoTratado}`;
+    Texto do OCR:
+    ${textoTratado}`;
 
     const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
       method: "POST",
@@ -292,9 +292,10 @@ ${textoTratado}`;
       throw new Error("A resposta da API está incompleta.");
     }
 
+
     let dataFormatada = "";
-    if (jsonReceita.data) {
-      const d = jsonReceita.data.trim();
+    if (jsonReceita.dataReceita) {
+      const d = jsonReceita.dataReceita.trim();
       if (d.includes("/")) {
         const partes = d.split("/");
         if (partes.length === 3) {
@@ -342,28 +343,28 @@ export async function tratarOCRParaExames(textoOCR) {
 
     const prompt = `Você é um assistente que interpreta textos extraídos via OCR e transforma os dados em JSON estruturado para exames médicos.
 
-Leia o texto abaixo e extraia os campos:
-- "data" (formato YYYY-MM-DD ou DD/MM/YYYY),
-- "tipo": tipo do exame,
-- "laboratorio": nome do laboratório que realizou o exame,
-- "resultado": resultado do exame,
-- "observacoes": observações adicionais,
-- "resumo": o mesmo texto abaixo, mas reescrito com ortografia corrigida e identado bom para leitura.
+    Leia o texto abaixo e extraia os campos:
+    - "dataExame" (formato YYYY-MM-DD ou DD/MM/YYYY),
+    - "tipo": tipo do exame,
+    - "laboratorio": nome do laboratório que realizou o exame,
+    - "resultado": resultado do exame,
+    - "observacoes": observações adicionais,
+    - "resumo": o mesmo texto abaixo, mas reescrito com ortografia corrigida e identado bom para leitura.
 
-IMPORTANTE: Se algum dos campos acima não estiver presente no texto ou estiver vazio, preencha com um texto padrão explicativo para evitar valores vazios ou nulos.
+    IMPORTANTE: Se algum dos campos acima não estiver presente no texto ou estiver vazio, preencha com um texto padrão explicativo para evitar valores vazios ou nulos.
 
-Retorne apenas o JSON com os dados extraídos, no seguinte formato:
-{
-  "data": "YYYY-MM-DD",
-  "tipo": "Tipo do exame",
-  "laboratorio": "Nome do laboratório",
-  "resultado": "Resultado do exame",
-  "observacoes": "Texto das observações",
-  "resumo": "Texto do OCR reescrito e normalizado. Corrija a ortografia, padronize os termos médicos e organize como se fosse o resultado de um exame laboratorial".
-}
+    Retorne apenas o JSON com os dados extraídos, no seguinte formato:
+    {
+      "dataExame": "YYYY-MM-DD",
+      "tipo": "Tipo do exame",
+      "laboratorio": "Nome do laboratório",
+      "resultado": "Resultado do exame",
+      "observacoes": "Texto das observações",
+      "resumo": "Texto do OCR reescrito e normalizado. Corrija a ortografia, padronize os termos médicos e organize como se fosse o resultado de um exame laboratorial".
+    }
 
-Texto do OCR:
-${textoTratado}`;
+    Texto do OCR:
+    ${textoTratado}`;
 
     const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
       method: "POST",
@@ -403,14 +404,30 @@ ${textoTratado}`;
       throw new Error("A resposta da API está incompleta.");
     }
 
-    console.log(jsonExame);
+    let dataFormatada = "";
+    if (jsonExame.dataExame) {
+      const d = jsonExame.dataExame.trim();
+      if (d.includes("/")) {
+        const partes = d.split("/");
+        if (partes.length === 3) {
+          dataFormatada = `${partes[2]}-${partes[1].padStart(
+            2,
+            "0"
+          )}-${partes[0].padStart(2, "0")}`;
+        }
+      } else {
+        dataFormatada = d;
+      }
+    }
+
     return {
-      data: jsonExame.data || "",
+      dataExame: dataFormatada || "",
       tipo: jsonExame.tipo || "",
       laboratorio: jsonExame.laboratorio || "",
       resultado: jsonExame.resultado || "",
       observacoes: jsonExame.observacoes,
       resumo: jsonExame.resumo,
+      nomeExame: jsonExame.nomeExame || "",
     };
   } catch (error) {
     console.error("❌ Erro ao tratar OCR para Exames:", error.message);
@@ -432,35 +449,35 @@ export async function tratarOCRParaDocumentoClinico(textoOCR) {
 
     const prompt = `Você é um assistente que interpreta textos extraídos via OCR e transforma os dados em JSON estruturado para documentos clínicos.
 
-Leia o texto abaixo e extraia os campos:
-- "data" (formato YYYY-MM-DD ou DD/MM/YYYY),
-- "medico": nome do médico,
-- "especialidade": especialidade médica do profissional,
-- "observacoes": observações,
-- "conclusoes": conclusões do médico geral,
-- "resumo": o mesmo texto abaixo, mas reescrito com ortografia corrigida, pontuação adequada e espaçamento correto e faça uma identação textual,
-- "tipo": tipo do documento (laudo, atestado, receita, relatório, exame, entre outros), que deve ser identificado sempre com base no conteúdo, mesmo que o texto não tenha título explícito.
+    Leia o texto abaixo e extraia os campos:
+    - "dataDocumentoCli" (formato YYYY-MM-DD ou DD/MM/YYYY),
+    - "medico": nome do médico,
+    - "especialidade": especialidade médica,
+    - "observacoes": observações do documento gerais,
+    - "conclusoes": conclusões do médico geral,
+    - "resumo": o mesmo texto abaixo, mas reescrito com ortografia corrigida, pontuação adequada e espaçamento correto e faça uma identação textual,
+    - "tipo": tipo do documento (laudo, atestado, receita, relatório, exame, entre outros), que deve ser identificado sempre com base no conteúdo, mesmo que o texto não tenha título explícito.
 
-Se o texto contiver palavras como "LAUDO MÉDICO", "ATESTADO", "RECEITA", "RELATÓRIO", ou termos similares, utilize o tipo correspondente.  
-Se não houver título claro, inferir o tipo com base no conteúdo.
+    Se o texto contiver palavras como "LAUDO MÉDICO", "ATESTADO", "RECEITA", "RELATÓRIO", ou termos similares, utilize o tipo correspondente.  
+    Se não houver título claro, inferir o tipo com base no conteúdo.
 
 
-IMPORTANTE: Se algum dos campos acima não estiver presente ou estiver vazio, preencha com um texto padrão explicativo para evitar valores vazios ou nulos.
+    IMPORTANTE: Se algum dos campos acima não estiver presente ou estiver vazio, preencha com um texto padrão explicativo para evitar valores vazios ou nulos.
 
-Retorne apenas o JSON com os dados extraídos, no seguinte formato:
-{
-  "data": "YYYY-MM-DD",
-  "medico": "Nome do médico",
-  "especialidade": "Especialidade médica",
-  "observacoes": "observações",
-  "conclusoes": "conclusões",
-  "resumo": "reformatar textos extraídos via OCR para melhorar a legibilidade.",
-  "tipo": "tipo do documento ou titulo dado (laudo, atestado, receita, relatório, exame, etc.) com base no que está escrito"
-}
+    Retorne apenas o JSON com os dados extraídos, no seguinte formato:
+    {
+      "dataDocumentoCli": "YYYY-MM-DD",
+      "medico": "Nome do médico",
+      "especialidade": "Especialidade médica",
+      "observacoes": "observações",
+      "conclusoes": "conclusões",
+      "resumo": "reformatar textos extraídos via OCR para melhorar a legibilidade.",
+      "tipo": "tipo do documento ou titulo dado (laudo, atestado, receita, relatório, exame, etc.) com base no que está escrito"
+    }
 
-Texto do OCR:
-${textoTratado}
-`;
+    Texto do OCR:
+    ${textoTratado}
+    `;
 
     const res = await fetch("https://openrouter.ai/api/v1/chat/completions", {
       method: "POST",
@@ -489,7 +506,6 @@ ${textoTratado}
     if (!res.ok) throw new Error(`Erro na API: ${res.statusText}`);
     const data = await res.json();
 
-    console.log(data);
     let jsonDocumento;
     try {
       jsonDocumento = JSON.parse(data.choices[0].message.content);
@@ -501,11 +517,29 @@ ${textoTratado}
       throw new Error("A resposta da API está incompleta.");
     }
 
+    let dataFormatada = "";
+    if (jsonDocumento.dataDocumentoCli) {
+      const d = jsonDocumento.dataDocumentoCli.trim();
+      if (d.includes("/")) {
+        const partes = d.split("/");
+        if (partes.length === 3) {
+          dataFormatada = `${partes[2]}-${partes[1].padStart(
+            2,
+            "0"
+          )}-${partes[0].padStart(2, "0")}`;
+        }
+      } else {
+        dataFormatada = d;
+      }
+    }
+
+
+
     return {
-      data: jsonDocumento.data || "",
+      dataDocumentoCli: jsonDocumento.dataDocumentoCli || "",
       medico: jsonDocumento.medico || "",
       especialidade: jsonDocumento.especialidade || "",
-      tipo: jsonDocumento.tipo || "documento clínico",
+      tipo: jsonDocumento.tipo || "",
       observacoes: normalizarTexto(jsonDocumento.observacoes),
       conclusoes: normalizarTexto(jsonDocumento.conclusoes),
       resumo: normalizarTexto(jsonDocumento.resumo),

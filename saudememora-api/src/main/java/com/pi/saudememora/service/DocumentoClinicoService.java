@@ -37,7 +37,7 @@ public class DocumentoClinicoService {
             // Atualiza campos
             docAtual.setMedico(documento.getMedico());
             docAtual.setEspecialidade(documento.getEspecialidade());
-            docAtual.setData(documento.getData());
+            docAtual.setDataDocumentoCli(documento.getDataDocumentoCli());
             docAtual.setObservacoes(documento.getObservacoes());
             docAtual.setConclusoes(documento.getConclusoes());
             docAtual.setPaciente(documento.getPaciente());

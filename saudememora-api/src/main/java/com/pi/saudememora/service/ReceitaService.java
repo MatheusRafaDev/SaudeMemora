@@ -1,5 +1,6 @@
 package com.pi.saudememora.service;
 
+import com.pi.saudememora.model.Medicamento;
 import com.pi.saudememora.model.Receita;
 import com.pi.saudememora.repository.ReceitaRepository;
 import org.slf4j.Logger;
@@ -8,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -23,21 +25,36 @@ public class ReceitaService {
     }
 
     @Transactional
-    public Receita atualizarReceita(Receita receita) {
+    public Receita atualizarReceitaComMedicamentos(Receita receitaAtualizada) {
         try {
-            // Verifica se a receita existe
-            if (receita.getId() == null || !receitaRepository.existsById(receita.getId())) {
-                logger.warn("Tentativa de atualizar receita não existente: ID {}", receita.getId());
+            if (receitaAtualizada.getId() == null || !receitaRepository.existsById(receitaAtualizada.getId())) {
+                logger.warn("Tentativa de atualizar receita não existente: ID {}", receitaAtualizada.getId());
                 return null;
             }
 
-            // Salva e retorna a receita atualizada
-            return receitaRepository.save(receita);
+            Receita receitaOriginal = receitaRepository.findById(receitaAtualizada.getId())
+                    .orElseThrow(() -> new RuntimeException("Receita não encontrada"));
+
+            receitaOriginal.setDataReceita(receitaAtualizada.getDataReceita());
+            receitaOriginal.setCrmMedico(receitaAtualizada.getCrmMedico());
+            receitaOriginal.setMedico(receitaAtualizada.getMedico());
+            receitaOriginal.setObservacoes(receitaAtualizada.getObservacoes());
+            receitaOriginal.setResumo(receitaAtualizada.getResumo());
+            receitaOriginal.setPosologia(receitaAtualizada.getPosologia());
+
+            receitaOriginal.getMedicamentos().clear();
+            for (Medicamento medicamento : receitaAtualizada.getMedicamentos()) {
+                medicamento.setReceita(receitaOriginal);
+                receitaOriginal.getMedicamentos().add(medicamento);
+            }
+
+            return receitaRepository.save(receitaOriginal);
         } catch (Exception e) {
-            logger.error("Erro ao atualizar receita com ID {}", receita.getId(), e);
+            logger.error("Erro ao atualizar receita com ID {}", receitaAtualizada.getId(), e);
             throw new RuntimeException("Erro ao atualizar receita", e);
         }
     }
+
 
     // Outros métodos existentes (buscarPorId, createReceita, etc.)
     public Optional<Receita> buscarPorId(Long id) {

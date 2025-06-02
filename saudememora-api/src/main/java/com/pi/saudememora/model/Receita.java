@@ -34,13 +34,7 @@ public class Receita {
     @Column(name = "ds_imagem")
     private String imagem;
 
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
-    @Column(name = "dt_receita", nullable = false)
-    private LocalDate dataReceita;
 
-    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
-    @Column(name = "dt_inclusao", nullable = false, updatable = false)
-    private LocalDate dataInclusao;
 
     @OneToMany(mappedBy = "receita", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Medicamento> medicamentos = new ArrayList<>();
@@ -52,6 +46,17 @@ public class Receita {
     @ManyToOne
     @JoinColumn(name = "id_paciente", nullable = false)
     private Paciente paciente;
+
+
+
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+    @Column(name = "dt_receita", nullable = false)
+    private LocalDate dataReceita;
+
+    @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
+    @Column(name = "dt_inclusao", nullable = false, updatable = false)
+    private LocalDate dataInclusao;
 
     @PrePersist
     protected void onCreate() {

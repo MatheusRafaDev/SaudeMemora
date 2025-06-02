@@ -25,7 +25,6 @@ public class MedicamentoController {
         this.medicamentoRepository = medicamentoRepository;
     }
 
-    // 1) Criar um novo medicamento
     @PostMapping
     public ResponseEntity<?> createMedicamento(@RequestBody Medicamento medicamento) throws JsonProcessingException {
         ObjectMapper mapper = new ObjectMapper();
@@ -42,11 +41,19 @@ public class MedicamentoController {
         }
     }
 
-    // 2) Obter todos os medicamentos
-    @GetMapping
+
     public ResponseEntity<List<Medicamento>> getAllMedicamentos() {
         List<Medicamento> medicamentos = medicamentoRepository.findAll();
         if (medicamentos.isEmpty()) return ResponseEntity.noContent().build();
+        return ResponseEntity.ok(medicamentos);
+    }
+
+    @GetMapping("/receita/{receitaId}")
+    public ResponseEntity<List<Medicamento>> getMedicamentosByReceitaId(@PathVariable Long receitaId) {
+        List<Medicamento> medicamentos = medicamentoRepository.findByReceitaId(receitaId);
+        if (medicamentos.isEmpty()) {
+            return ResponseEntity.noContent().build();
+        }
         return ResponseEntity.ok(medicamentos);
     }
 

@@ -87,14 +87,14 @@ public class DocumentoClinicoController {
             }
 
             DocumentoClinico documentoAtual = documentoExistente.get();
+            documentoAtual.setTipo(documento.getTipo());
+            documentoAtual.setDataDocumentoCli(documento.getDataDocumentoCli());
+            documentoAtual.setMedico(documento.getMedico());
+            documentoAtual.setEspecialidade(documento.getEspecialidade());
+            documentoAtual.setConclusoes(documento.getConclusoes());
+            documentoAtual.setObservacoes(documento.getObservacoes());
 
-            if (documento.getTipo() != null) {
-                documentoAtual.setTipo(documento.getTipo());
-            }
 
-            if (documento.getData() != null) {
-                documentoAtual.setData(documento.getData());
-            }
             DocumentoClinico atualizado = service.salvar(documentoAtual);
             return ResponseEntity.ok(atualizado);
         } catch (Exception e) {

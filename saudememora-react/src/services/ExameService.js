@@ -46,6 +46,7 @@ const ExameService = {
   // Criar um novo exame
   create: async (exame) => {
     try {
+
       const response = await axiosInstance.post("/api/exames", exame, {
         headers: {
           "Content-Type": "application/json",
