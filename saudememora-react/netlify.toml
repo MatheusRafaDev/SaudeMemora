@@ -1,4 +1,8 @@
 [build]
-  command = "CI= DISABLE_ESLINT_PLUGIN=true npm install && npm run build"
+  command = "CI= npm install && npm run build"
   publish = "build"
   functions = "netlify/functions"
+
+[build.environment]
+  NODE_VERSION = "18.18.0"
+  DISABLE_ESLINT_PLUGIN = "true"
