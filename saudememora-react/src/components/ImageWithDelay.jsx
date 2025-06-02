@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { TransformWrapper, TransformComponent } from 'react-zoom-pan-pinch';
 import { Spinner } from 'react-bootstrap';
+import axiosInstance from '../../axiosConfig';
 
 const ImageWithDelay = ({ tipo, id }) => {
   const [loaded, setLoaded] = useState(false);
@@ -45,7 +46,7 @@ const ImageWithDelay = ({ tipo, id }) => {
           }}
         >
           <img
-            src={`http://localhost:7070/api/${tipo}/imagem/${id}`}
+            src={`${urlBase}/api/${tipo}/imagem/${id}`}
             alt={`Imagem de ${tipo}`}
             className="img-fluid rounded shadow"
             style={{

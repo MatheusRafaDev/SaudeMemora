@@ -7,6 +7,7 @@ import { registerLocale } from "react-datepicker";
 import DocumentoClinicoService from "../../services/DocumentoClinicoService";
 import ptBR from 'date-fns/locale/pt-BR';
 import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
+import axiosInstance from '../../axiosConfig';
 import {
   FaFileAlt,
   FaFileMedical,
@@ -79,6 +80,7 @@ const DocumentoClinicoForm = ({ data: initialData, isLoading = false }) => {
   const [data, setData] = useState(documentoClinicoModel);
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
+  const urlBase = axiosInstance.defaults.baseURL;
 
   useEffect(() => {
     if (initialData) {
@@ -156,7 +158,7 @@ const DocumentoClinicoForm = ({ data: initialData, isLoading = false }) => {
                 }}
               >
                 <img
-                  src={`http://localhost:7070/api/documentosclinicos/imagem/${data.id}`}
+                  src={`${urlBase}/api/documentosclinicos/imagem/${data.id}`}
                   alt="Imagem do documento"
                   className="img-fluid rounded shadow"
                   style={{

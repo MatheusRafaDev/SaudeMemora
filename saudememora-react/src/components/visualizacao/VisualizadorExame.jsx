@@ -2,6 +2,7 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 import formatarData from '../../utils/formatarData';
+import axiosInstance from '../../axiosConfig';
 import {
   FaCalendarAlt,
   FaFlask,
@@ -14,7 +15,7 @@ import {
 
 export default function VisualizadorExame({ exame }) {
   const navigate = useNavigate();
-
+  const urlBase = axiosInstance.defaults.baseURL;
   return (
     <div
       className="mx-auto py-4"
@@ -76,7 +77,7 @@ export default function VisualizadorExame({ exame }) {
                     }}
                   >
                     <img
-                      src={`http://localhost:7070/api/exames/imagem/${exame.id}`}
+                      src={`${urlBase}/api/exames/imagem/${exame.id}`}
                       alt={`Imagem do exame ${exame.nomeExame}`}
                       className="img-fluid rounded shadow"
                       style={{

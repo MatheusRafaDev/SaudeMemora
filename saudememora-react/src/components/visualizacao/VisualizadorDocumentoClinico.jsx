@@ -2,6 +2,7 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import formatarData from '../../utils/formatarData';
 import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
+import axiosInstance from '../../axiosConfig';
 import {
   FaCalendarAlt,
   FaFileAlt,
@@ -16,7 +17,7 @@ export default function VisualizadorDocumentoClinico({ documentoClinico }) {
   const navigate = useNavigate();
 
   const documento = documentoClinico;
-
+  const urlBase = axiosInstance.defaults.baseURL;
 
   return (
     <div
@@ -81,7 +82,7 @@ export default function VisualizadorDocumentoClinico({ documentoClinico }) {
                     }}
                   >
                     <img
-                      src={`http://localhost:7070/api/documentosclinicos/imagem/${documento.id}`}
+                      src={`${urlBase}/api/documentosclinicos/imagem/${documento.id}`}
                       alt={`Documento ${documento.tipo}`}
                       className="img-fluid rounded shadow"
                       style={{

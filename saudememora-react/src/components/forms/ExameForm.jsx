@@ -7,6 +7,8 @@ import ptBR from "date-fns/locale/pt-BR";
 import { registerLocale } from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import ExameService from "../../services/ExameService";
+import axiosInstance from '../../axiosConfig';
+
 
 import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 import {
@@ -38,6 +40,7 @@ const ExameForm = ({ data: initialData, isLoading = false }) => {
 
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
+  const urlBase = axiosInstance.defaults.baseURL;
 
   // Função para converter string de data em objeto Date
   const parseDateString = (dateString) => {
@@ -176,7 +179,7 @@ const ExameForm = ({ data: initialData, isLoading = false }) => {
                 }}
               >
                 <img
-                  src={`http://localhost:7070/api/exames/imagem/${data.id}`}
+                  src={`${urlBase}/api/exames/imagem/${data.id}`}
                   alt="Imagem do exame"
                   className="img-fluid rounded shadow"
                   style={{

@@ -117,7 +117,7 @@ public class ExameController {
             Exame exameExistente = exameService.findById(id)
                     .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Exame não encontrado"));
 
-            exameExistente.setData(exame.getData());
+            exameExistente.setDataExame(exame.getDataExame());
             exameExistente.setTipo(exame.getTipo());
             exameExistente.setLaboratorio(exame.getLaboratorio());
             exameExistente.setResultado(exame.getResultado());

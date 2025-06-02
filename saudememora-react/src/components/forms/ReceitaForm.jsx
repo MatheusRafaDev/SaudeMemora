@@ -4,6 +4,7 @@ import { useNavigate } from "react-router-dom";
 import ReceitaService from "../../services/ReceitaService";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
+import axiosInstance from '../../axiosConfig';
 import {
   FaPills,
   FaCalendarAlt,
@@ -18,7 +19,7 @@ const ReceitaForm = ({ data: initialData, isLoading = false }) => {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
   const [idLoaded, setIdLoaded] = useState(false);
-
+  const urlBase = axiosInstance.defaults.baseURL;
   const [data, setData] = useState({
     id: null,
     dataReceita: null,
@@ -212,7 +213,7 @@ const ReceitaForm = ({ data: initialData, isLoading = false }) => {
                   }}
                 >
                   <img
-                    src={`http://localhost:7070/api/receitas/imagem/${data.id}`}
+                    src={`${urlBase}/api/receitas/imagem/${data.id}`}
                     alt="Imagem do documento"
                     className="img-fluid rounded shadow"
                     style={{

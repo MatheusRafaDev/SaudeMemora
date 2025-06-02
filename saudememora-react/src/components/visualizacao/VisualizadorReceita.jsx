@@ -2,6 +2,8 @@ import React from "react";
 import { useNavigate } from "react-router-dom";
 import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
 import formatarData from '../../utils/formatarData';
+import axiosInstance from '../../axiosConfig';
+
 import {
   FaCalendarAlt,
   FaUserMd,
@@ -13,7 +15,7 @@ import {
 
 export default function ReceitaComMedicamentos({ receita }) {
   const navigate = useNavigate();
-
+  const urlBase = axiosInstance.defaults.baseURL;
   return (
     <div
       className="mx-auto py-4"
@@ -76,7 +78,7 @@ export default function ReceitaComMedicamentos({ receita }) {
                     }}
                   >
                     <img
-                      src={`http://localhost:7070/api/receitas/imagem/${receita.id}`}
+                      src={`${urlBase}/api/receitas/imagem/${receita.id}`}
                       alt="Imagem da Receita"
                       className="img-fluid rounded shadow"
                       style={{
