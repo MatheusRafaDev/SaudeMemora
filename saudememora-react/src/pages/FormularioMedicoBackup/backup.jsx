@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
+import { ocrSpace } from "../ocr/ocrSpace";
+import { aplicarCamposComOCR } from "../ocr/aplicarCamposComOCR";
 import "../styles/FormularioMedico.css";
 import Nav from "../components/Nav";
 import { useNavigate } from "react-router-dom";
@@ -121,6 +123,9 @@ const perguntas = [
 
 const FormularioMedico = () => {
   const [respostas, setRespostas] = useState({});
+  const [imagem, setImagem] = useState(null);
+  const [textoOCR, setTextoOCR] = useState("");
+  const [ocrExecutado, setOcrExecutado] = useState(false);
   const [mensagem, setMensagem] = useState("");
   const [isAtualizar, setIsAtualizar] = useState(false);
   const navigate = useNavigate();
@@ -194,10 +199,12 @@ const FormularioMedico = () => {
         };
 
         setRespostas(novasRespostas);
+        setTextoOCR(fichaResponse.ocrTexto || "");
         setIsAtualizar(true);
       }
     } catch (error) {
       console.error("Erro ao buscar ficha:", error);
+
     } finally {
       setCarregando(false);
     }
@@ -216,6 +223,45 @@ const FormularioMedico = () => {
       obterFicha();
     }
   }, [paciente.id]);
+
+  const handleFileChange = (e) => {
+    setImagem(e.target.files[0]);
+    setOcrExecutado(false);
+    setTextoOCR("");
+  };
+
+  const executarOCR = async () => {
+    if (!imagem) {
+      setMensagem("Carregue uma imagem primeiro.");
+      return;
+    }
+    if (!imagem.type.startsWith("image/")) {
+      setMensagem("Por favor, selecione uma imagem válida.");
+      return;
+    }
+
+    setCarregando(true);
+    try {
+      const texto = await ocrSpace(imagem);
+      setTextoOCR(texto || "");
+      setOcrExecutado(true);
+      setMensagem("");
+    } catch (error) {
+      setMensagem("Erro ao processar OCR. Tente novamente.");
+      console.error("OCR Error:", error);
+    } finally {
+      setCarregando(false);
+    }
+  };
+
+  const handleAplicarOCR = () => {
+    if (!ocrExecutado) {
+      setMensagem("Execute o OCR primeiro.");
+      return;
+    }
+    aplicarCamposComOCR(textoOCR, perguntas, setRespostas, setMensagem);
+    setMensagem("Campos preenchidos com sucesso!");
+  };
 
   const handleChange = (chave, valor) => {
     setRespostas((prev) => {
@@ -251,6 +297,7 @@ const FormularioMedico = () => {
         return answer && answer !== "";
       }
 
+
       return true;
     });
   };
@@ -273,7 +320,12 @@ const FormularioMedico = () => {
 
       const formData = new FormData();
       formData.append("respostas", JSON.stringify(dadosParaEnviar));
+      formData.append("textoOCR", textoOCR);
       formData.append("paciente", JSON.stringify(paciente));
+
+      if (imagem instanceof File) {
+        formData.append("imagem", imagem);
+      }
 
       let response;
       if (!isAtualizar) {
@@ -291,10 +343,12 @@ const FormularioMedico = () => {
 
         if (!isAtualizar) {                
           navigate("/home");
-        } else {
+         } else {
           window.location.reload();
           navigate(0);
+
         }
+
       } else {
         setMensagem(response.message || "Erro ao processar a ficha.");
       }
@@ -316,6 +370,76 @@ const FormularioMedico = () => {
         <div className="saude-card shadow-sm p-4 rounded bg-white">
           <h4 className="mb-4 text-center">Formulário Médico (Anamnese)</h4>
           <form>
+            <div className="alert alert-info mt-3" role="alert">
+              🔍 Para melhores resultados, recomendamos fazer um{" "}
+              <strong>escaneamento do documento</strong> antes de enviá-lo.
+              Fotos com baixa qualidade podem prejudicar o reconhecimento do
+              texto.
+            </div>
+            <div className="mb-3">
+              <label htmlFor="imagemFicha" className="form-label">
+                Upload da Ficha Médica (Imagem)
+              </label>
+              <input
+                type="file"
+                id="imagemFicha"
+                accept="image/*"
+                onChange={handleFileChange}
+                className="form-control"
+                disabled={carregando}
+              />
+            </div>
+
+            {imagem && (
+              <div className="mt-3 text-center">
+                <img
+                  src={
+                    typeof imagem === "string"
+                      ? imagem
+                      : URL.createObjectURL(imagem)
+                  }
+                  alt="Imagem carregada"
+                  className="img-fluid"
+                  style={{ maxWidth: "300px", maxHeight: "300px" }}
+                />
+              </div>
+            )}
+
+            <div className="mb-3 d-flex flex-column flex-sm-row gap-2">
+              <button
+                type="button"
+                className="btn btn-primary w-100"
+                onClick={executarOCR}
+                disabled={!imagem || carregando}
+              >
+                {carregando ? "Processando OCR..." : "Executar OCR"}
+              </button>
+              <button
+                type="button"
+                className="btn btn-outline-secondary w-100"
+                onClick={handleAplicarOCR}
+                disabled={!ocrExecutado || carregando}
+              >
+                Aplicar OCR
+              </button>
+            </div>
+
+            <div className="mb-3">
+              <label htmlFor="textoOCR" className="form-label">
+                Texto Extraído pelo OCR:
+              </label>
+              <textarea
+                id="textoOCR"
+                className="form-control"
+                rows="5"
+                value={textoOCR}
+                readOnly
+                placeholder="O texto extraído aparecerá aqui..."
+              />
+            </div>
+
+            
+
             {perguntas.map((item) => {
               if (item.dependeSexo && paciente.sexo?.toLowerCase() === "m") {
                 return null;

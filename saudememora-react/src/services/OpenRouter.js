@@ -350,6 +350,8 @@ export async function tratarOCRParaExames(textoOCR) {
     - "resultado": resultado do exame,
     - "observacoes": observações adicionais,
     - "resumo": o mesmo texto abaixo, mas reescrito com ortografia corrigida e identado bom para leitura.
+    - "nomeExame": nome do exame, se houver.
+    Se o texto contiver palavras como "LAUDO", "EXAME", "RESULTADO", ou termos similares, utilize o tipo correspondente.
 
     IMPORTANTE: Se algum dos campos acima não estiver presente no texto ou estiver vazio, preencha com um texto padrão explicativo para evitar valores vazios ou nulos.
 
@@ -361,6 +363,7 @@ export async function tratarOCRParaExames(textoOCR) {
       "resultado": "Resultado do exame",
       "observacoes": "Texto das observações",
       "resumo": "Texto do OCR reescrito e normalizado. Corrija a ortografia, padronize os termos médicos e organize como se fosse o resultado de um exame laboratorial".
+      "nomeExame": "Nome do exame, se houver"
     }
 
     Texto do OCR:
@@ -393,10 +396,12 @@ export async function tratarOCRParaExames(textoOCR) {
     if (!res.ok) throw new Error(`Erro na API: ${res.statusText}`);
     const data = await res.json();
 
+    console.log("Resposta da API:", data);
     let jsonExame;
     try {
       jsonExame = JSON.parse(data.choices[0].message.content);
     } catch (e) {
+      jsonExame = JSON.parse(data.choices[0].message.content);
       throw new Error("Resposta da API não é um JSON válido.");
     }
 
@@ -573,7 +578,7 @@ export async function extrairMedicamentosDoOCR(textoOCR) {
 
     
 
-    sem ter nomes iguais de medicamentos, e sem repetir medicamentos.
+       sem ter nomes iguais de medicamentos, e sem repetir medicamentos.
 
       {
         "medicamentos": [

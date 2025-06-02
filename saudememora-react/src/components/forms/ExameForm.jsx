@@ -2,6 +2,9 @@ import React, { useState, useEffect } from "react";
 import { Form, Spinner } from "react-bootstrap";
 import DatePicker from "react-datepicker";
 import { useNavigate } from "react-router-dom";
+import { format, parseISO } from "date-fns";
+import ptBR from "date-fns/locale/pt-BR";
+import { registerLocale } from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import ExameService from "../../services/ExameService";
 
@@ -17,6 +20,8 @@ import {
   FaStickyNote,
 } from "react-icons/fa";
 
+registerLocale('pt-BR', ptBR);
+
 const ExameForm = ({ data: initialData, isLoading = false }) => {
   const [data, setData] = useState({
     nomeExame: "",
@@ -28,13 +33,19 @@ const ExameForm = ({ data: initialData, isLoading = false }) => {
     resumo: "",
     id: null,
     imagem: null,
+    dataExame: null,
   });
 
   const navigate = useNavigate();
   const [loading, setLoading] = useState(false);
+  const [dateInputValue, setDateInputValue] = useState('');
 
   useEffect(() => {
     if (initialData) {
+      const dataExame = initialData.dataExame 
+        ? new Date(initialData.dataExame) 
+        : null;
+
       setData({
         nomeExame: initialData.nomeExame || "",
         tipo: initialData.tipo || "",
@@ -45,7 +56,12 @@ const ExameForm = ({ data: initialData, isLoading = false }) => {
         resumo: initialData.resumo || "",
         id: initialData.id || null,
         imagem: initialData.imagem || null,
+        dataExame
       });
+
+      if (dataExame) {
+        setDateInputValue(format(dataExame, 'dd/MM/yyyy', { locale: ptBR }));
+      }
     }
   }, [initialData]);
 
@@ -55,30 +71,46 @@ const ExameForm = ({ data: initialData, isLoading = false }) => {
   };
 
   const handleDateChange = (date) => {
-    setData((prev) => ({ ...prev, data: date }));
+    setData(prev => ({ ...prev, dataExame: date }));
+    setDateInputValue(date ? format(date, 'dd/MM/yyyy', { locale: ptBR }) : '');
+  };
+
+  const handleDateInputChange = (e) => {
+    const value = e.target.value;
+    setDateInputValue(value);
+    if (value.length === 10) {
+      const [day, month, year] = value.split('/');
+      const parsedDate = new Date(`${year}-${month}-${day}`);
+      
+      if (!isNaN(parsedDate.getTime())) {
+        setData(prev => ({ ...prev, dataExame: parsedDate }));
+      }
+    }
   };
 
   const handleUpdate = async (e) => {
-    e.preventDefault();
-    setLoading(true);
+  e.preventDefault();
+  setLoading(true);
 
-    try {
-      const { id, imagem, ...dados } = data;
+  try {
+    const { id, imagem, ...dados } = data;
 
-      if (dados.data) {
-        dados.data = dados.data.toISOString();
-      }
-
-      await ExameService.update(id, dados);
-
-      navigate("/meus-documentos");
-    } catch (error) {
-      console.error("Falha na atualização:", error);
-      alert(`Erro ao atualizar: ${error.message}`);
-    } finally {
-      setLoading(false);
+    if (dados.dataExame) {
+      const year = dados.dataExame.getFullYear();
+      const month = String(dados.dataExame.getMonth() + 1).padStart(2, '0');
+      const day = String(dados.dataExame.getDate()).padStart(2, '0');
+      dados.dataExame = `${year}-${month}-${day}`;
     }
-  };
+
+    await ExameService.update(id, dados);
+    navigate("/meus-documentos");
+  } catch (error) {
+    console.error("Falha na atualização:", error);
+    alert(`Erro ao atualizar: ${error.message}`);
+  } finally {
+    setLoading(false);
+  }
+};
 
   return (
     <div className="mx-auto px-3" style={{ maxWidth: "900px" }}>
@@ -202,20 +234,24 @@ const ExameForm = ({ data: initialData, isLoading = false }) => {
               </div>
 
               <div className="col-md-6">
-                <Form.Group controlId="data">
+                <Form.Group controlId="dataExame">
                   <Form.Label className="fw-semibold">
                     <FaCalendarAlt className="me-1 text-primary" /> Data do
                     Exame
                   </Form.Label>
                   <DatePicker
-                    selected={data.data}
+                    selected={data.dataExame}
                     onChange={handleDateChange}
+                    onChangeRaw={handleDateInputChange}
+                    value={dateInputValue}
                     className="form-control"
                     dateFormat="dd/MM/yyyy"
+                    placeholderText="DD/MM/AAAA"
                     required
                     disabled={isLoading || loading}
-                    wrapperClassName="w-100"
-                    placeholderText="Selecione a data"
+                    locale="pt-BR"
+                    showYearDropdown
+                    dropdownMode="select"
                   />
                 </Form.Group>
               </div>

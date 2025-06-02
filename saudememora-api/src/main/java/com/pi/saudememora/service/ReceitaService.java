@@ -40,7 +40,6 @@ public class ReceitaService {
             receitaOriginal.setMedico(receitaAtualizada.getMedico());
             receitaOriginal.setObservacoes(receitaAtualizada.getObservacoes());
             receitaOriginal.setResumo(receitaAtualizada.getResumo());
-            receitaOriginal.setPosologia(receitaAtualizada.getPosologia());
 
             receitaOriginal.getMedicamentos().clear();
             for (Medicamento medicamento : receitaAtualizada.getMedicamentos()) {

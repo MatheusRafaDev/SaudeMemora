@@ -23,13 +23,11 @@ export async function processarReceitaComImagem(
     const medicamentosFinal = Array.isArray(medicamentos) ? medicamentos : [];
 
     const receitaData = {
-      medico: receitaJSON.medico || "Médico não informado",
-      crmMedico: receitaJSON.crm || "CRM não informado",
-      posologia: receitaJSON.posologia || "Posologia não informada",
-      observacoes: receitaJSON.observacoes || "Sem observações",
-      resumo: receitaJSON.resumo || textoOCR || "Sem resumo",
-      dataReceita:
-        receitaJSON.dataReceita || new Date().toISOString().split("T")[0],
+      medico: receitaJSON.medico || "",
+      crmMedico: receitaJSON.crm || "",
+      observacoes: receitaJSON.observacoes || "",
+      resumo: receitaJSON.resumo || "",
+      dataReceita:receitaJSON.dataReceita || new Date().toISOString().split("T")[0],
       paciente: { id: paciente.id },
       documento: { id: documentoId },
       medicamentos: medicamentosFinal,
@@ -75,13 +73,13 @@ export async function processarExameComImagem(
       throw new Error(`Erro no OCR do exame: ${exameJSON.error}`);
 
     const exameData = {
-      nomeExame: exameJSON.nomeExame || "Exame importado via OCR",
-      tipo: exameJSON.tipo || "Tipo não informado",
+      nomeExame: exameJSON.nomeExame || "",
+      tipo: exameJSON.tipo || "",
       dataExame: exameJSON.dataExame || new Date().toISOString().split("T")[0],
-      laboratorio: exameJSON.laboratorio || "Laboratório não informado",
-      resultado: exameJSON.resultado || textoOCR || "Resultado não informado",
-      observacoes: exameJSON.observacoes || "Sem observações",
-      resumo: exameJSON.resumo || textoOCR || "Sem resumo",
+      laboratorio: exameJSON.laboratorio || "",
+      resultado: exameJSON.resultado || textoOCR || "",
+      observacoes: exameJSON.observacoes || "",
+      resumo: exameJSON.resumo || textoOCR || "",
       paciente: { id: paciente.id },
       documento: { id: documentoId },
     };
@@ -134,13 +132,13 @@ export async function processarDocumentoClinicoComImagem(
 
     const documentoData = {
       dataDocumentoCli: documentoJSON.dataDocumentoCli,
-      medico: documentoJSON.medico || "Médico não informado",
-      especialidade: documentoJSON.especialidade || "Especialidade não informada",
-      observacoes: documentoJSON.observacoes || "Sem observações",
-      conclusoes: documentoJSON.conclusoes || "Sem conclusões",
-      resumo: documentoJSON.resumo || "Sem resumo",
-      conteudo: documentoJSON.conteudo || textoOCR || "Sem conteúdo original",
-      tipo: documentoJSON.tipo ||  "Sem tipo",
+      medico: documentoJSON.medico || "",
+      especialidade: documentoJSON.especialidade || "",
+      observacoes: documentoJSON.observacoes || "",
+      conclusoes: documentoJSON.conclusoes || "",
+      resumo: documentoJSON.resumo || "",
+      conteudo: documentoJSON.conteudo || textoOCR || "",
+      tipo: documentoJSON.tipo ||  "",
       paciente: { id: paciente.id },
       documento: { id: documentoId },
     };

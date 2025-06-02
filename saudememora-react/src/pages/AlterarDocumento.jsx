@@ -33,6 +33,7 @@ const AlterarDocumento = () => {
     ...(tipo === "exame" && {
       nomeExame: "",
       tipoExame: "",
+      dataExame: null,
       laboratorio: "",
       data: null,
       resultado: "",
@@ -94,6 +95,7 @@ const AlterarDocumento = () => {
             ...(response.data.data  ),
             ...(response.data.dataReceita && {
               dataReceita: response.data.dataReceita,
+              dataExame: response.data.dataExame,
               documento: response.data.documento ||{},
               paciente: response.data.paciente || {},
               medicamentos: response.data.medicamentos || [],

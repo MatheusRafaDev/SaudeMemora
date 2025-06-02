@@ -112,7 +112,6 @@ public class ExameController {
         try {
 
             String jsonRecebido = objectMapper.writeValueAsString(exame);
-            log.info("JSON Recebido: {}", jsonRecebido);
 
 
             Exame exameExistente = exameService.findById(id)
@@ -123,22 +122,20 @@ public class ExameController {
             exameExistente.setLaboratorio(exame.getLaboratorio());
             exameExistente.setResultado(exame.getResultado());
             exameExistente.setResumo(exame.getResumo());
+            exameExistente.setDataExame(exame.getDataExame());
             exameExistente.setObservacoes(exame.getObservacoes());
             exameExistente.setNomeExame(exame.getNomeExame());
             exameExistente.setTipo(exame.getTipo());
 
-            System.out.println(exame.getTipo());
 
             Exame exameAtualizado = exameService.save(exameExistente);
             return ResponseEntity.ok(exameAtualizado);
 
         } catch (JsonProcessingException e) {
-            log.error("Erro ao processar JSON: {}", e.getMessage());
             return ResponseEntity.badRequest().build();
         } catch (ResponseStatusException e) {
             throw e;
         } catch (Exception e) {
-            log.error("Erro interno: {}", e.getMessage());
             return ResponseEntity.internalServerError().build();
         }
     }

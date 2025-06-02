@@ -34,8 +34,6 @@ public class Receita {
     @Column(name = "ds_imagem")
     private String imagem;
 
-
-
     @OneToMany(mappedBy = "receita", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Medicamento> medicamentos = new ArrayList<>();
 
@@ -46,7 +44,6 @@ public class Receita {
     @ManyToOne
     @JoinColumn(name = "id_paciente", nullable = false)
     private Paciente paciente;
-
 
 
 
@@ -86,14 +83,6 @@ public class Receita {
 
     public void setCrmMedico(String crmMedico) {
         this.crmMedico = crmMedico;
-    }
-
-    public String getPosologia() {
-        return posologia;
-    }
-
-    public void setPosologia(String posologia) {
-        this.posologia = posologia;
     }
 
     public String getObservacoes() {

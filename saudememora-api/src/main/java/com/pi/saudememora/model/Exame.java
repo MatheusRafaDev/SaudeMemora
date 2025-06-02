@@ -54,6 +54,14 @@ public class Exame {
     @Column(name = "dt_exame", nullable = false)
     private LocalDate dataExame;
 
+    public LocalDate getDataExame() {
+        return dataExame;
+    }
+
+    public void setDataExame(LocalDate dataExame) {
+        this.dataExame = dataExame;
+    }
+
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
     @Column(name = "dt_inclusao", nullable = false, updatable = false)
     private LocalDate dataInclusao;
