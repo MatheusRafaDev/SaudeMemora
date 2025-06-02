@@ -227,10 +227,19 @@ const CadastroPaciente = () => {
               </label>
             </div>
 
-            <div className="d-flex justify-content-center mt-3">
+            <div className="d-flex justify-content-center gap-2 mt-3">
+              <button
+                type="button"
+                className="btn btn-link btn-sm text-muted"
+                onClick={() => navigate("/login")}
+                style={{ textDecoration: "none" }}
+              >
+                Já tenho conta
+              </button>
+
               <button
                 type="submit"
-                className="btn btn-outline-primary btn-sm px-4"
+                className="btn btn-primary btn-sm px-4"
                 disabled={!aceitaTermos}
               >
                 Próximo
