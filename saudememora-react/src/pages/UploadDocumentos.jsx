@@ -338,7 +338,7 @@ export default function UploadDocumentos() {
             <input
               id="cameraInput"
               type="file"
-              accept="image/*"
+              accept="/*"
               onChange={handleFileChange}
               hidden
               disabled={processando || adicionandoDocumento}
