@@ -490,47 +490,65 @@ export default function ListarDocumentos() {
     return ordenacao.direcao === "asc" ? <FaSortUp /> : <FaSortDown />;
   };
 
-  const ConfirmationModal = ({ show, message, onConfirm, onClose }) => {
-    return (
-      <ReactModal
-        isOpen={show}
-        onRequestClose={onClose}
-        contentLabel="Confirmação"
-        className="modal-content"
-        overlayClassName="modal-overlay"
-      >
-        <div className="modal-inner">
-          <div className="flex justify-between items-start mb-4">
-            <h3 className="text-lg font-semibold text-gray-800">
-              Confirmar ação
-            </h3>
-            <button
-              onClick={onClose}
-              className="text-gray-500 hover:text-gray-700 transition"
-            >
-              <FaTimes />
-            </button>
-          </div>
-          <p className="mb-6 text-gray-600">{message}</p>
-          <div className="flex justify-end gap-3">
-            <button
-              onClick={onClose}
-              className="px-4 py-2 border rounded-md text-gray-700 hover:bg-gray-100 transition"
-            >
-              Cancelar
-            </button>
-            <button
-              onClick={onConfirm}
-              disabled={loading}
-              className={`px-4 py-2 rounded-md flex items-center gap-2 transition ${"text-black"}`}
-            >
-              <FaCheck /> Confirmar
-            </button>
-          </div>
+  const ConfirmationModal = ({ 
+  show, 
+  message, 
+  onConfirm, 
+  onClose,
+  loading = false 
+}) => {
+  return (
+    <ReactModal
+      isOpen={show}
+      onRequestClose={onClose}
+      contentLabel="Confirmação"
+      className="modal-content"
+      overlayClassName="modal-overlay"
+      shouldCloseOnOverlayClick={!loading}
+      shouldCloseOnEsc={!loading}
+    >
+      <div className="modal-inner">
+        <div className="modal-header">
+          <h3 className="modal-title">Confirmar ação</h3>
+          <button
+            onClick={onClose}
+            disabled={loading}
+            className="modal-close-btn"
+          >
+            <FaTimes />
+          </button>
         </div>
-      </ReactModal>
-    );
-  };
+        
+        <div className="modal-body">
+          <p>{message}</p>
+        </div>
+        
+        <div className="modal-footer">
+          <button
+            onClick={onClose}
+            disabled={loading}
+            className="modal-cancel-btn"
+          >
+            Cancelar
+          </button>
+          <button
+            onClick={onConfirm}
+            disabled={loading}
+            className="modal-confirm-btn"
+          >
+            {loading ? (
+              <span className="loading-spinner">Processando...</span>
+            ) : (
+              <>
+                <FaCheck /> Confirmar
+              </>
+            )}
+          </button>
+        </div>
+      </div>
+    </ReactModal>
+  );
+};
 
   const totalDocumentos = () => {
     return (
@@ -1514,22 +1532,8 @@ export default function ListarDocumentos() {
           z-index: 1000;
         }
 
-        .modal-content {
-          position: relative;
-          background: white;
-          border-radius: 0.5rem;
-          box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-          max-width: 500px;
-          width: 90%;
-          padding: 1.5rem;
-          outline: none;
-        }
 
-        .modal-inner {
-          display: flex;
-          flex-direction: column;
-          height: 100%;
-        }
+
 
         @media (max-width: 768px) {
           .content {
@@ -1593,6 +1597,8 @@ export default function ListarDocumentos() {
             gap: 6px;
           }
         }
+
+        
       `}</style>
     </div>
   );
