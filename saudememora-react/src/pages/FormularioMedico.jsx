@@ -275,6 +275,7 @@ const FormularioMedico = () => {
       formData.append("respostas", JSON.stringify(dadosParaEnviar));
       formData.append("paciente", JSON.stringify(paciente));
 
+
       let response;
       if (!isAtualizar) {
         response = await cadastrarFichaMedica(formData);
@@ -289,7 +290,8 @@ const FormularioMedico = () => {
             : "Ficha cadastrada com sucesso!"
         );
 
-        if (!isAtualizar) {                
+        if (!isAtualizar) {       
+                localStorage.setItem("paciente", JSON.stringify(paciente));         
           navigate("/home");
         } else {
           window.location.reload();

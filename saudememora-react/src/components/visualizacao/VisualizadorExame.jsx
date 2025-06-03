@@ -125,7 +125,7 @@ export default function VisualizadorExame({ exame }) {
       </div>
 
       <div className="card shadow-sm border-0">
-        <div className="card-body" style={{ textAlign: "justify" }}>
+
           <h4 className="text-primary">
             <FaStickyNote /> Resumo
           </h4>
@@ -142,7 +142,7 @@ export default function VisualizadorExame({ exame }) {
             }}
           ></textarea>
         </div>
-      </div>
+
 
     </div>
   );

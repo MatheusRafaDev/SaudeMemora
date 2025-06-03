@@ -1,8 +1,8 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
-import formatarData from '../../utils/formatarData';
-import axiosInstance from '../../axiosConfig';
+import formatarData from "../../utils/formatarData";
+import axiosInstance from "../../axiosConfig";
 
 import {
   FaCalendarAlt,
@@ -29,7 +29,7 @@ export default function ReceitaComMedicamentos({ receita }) {
     >
       <div className="text-center mb-4">
         <h3 className="text-secondary">Visualizar documento</h3>
-      
+
         <button
           className="btn btn-outline-primary w-100"
           onClick={() => navigate(-1)}
@@ -102,7 +102,7 @@ export default function ReceitaComMedicamentos({ receita }) {
         <div className="card-body" style={{ textAlign: "justify" }}>
           <p>
             <FaCalendarAlt /> <strong>Data: </strong>
-                {formatarData(receita.dataReceita)}
+            {formatarData(receita.dataReceita)}
           </p>
           <p>
             <FaUserMd /> <strong>Doutor(a): </strong>
@@ -144,26 +144,27 @@ export default function ReceitaComMedicamentos({ receita }) {
         </div>
       </div>
 
-      <div className="card shadow-sm border-0">
-        <div className="card-body" style={{ textAlign: "justify" }}>
+      <div className="card shadow">
+
           <h4 className="text-primary">
             <FaStickyNote /> Resumo
           </h4>
           <textarea
-            className="form-control mt-3 border border-info rounded"
+            className="form-control mt-8 border border-info rounded"
             value={receita.resumo || ""}
-            rows={5}
+            rows={10}
             readOnly
             style={{
               backgroundColor: "#f8f9fa",
               fontSize: "1rem",
               padding: "10px",
               textAlign: "justify",
+              height: "auto", 
+              overflowY: "auto", 
             }}
           ></textarea>
         </div>
       </div>
 
-    </div>
   );
 }
