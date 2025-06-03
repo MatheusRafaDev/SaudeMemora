@@ -24,6 +24,18 @@ function Home() {
           <p>Escolha uma das opções abaixo para navegar pela plataforma</p>
         </div>
 
+        <div className="app-description">
+          <h2>O que é o Saúde Memora?</h2>
+          <div className="description-content">
+            <div className="description-text">
+              <p>
+                O <strong>Saúde Memora</strong> é sua plataforma digital para gerenciamento completo de documentos médicos. 
+                Com tecnologia de OCR e IA, transformamos seus documentos físicos em registros digitais organizados e acessíveis.
+              </p>
+            </div>
+          </div>
+        </div>
+
         <div className="cards-grid">
           <div className="card" onClick={() => navigate("/perfil")}>
             <div className="card-icon">
@@ -33,6 +45,7 @@ function Home() {
               />
             </div>
             <span>Meu Perfil</span>
+            <p className="card-description">Acesse e atualize seus dados pessoais</p>
           </div>
 
           <div className="card" onClick={() => navigate("/visualizar-ficha")}>
@@ -43,6 +56,7 @@ function Home() {
               ></i>
             </div>
             <span>Ficha Médica</span>
+            <p className="card-description">Consulte seu histórico de saúde e alergias</p>
           </div>
 
           <div className="card" onClick={() => navigate("/meus-documentos")}>
@@ -53,6 +67,7 @@ function Home() {
               />
             </div>
             <span>Meus Documentos</span>
+            <p className="card-description">Exames, receitas e documentos clínicos</p>
           </div>
 
           <div className="card" onClick={() => navigate("/upload-documentos")}>
@@ -63,6 +78,7 @@ function Home() {
               />
             </div>
             <span>Processar Documento</span>
+            <p className="card-description">Digitalize e organize novos documentos</p>
           </div>
 
           <div className="card" onClick={() => navigate("/relatorios")}>
@@ -73,6 +89,7 @@ function Home() {
               />
             </div>
             <span>Relatórios</span>
+            <p className="card-description">Visualize análises do seu histórico</p>
           </div>
         </div>
       </main>

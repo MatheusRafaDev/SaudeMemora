@@ -315,7 +315,7 @@ export default function UploadDocumentos() {
           >
             <option value="">Selecione o tipo</option>
             <option value="E">Exame</option>
-            <option value="R">Receitas</option>
+            <option value="R">Receita</option>
             <option value="D">Documento Clínico</option>
           </select>
         </div>
