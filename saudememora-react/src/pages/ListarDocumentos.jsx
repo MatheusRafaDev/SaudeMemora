@@ -585,12 +585,7 @@ export default function ListarDocumentos() {
 
       <div className="prontuario-container">
         <div className="content">
-          <button
-            onClick={() => navigate(-1)}
-            className="btn btn-link text-secondary"
-          >
-            ← Voltar
-          </button>
+
           <div className="header-with-actions">
             <h1 className="title">Documentos</h1>
             <div className="flex items-center gap-4">

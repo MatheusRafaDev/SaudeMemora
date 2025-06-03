@@ -1,5 +1,10 @@
 import React from "react";
-import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-dom";
+import {
+  BrowserRouter as Router,
+  Routes,
+  Route,
+  Navigate,
+} from "react-router-dom";
 import Login from "./pages/Login";
 import Home from "./pages/Home";
 import CadastroPaciente from "./pages/CadastroPaciente";
@@ -15,7 +20,6 @@ import VisualizarFichaMedica from "./pages/VisualizarFichaMedica";
 import AlterarDocumento from "./pages/AlterarDocumento";
 import "bootstrap/dist/js/bootstrap.bundle.min.js";
 import "./styles/global.css";
-
 const isPacienteLoggedIn = () => {
   const data = localStorage.getItem("paciente");
   if (!data) return false;
@@ -31,46 +35,62 @@ const isPacienteLoggedIn = () => {
 
 function App() {
   return (
-    <Router>
-      <Routes>
-        {/* Rota raiz redireciona direto conforme login */}
-        <Route
-          path="/"
-          element={
-            isPacienteLoggedIn() ? <Navigate to="/home" /> : <Navigate to="/login" />
-          }
-        />
+    <div className="app-container">
+        <Router>
+          <Routes>
+            <Route
+              path="/"
+              element={
+                isPacienteLoggedIn() ? (
+                  <Navigate to="/home" />
+                ) : (
+                  <Navigate to="/login" />
+                )
+              }
+            />
 
-        <Route path="/login" element={<Login />} />
+            <Route path="/login" element={<Login />} />
 
-        <Route
-          path="/home"
-          element={isPacienteLoggedIn() ? <Home /> : <Navigate to="/login" />}
-        />
+            <Route
+              path="/home"
+              element={
+                isPacienteLoggedIn() ? <Home /> : <Navigate to="/login" />
+              }
+            />
 
-        <Route path="/relatorio-documentos" element={<RelatorioDocumentos />} />
-        <Route path="/visualizar-ficha" element={<VisualizarFichaMedica />} />
+            <Route
+              path="/relatorio-documentos"
+              element={<RelatorioDocumentos />}
+            />
+            <Route
+              path="/visualizar-ficha"
+              element={<VisualizarFichaMedica />}
+            />
 
-        <Route path="/criar-conta" element={<CadastroPaciente />} />
-        <Route path="/perfil" element={<Perfil />} />
+            <Route path="/criar-conta" element={<CadastroPaciente />} />
+            <Route path="/perfil" element={<Perfil />} />
 
-        <Route path="/formulario-medico" element={<FormularioMedico />} />
-        <Route path="/relatorios" element={<RelatorioDocumentos />} />
-        <Route path="/ocr" element={<OCRLeituraCursiva />} />
+            <Route path="/formulario-medico" element={<FormularioMedico />} />
+            <Route path="/relatorios" element={<RelatorioDocumentos />} />
+            <Route path="/ocr" element={<OCRLeituraCursiva />} />
 
-        <Route path="/upload-documentos" element={<UploadDocumentos />} />
+            <Route path="/upload-documentos" element={<UploadDocumentos />} />
 
-        <Route path="/editar-documento" element={<AlterarDocumento />} />
+            <Route path="/editar-documento" element={<AlterarDocumento />} />
 
-        <Route path="/alterar-perfil" element={<EditarPerfil />} />
+            <Route path="/alterar-perfil" element={<EditarPerfil />} />
 
-        <Route path="/meus-documentos" element={<ListarDocumentos />} />
+            <Route path="/meus-documentos" element={<ListarDocumentos />} />
 
-        <Route path="/visualizar-documento" element={<VisualizadorDocumento />} />
+            <Route
+              path="/visualizar-documento"
+              element={<VisualizadorDocumento />}
+            />
 
-        <Route path="*" element={<Navigate to="/home" />} />
-      </Routes>
-    </Router>
+            <Route path="*" element={<Navigate to="/home" />} />
+          </Routes>
+        </Router>
+      </div>
   );
 }
 
