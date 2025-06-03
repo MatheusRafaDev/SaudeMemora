@@ -135,7 +135,12 @@ const VisualizarFichaMedica = () => {
   return (
     <>
       <Nav />
-
+      <button
+        onClick={() => navigate(-1)}
+        className="btn btn-link text-secondary"
+      >
+        ← Voltar
+      </button>
       <div className="container container-custom">
         <div className="header-flex">
           <div>
