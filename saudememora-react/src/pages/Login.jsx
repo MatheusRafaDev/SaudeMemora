@@ -17,6 +17,9 @@ export default function Login() {
       const result = await loginPaciente(email, senha);
       if (result.success) {
         localStorage.setItem("paciente", JSON.stringify(result.data));
+        localStorage.setItem("paciente", JSON.stringify(result.data));
+        localStorage.setItem("paciente", JSON.stringify(result.data));
+        localStorage.setItem("paciente", JSON.stringify(result.data));
         navigate("/home");
       } else {
         setErro(result.message || "Falha ao fazer login");

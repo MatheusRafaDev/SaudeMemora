@@ -1,8 +1,8 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import formatarData from '../../utils/formatarData';
+import formatarData from "../../utils/formatarData";
 import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
-import axiosInstance from '../../axiosConfig';
+import axiosInstance from "../../axiosConfig";
 import {
   FaCalendarAlt,
   FaFileAlt,
@@ -39,7 +39,6 @@ export default function VisualizadorDocumentoClinico({ documentoClinico }) {
         >
           <FaArrowLeft /> Voltar
         </button>
-        
       </div>
 
       <div className="card shadow-sm border-0 mb-4">
@@ -108,7 +107,8 @@ export default function VisualizadorDocumentoClinico({ documentoClinico }) {
             <FaFileAlt /> {documento.tipo || "Documento Clinico"}
           </h5>
           <p>
-            <FaCalendarAlt /> <strong>Data:</strong>{formatarData(documento.dataDocumentoCli)} 
+            <FaCalendarAlt /> <strong>Data:</strong>
+            {formatarData(documento.dataDocumentoCli)}
           </p>
           <p>
             <FaUserMd /> <strong>Médico:</strong>{" "}
@@ -131,6 +131,7 @@ export default function VisualizadorDocumentoClinico({ documentoClinico }) {
       </div>
 
       <div className="card shadow-sm border-0">
+        <div className="card-body" style={{ textAlign: "justify" }}>
           <h4 className="text-primary">
             <FaStickyNote /> Resumo
           </h4>
@@ -147,6 +148,7 @@ export default function VisualizadorDocumentoClinico({ documentoClinico }) {
             }}
           ></textarea>
         </div>
+      </div>
     </div>
   );
 }

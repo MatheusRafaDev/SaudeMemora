@@ -1,8 +1,8 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
 import { TransformWrapper, TransformComponent } from "react-zoom-pan-pinch";
-import formatarData from '../../utils/formatarData';
-import axiosInstance from '../../axiosConfig';
+import formatarData from "../../utils/formatarData";
+import axiosInstance from "../../axiosConfig";
 import {
   FaCalendarAlt,
   FaFlask,
@@ -104,7 +104,8 @@ export default function VisualizadorExame({ exame }) {
             <FaFileMedical /> {exame.nomeExame || "Exame sem nome"}
           </h5>
           <p>
-            <FaCalendarAlt /> <strong>Data:</strong> {formatarData(exame.dataExame)}
+            <FaCalendarAlt /> <strong>Data:</strong>{" "}
+            {formatarData(exame.dataExame)}
           </p>
           <p>
             <FaFlask /> <strong>Tipo:</strong> {exame.tipo || "Não informado"}
@@ -125,25 +126,24 @@ export default function VisualizadorExame({ exame }) {
       </div>
 
       <div className="card shadow-sm border-0">
-
-          <h4 className="text-primary">
-            <FaStickyNote /> Resumo
-          </h4>
-          <textarea
-            className="form-control mt-3 border border-info rounded"
-            value={exame.resumo || ""}
-            rows={5}
-            readOnly
-            style={{
-              backgroundColor: "#f8f9fa",
-              fontSize: "1rem",
-              padding: "10px",
-              textAlign: "justify",
-            }}
-          ></textarea>
-        </div>
-
-
+        <div className="card-body" style={{ textAlign: "justify" }}>
+        <h4 className="text-primary">
+          <FaStickyNote /> Resumo
+        </h4>
+        <textarea
+          className="form-control mt-3 border border-info rounded"
+          value={exame.resumo || ""}
+          rows={5}
+          readOnly
+          style={{
+            backgroundColor: "#f8f9fa",
+            fontSize: "1rem",
+            padding: "10px",
+            textAlign: "justify",
+          }}
+        ></textarea>
+      </div>
+      </div>
     </div>
   );
 }

@@ -145,26 +145,26 @@ export default function ReceitaComMedicamentos({ receita }) {
       </div>
 
       <div className="card shadow">
-
-          <h4 className="text-primary">
-            <FaStickyNote /> Resumo
-          </h4>
-          <textarea
-            className="form-control mt-8 border border-info rounded"
-            value={receita.resumo || ""}
-            rows={10}
-            readOnly
-            style={{
-              backgroundColor: "#f8f9fa",
-              fontSize: "1rem",
-              padding: "10px",
-              textAlign: "justify",
-              height: "auto", 
-              overflowY: "auto", 
-            }}
-          ></textarea>
-        </div>
+        <div className="card-body" style={{ textAlign: "justify" }}>
+        <h4 className="text-primary">
+          <FaStickyNote /> Resumo
+        </h4>
+        <textarea
+          className="form-control mt-8 border border-info rounded"
+          value={receita.resumo || ""}
+          rows={10}
+          readOnly
+          style={{
+            backgroundColor: "#f8f9fa",
+            fontSize: "1rem",
+            padding: "10px",
+            textAlign: "justify",
+            height: "auto",
+            overflowY: "auto",
+          }}
+        ></textarea>
       </div>
-
+    </div>
+    </div>
   );
 }
