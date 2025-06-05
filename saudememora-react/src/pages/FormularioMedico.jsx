@@ -291,11 +291,10 @@ const FormularioMedico = () => {
         );
 
         if (!isAtualizar) {       
-                localStorage.setItem("paciente", JSON.stringify(paciente));         
+                 
           navigate("/home");
         } else {
-          window.location.reload();
-          navigate(0);
+          navigate("/formulario-medico");
         }
       } else {
         setMensagem(response.message || "Erro ao processar a ficha.");

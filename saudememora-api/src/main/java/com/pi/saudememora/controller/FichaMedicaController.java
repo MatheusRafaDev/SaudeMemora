@@ -124,18 +124,17 @@ public class FichaMedicaController {
                 });
     }
 
-    @GetMapping("/paciente/{id}") // Mantendo o endpoint original
+    @GetMapping("/paciente/{id}")
     public ResponseEntity<?> obterFichaMedicaPorUsuarioId(@PathVariable Long id) {
         logger.info("Buscando ficha médica por paciente ID: {}", id);
         FichaMedica fichaMedica = fichaMedicaService.obterFichaMedicaPorUsuarioId(id);
 
-        if (fichaMedica != null) {
-            fichaMedica.setImagem(new byte[0]); // Limpa a imagem conforme original
-            return ResponseEntity.ok(fichaMedica);
+        if (fichaMedica == null) {
+            logger.warn("Nenhuma ficha médica encontrada para paciente ID: {}", id);
+            return ResponseEntity.notFound().build();
         }
 
-        logger.warn("Nenhuma ficha médica encontrada para paciente ID: {}", id);
-        return ResponseEntity.notFound().build();
+        return ResponseEntity.ok(fichaMedica);
     }
 
     @GetMapping("/paciente/{id}/imagem") // Mantendo o endpoint original

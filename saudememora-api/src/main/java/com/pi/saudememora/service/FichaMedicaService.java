@@ -2,6 +2,7 @@ package com.pi.saudememora.service;
 
 import com.pi.saudememora.model.FichaMedica;
 import com.pi.saudememora.repository.FichaMedicaRepository;
+import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
@@ -18,7 +19,7 @@ public class FichaMedicaService {
     public FichaMedica salvarFichaMedica(FichaMedica fichaMedica) {
         return fichaMedicaRepository.save(fichaMedica);
     }
-
+    @Transactional
     public FichaMedica obterFichaMedicaPorUsuarioId(Long idPaciente) {
         FichaMedica fichaMedica = fichaMedicaRepository.findByPaciente_Id(idPaciente);
         return fichaMedica;
