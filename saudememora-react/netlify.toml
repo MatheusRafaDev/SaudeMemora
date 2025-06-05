@@ -23,10 +23,16 @@
 [[headers]]
   for = "/*"
   [headers.values]
-    X-Frame-Options = "DENY"
-    X-XSS-Protection = "1; mode=block"
-    Content-Security-Policy = "default-src 'self'; script-src 'self' 'unsafe-inline' https://*.netlify.app; style-src 'self' 'unsafe-inline'; img-src 'self' data:;"
-    Cache-Control = "public, max-age=0, must-revalidate"  # Cache control para SPA
+    Content-Security-Policy = """
+      default-src 'self';
+      font-src 'self' https://fonts.gstatic.com;
+      connect-src 'self' https://saudememora.onrender.com;
+      script-src 'self' 'unsafe-inline' 'unsafe-eval';
+      style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
+      img-src 'self' data:;
+      frame-src 'none';
+      object-src 'none';
+    """
 
 # Configurações opcionais para melhorar o tempo de build
 [build.processing]
