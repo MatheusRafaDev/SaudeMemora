@@ -204,6 +204,7 @@ function App() {
             path="/visualizar-documento"
             element={
               <AuthWrapper>
+                <Nav />
                 <VisualizadorDocumento />
               </AuthWrapper>
             }

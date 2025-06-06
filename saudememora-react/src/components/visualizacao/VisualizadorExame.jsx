@@ -9,6 +9,7 @@ import {
   FaNotesMedical,
   FaFileMedical,
   FaInfoCircle,
+  FaDownload,
   FaArrowLeft,
   FaStickyNote,
 } from "react-icons/fa";
@@ -16,6 +17,27 @@ import {
 export default function VisualizadorExame({ exame }) {
   const navigate = useNavigate();
   const urlBase = axiosInstance.defaults.baseURL;
+
+  const handleDownload = async () => {
+    try {
+      const response = await fetch(`${urlBase}/api/exames/imagem/${exame.id}`);
+      if (!response.ok) throw new Error("Erro ao baixar a imagem");
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `exame-${exame.id}.jpg`; // nome ajustado para exame
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+
+      window.URL.revokeObjectURL(url);
+    } catch {
+      alert("Erro ao baixar a imagem");
+    }
+  };
+
   return (
     <div
       className="mx-auto py-4"
@@ -37,6 +59,7 @@ export default function VisualizadorExame({ exame }) {
           <FaArrowLeft /> Voltar
         </button>
       </div>
+
       <div className="card shadow-sm border-0 mb-4">
         <div
           className="card-body text-center"
@@ -49,55 +72,58 @@ export default function VisualizadorExame({ exame }) {
               maxScale={5}
               wheel={{ step: 0.1 }}
             >
-              {({ zoomIn, zoomOut, resetTransform }) => (
-                <>
-                  <div
-                    className="tools"
-                    style={{
-                      position: "absolute",
-                      zIndex: 10,
-                      top: "10px",
-                      left: "10px",
-                    }}
-                  ></div>
-                  <TransformComponent
-                    wrapperStyle={{
-                      width: "100%",
-                      height: "100%",
-                      display: "flex",
-                      justifyContent: "center",
-                      alignItems: "center",
-                    }}
-                    contentStyle={{
-                      width: "100%",
-                      height: "100%",
-                      display: "flex",
-                      justifyContent: "center",
-                      alignItems: "center",
-                    }}
-                  >
-                    <img
-                      src={`${urlBase}/api/exames/imagem/${exame.id}`}
-                      alt={`Imagem do exame ${exame.nomeExame}`}
-                      className="img-fluid rounded shadow"
-                      style={{
-                        maxHeight: "100%",
-                        maxWidth: "100%",
-                        objectFit: "contain",
-                        cursor: "grab",
-                      }}
-                    />
-                  </TransformComponent>
-                </>
-              )}
+              <TransformComponent
+                wrapperStyle={{
+                  width: "100%",
+                  height: "100%",
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+                contentStyle={{
+                  width: "100%",
+                  height: "100%",
+                  display: "flex",
+                  justifyContent: "center",
+                  alignItems: "center",
+                }}
+              >
+                <img
+                  src={`${urlBase}/api/exames/imagem/${exame.id}`}
+                  alt={`Imagem do exame ${exame.nomeExame}`}
+                  className="img-fluid rounded shadow"
+                  style={{
+                    maxHeight: "100%",
+                    maxWidth: "100%",
+                    objectFit: "contain",
+                    cursor: "grab",
+                  }}
+                />
+              </TransformComponent>
             </TransformWrapper>
           ) : (
-            <p className="text-muted">Imagem não disponível</p>
+            <p>Imagem não disponível</p>
           )}
         </div>
+
+        <button
+          onClick={handleDownload}
+          className="btn btn-outline-secondary btn-sm mt-2 d-flex align-items-center justify-content-center"
+          style={{
+            width: "auto",
+            minWidth: "140px",
+            gap: "6px",
+            fontWeight: "500",
+            padding: "4px 10px",
+            fontSize: "0.85rem",
+          }}
+          title="Baixar imagem"
+        >
+          <FaDownload size={14} />
+          Salvar imagem
+        </button>
       </div>
 
-      {/* Dados do exame */}
       <div className="card shadow-sm border-0 mb-4">
         <div className="card-body" style={{ textAlign: "justify" }}>
           <h5>
@@ -127,22 +153,22 @@ export default function VisualizadorExame({ exame }) {
 
       <div className="card shadow-sm border-0">
         <div className="card-body" style={{ textAlign: "justify" }}>
-        <h4 className="text-primary">
-          <FaStickyNote /> Resumo
-        </h4>
-        <textarea
-          className="form-control mt-3 border border-info rounded"
-          value={exame.resumo || ""}
-          rows={5}
-          readOnly
-          style={{
-            backgroundColor: "#f8f9fa",
-            fontSize: "1rem",
-            padding: "10px",
-            textAlign: "justify",
-          }}
-        ></textarea>
-      </div>
+          <h4 className="text-primary">
+            <FaStickyNote /> Resumo
+          </h4>
+          <textarea
+            className="form-control mt-3 border border-info rounded"
+            value={exame.resumo || ""}
+            rows={5}
+            readOnly
+            style={{
+              backgroundColor: "#f8f9fa",
+              fontSize: "1rem",
+              padding: "10px",
+              textAlign: "justify",
+            }}
+          ></textarea>
+        </div>
       </div>
     </div>
   );

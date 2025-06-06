@@ -8,6 +8,7 @@ import {
   FaCalendarAlt,
   FaUserMd,
   FaAward,
+  FaDownload,
   FaPills,
   FaStickyNote,
   FaArrowLeft,
@@ -16,6 +17,29 @@ import {
 export default function ReceitaComMedicamentos({ receita }) {
   const navigate = useNavigate();
   const urlBase = axiosInstance.defaults.baseURL;
+
+  const handleDownload = async () => {
+    try {
+      const response = await fetch(
+        `${urlBase}/api/receitas/imagem/${receita.id}`
+      );
+      if (!response.ok) throw new Error("Erro ao baixar a imagem");
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `receita-${receita.id}.jpg`;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+
+      window.URL.revokeObjectURL(url);
+    } catch {
+      alert("Erro ao baixar a imagem");
+    }
+  };
+
   return (
     <div
       className="mx-auto py-4"
@@ -41,61 +65,73 @@ export default function ReceitaComMedicamentos({ receita }) {
       <div className="card shadow-sm border-0 mb-4">
         <div
           className="card-body text-center"
-          style={{ height: "300px", position: "relative" }}
+          style={{
+            height: "50%",
+            maxHeight: "60vh",
+            position: "relative",
+            padding: 0,
+            overflow: "hidden",
+          }}
         >
-          {receita.imagem ? (
-            <TransformWrapper
-              initialScale={1.1}
-              minScale={1}
-              maxScale={5}
-              wheel={{ step: 0.1 }}
+          <TransformWrapper
+            initialScale={1.1}
+            minScale={1}
+            maxScale={5}
+            wheel={{ step: 0.1 }}
+            doubleClick={{ disabled: true }}
+          >
+            <TransformComponent
+              wrapperStyle={{
+                width: "100%",
+                height: "100%",
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+              }}
+              contentStyle={{
+                width: "100%",
+                height: "100%",
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center",
+              }}
             >
-              {({ zoomIn, zoomOut, resetTransform }) => (
-                <>
-                  <div
-                    className="tools"
-                    style={{
-                      position: "absolute",
-                      zIndex: 10,
-                      top: "10px",
-                      left: "10px",
-                    }}
-                  ></div>
-                  <TransformComponent
-                    wrapperStyle={{
-                      width: "100%",
-                      height: "100%",
-                      display: "flex",
-                      justifyContent: "center",
-                      alignItems: "center",
-                    }}
-                    contentStyle={{
-                      width: "100%",
-                      height: "100%",
-                      display: "flex",
-                      justifyContent: "center",
-                      alignItems: "center",
-                    }}
-                  >
-                    <img
-                      src={`${urlBase}/api/receitas/imagem/${receita.id}`}
-                      alt="Imagem da Receita"
-                      className="img-fluid rounded shadow"
-                      style={{
-                        maxHeight: "100%",
-                        maxWidth: "100%",
-                        objectFit: "contain",
-                        cursor: "grab",
-                      }}
-                    />
-                  </TransformComponent>
-                </>
-              )}
-            </TransformWrapper>
-          ) : (
-            <p className="text-muted">Imagem não disponível</p>
-          )}
+              <img
+                src={`${urlBase}/api/receitas/imagem/${receita.id}`}
+                alt={`Imagem da receita ${receita.id}`}
+                className="img-fluid rounded shadow"
+                style={{
+                  maxHeight: "100%",
+                  maxWidth: "100%",
+                  objectFit: "contain",
+                  cursor: "grab",
+                  userSelect: "none",
+                  height: "auto",
+                  width: "auto",
+                  maxWidth: "100%",
+                }}
+                draggable={false}
+              />
+            </TransformComponent>
+          </TransformWrapper>
         </div>
+
+        <button
+          onClick={handleDownload}
+          className="btn btn-outline-secondary btn-sm mt-2 d-flex align-items-center justify-content-center"
+          style={{
+            width: "auto",
+            minWidth: "140px",
+            gap: "6px",
+            fontWeight: "500",
+            padding: "4px 10px",
+            fontSize: "0.85rem",
+          }}
+          title="Baixar imagem"
+        >
+          <FaDownload size={14} />
+          Salvar imagem
+        </button>
       </div>
 
       <div className="card shadow-sm border-0 mb-4">
@@ -146,25 +182,25 @@ export default function ReceitaComMedicamentos({ receita }) {
 
       <div className="card shadow">
         <div className="card-body" style={{ textAlign: "justify" }}>
-        <h4 className="text-primary">
-          <FaStickyNote /> Resumo
-        </h4>
-        <textarea
-          className="form-control mt-8 border border-info rounded"
-          value={receita.resumo || ""}
-          rows={10}
-          readOnly
-          style={{
-            backgroundColor: "#f8f9fa",
-            fontSize: "1rem",
-            padding: "10px",
-            textAlign: "justify",
-            height: "auto",
-            overflowY: "auto",
-          }}
-        ></textarea>
+          <h4 className="text-primary">
+            <FaStickyNote /> Resumo
+          </h4>
+          <textarea
+            className="form-control mt-8 border border-info rounded"
+            value={receita.resumo || ""}
+            rows={10}
+            readOnly
+            style={{
+              backgroundColor: "#f8f9fa",
+              fontSize: "1rem",
+              padding: "10px",
+              textAlign: "justify",
+              height: "auto",
+              overflowY: "auto",
+            }}
+          ></textarea>
+        </div>
       </div>
-    </div>
     </div>
   );
 }
