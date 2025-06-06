@@ -34,8 +34,7 @@ public class DocumentoClinico {
     @Column(name = "ds_imagem")
     private String imagem;
 
-    @Lob
-    @Column(name = "ds_resumo", columnDefinition = "TEXT")
+    @Column(name = "ds_resumo")
     private String resumo;
 
     @ManyToOne
@@ -48,7 +47,6 @@ public class DocumentoClinico {
 
     @Column(name = "ds_conteudo", length = 5000)
     private String conteudo;
-
 
 
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
