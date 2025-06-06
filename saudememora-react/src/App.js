@@ -20,12 +20,9 @@ import VisualizarFichaMedica from "./pages/VisualizarFichaMedica";
 import AlterarDocumento from "./pages/AlterarDocumento";
 import "bootstrap/dist/js/bootstrap.bundle.min.js";
 import "./styles/global.css";
-import Nav from "./components/Nav";
+import Layout from "./components/Layout";
 import { obterPaciente } from "./services/pacienteService";
 
-
-let lastVerification = 0;
-const CACHE_TIME = 5 * 60 * 1000; 
 
 const isPacienteLoggedIn = () => {
   const data = localStorage.getItem("paciente");
@@ -68,7 +65,6 @@ const AuthWrapper = ({ children }) => {
   return authState.isAuthenticated ? children : <Navigate to="/login" replace />;
 };
 
-
 const PublicWrapper = ({ children }) => {
   const [authState, setAuthState] = useState({ loading: true, isAuthenticated: false });
 
@@ -93,13 +89,11 @@ const PublicWrapper = ({ children }) => {
   return authState.isAuthenticated ? <Navigate to="/home" replace /> : children;
 };
 
-
 function App() {
   return (
     <div className="app-container">
       <Router>
         <Routes>
-
           <Route
             path="/"
             element={
@@ -108,7 +102,6 @@ function App() {
               </PublicWrapper>
             }
           />
-
 
           <Route
             path="/login"
@@ -131,8 +124,9 @@ function App() {
             path="/home"
             element={
               <AuthWrapper>
-                <Nav />
-                <Home />
+                <Layout>
+                  <Home />
+                </Layout>
               </AuthWrapper>
             }
           />
@@ -140,8 +134,9 @@ function App() {
             path="/perfil"
             element={
               <AuthWrapper>
-                <Nav />
-                <Perfil />
+                <Layout>
+                  <Perfil />
+                </Layout>
               </AuthWrapper>
             }
           />
@@ -149,8 +144,9 @@ function App() {
             path="/formulario-medico"
             element={
               <AuthWrapper>
-                <Nav />
-                <FormularioMedico />
+                <Layout>
+                  <FormularioMedico />
+                </Layout>
               </AuthWrapper>
             }
           />
@@ -158,8 +154,9 @@ function App() {
             path="/relatorios"
             element={
               <AuthWrapper>
-                <Nav />
-                <RelatorioDocumentos />
+                <Layout>
+                  <RelatorioDocumentos />
+                </Layout>
               </AuthWrapper>
             }
           />
@@ -168,8 +165,9 @@ function App() {
             path="/upload-documentos"
             element={
               <AuthWrapper>
-                <Nav />
-                <UploadDocumentos />
+                <Layout>
+                  <UploadDocumentos />
+                </Layout>
               </AuthWrapper>
             }
           />
@@ -177,8 +175,9 @@ function App() {
             path="/editar-documento"
             element={
               <AuthWrapper>
-                <Nav />
-                <AlterarDocumento />
+                <Layout>
+                  <AlterarDocumento />
+                </Layout>
               </AuthWrapper>
             }
           />
@@ -186,8 +185,9 @@ function App() {
             path="/alterar-perfil"
             element={
               <AuthWrapper>
-                <Nav />
-                <EditarPerfil />
+                <Layout>
+                  <EditarPerfil />
+                </Layout>
               </AuthWrapper>
             }
           />
@@ -195,8 +195,9 @@ function App() {
             path="/meus-documentos"
             element={
               <AuthWrapper>
-                <Nav />
-                <ListarDocumentos />
+                <Layout>
+                  <ListarDocumentos />
+                </Layout>
               </AuthWrapper>
             }
           />
@@ -204,8 +205,9 @@ function App() {
             path="/visualizar-documento"
             element={
               <AuthWrapper>
-                <Nav />
-                <VisualizadorDocumento />
+                <Layout>
+                  <VisualizadorDocumento />
+                </Layout>
               </AuthWrapper>
             }
           />
@@ -213,12 +215,12 @@ function App() {
             path="/visualizar-ficha"
             element={
               <AuthWrapper>
-                <Nav />
-                <VisualizarFichaMedica />
+                <Layout>
+                  <VisualizarFichaMedica />
+                </Layout>
               </AuthWrapper>
             }
           />
-
 
           <Route
             path="*"

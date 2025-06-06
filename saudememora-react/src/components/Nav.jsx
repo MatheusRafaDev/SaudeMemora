@@ -10,8 +10,12 @@ const Nav = () => {
     { path: "/home", icon: "bi-house", text: "Início" },
     { path: "/perfil", icon: "bi-person", text: "Perfil" },
     { path: "/meus-documentos", icon: "bi-file-earmark-medical", text: "Docs" },
-    { path: "/upload-documentos", icon: "bi-cloud-arrow-up", text: "Processar Doc" },
-    { path: "/visualizar-ficha", icon: "bi-file-text", text: "Ficha" }
+    {
+      path: "/upload-documentos",
+      icon: "bi-cloud-arrow-up",
+      text: "Processar Doc",
+    },
+    { path: "/visualizar-ficha", icon: "bi-file-text", text: "Ficha" },
   ];
 
   return (
@@ -28,7 +32,7 @@ const Nav = () => {
               color: location.pathname === item.path ? "#ffffff" : "#d1e5ff",
               fontWeight: location.pathname === item.path ? "600" : "400",
               textDecoration: "none",
-              fontSize: "0.85rem"
+              fontSize: "0.85rem",
             }}
           >
             <i className={`bi ${item.icon}`} style={{ fontSize: "1.2rem" }}></i>
@@ -45,7 +49,12 @@ const Nav = () => {
           right: 0;
           height: 60px;
           z-index: 1050;
+          margin-top: 40px;
         }
+
+
+
+
         .bottom-nav .nav-item:hover {
           background-color: rgba(255, 255, 255, 0.1);
         }
