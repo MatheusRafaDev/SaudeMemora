@@ -47,154 +47,96 @@ const VisualizarFichaMedica = () => {
 
   if (carregando) {
     return (
-      <>
-
-        <div className="container mt-3 text-center">
-          <p className="mt-2">Carregando ficha médica...</p>
-        </div>
-      </>
+      <div className="container mt-5 text-center">
+        <div className="spinner-border text-primary" />
+        <p className="mt-2">Carregando ficha médica...</p>
+      </div>
     );
   }
 
   if (!ficha) {
     return (
-      <>
-
-        <div className="container mt-3">
-          <div className="alert alert-warning text-center py-3 px-2">
-            <p className="mb-3 fs-6">
-              {mensagem || "Nenhuma ficha médica encontrada."}
-            </p>
-            <button
-              className="btn btn-primary btn-sm px-3"
-              onClick={() => navigate("/formulario-medico")}
-            >
-              Criar Ficha
-            </button>
-          </div>
+      <div className="container mt-5">
+        <div className="alert alert-warning text-center py-4 px-3 shadow-sm rounded">
+          <p className="mb-3 fs-6 fw-semibold">
+            {mensagem || "Nenhuma ficha médica encontrada."}
+          </p>
+          <button
+            className="btn btn-primary px-4"
+            onClick={() => navigate("/formulario-medico")}
+          >
+            Criar Ficha
+          </button>
         </div>
-      </>
+      </div>
     );
   }
 
   const dadosSaude = [
-    {
-      pergunta: "Tratamento médico",
-      valor: ficha.tratamentoMedico,
-      extra: ficha.tratamentoMedicoExtra,
-    },
-    {
-      pergunta: "Grávida",
-      valor: paciente.sexo === "F" ? ficha.gravidez : null,
-      extra: ficha.gravidezExtra,
-      condicional: paciente.sexo === "F",
-    },
+    { pergunta: "Tratamento médico", valor: ficha.tratamentoMedico, extra: ficha.tratamentoMedicoExtra },
+    { pergunta: "Grávida", valor: paciente.sexo === "F" ? ficha.gravidez : null, extra: ficha.gravidezExtra, condicional: paciente.sexo === "F" },
     { pergunta: "Faz regime", valor: ficha.regime, extra: ficha.regimeExtra },
     { pergunta: "Diabetes", valor: ficha.diabetes, extra: ficha.diabetesExtra },
     { pergunta: "Alergias", valor: ficha.alergias, extra: ficha.alergiasExtra },
     { pergunta: "Febre reumática", valor: ficha.reumatica },
     { pergunta: "Problemas de coagulação", valor: ficha.coagulacao },
-    {
-      pergunta: "Doença cardiovascular",
-      valor: ficha.doencaCardioVascular,
-      extra: ficha.doencaCardioVascularExtra,
-    },
+    { pergunta: "Doença cardiovascular", valor: ficha.doencaCardioVascular, extra: ficha.doencaCardioVascularExtra },
     { pergunta: "Problemas hemorrágicos", valor: ficha.hemorragicos },
-    {
-      pergunta: "Problemas com anestesia",
-      valor: ficha.problemasAnestesia,
-      extra: ficha.problemasAnestesiaExtra,
-    },
-    {
-      pergunta: "Alergia a medicamentos",
-      valor: ficha.alergiaMedicamentos,
-      extra: ficha.alergiaMedicamentosExtra,
-    },
-    {
-      pergunta: "Teve hepatite",
-      valor: ficha.hepatite,
-      extra: ficha.hepatiteExtra,
-    },
+    { pergunta: "Problemas com anestesia", valor: ficha.problemasAnestesia, extra: ficha.problemasAnestesiaExtra },
+    { pergunta: "Alergia a medicamentos", valor: ficha.alergiaMedicamentos, extra: ficha.alergiaMedicamentosExtra },
+    { pergunta: "Teve hepatite", valor: ficha.hepatite, extra: ficha.hepatiteExtra },
     { pergunta: "Portador do HIV", valor: ficha.hiv },
     { pergunta: "Usa/Usou drogas", valor: ficha.drogas },
     { pergunta: "Fumante", valor: ficha.fumante },
     { pergunta: "Já fumou", valor: ficha.fumou },
     { pergunta: "Pressão arterial", valor: ficha.pressao, isText: true },
-    {
-      pergunta: "Problemas respiratórios",
-      valor: ficha.respiratorio,
-      extra: ficha.respiratorioExtra,
-    },
-    {
-      pergunta: "Doenças na família",
-      valor: ficha.doencaFamilia,
-      extra: ficha.doencaFamiliaExtra,
-    },
+    { pergunta: "Problemas respiratórios", valor: ficha.respiratorio, extra: ficha.respiratorioExtra },
+    { pergunta: "Doenças na família", valor: ficha.doencaFamilia, extra: ficha.doencaFamiliaExtra },
   ];
 
   return (
-    <>
-
-
-      <div className="container container-custom">
-        <div className="header-flex">
-          <div>
-            <h4 className="fw-bold text-primary">Ficha Médica</h4>
-            <small className="text-muted">Anamnese</small>
-          </div>
-          <button
-            className="btn btn-primary btn-sm btn-edit"
-            onClick={() => navigate("/formulario-medico")}
-          >
-            Editar Ficha
-          </button>
+    <div className="container container-custom mt-4">
+      <div className="d-flex justify-content-between align-items-center mb-3">
+        <div>
+          <h4 className="fw-bold text-primary mb-1">Ficha Médica</h4>
+          <span className="text-muted small">Informações de saúde</span>
         </div>
-        <div className="section">
-          <h6 className="fw-bold mb-2">Paciente</h6>
-          <div className="d-flex flex-column gap-1">
-            <p className="mb-0 small">
-              <strong>Nome:</strong> {paciente.nome || "Não informado"}
-            </p>
-            <p className="mb-0 small">
-              <strong>CPF:</strong> {paciente.cpf || "Não informado"}
-            </p>
-            <p className="mb-0 small">
-              <strong>Nascimento:</strong>{" "}
-              {paciente.dataNascimento || "Não informado"}
-            </p>
-          </div>
-        </div>
+        <button
+          className="btn btn-outline-primary btn-sm"
+          onClick={() => navigate("/formulario-medico")}
+        >
+          Editar Ficha
+        </button>
+      </div>
 
-        <div className="section">
-          <h6 className="fw-bold mb-2">Dados de Saúde</h6>
-          <div className="list-group list-group-flush">
-            {dadosSaude.map((item, idx) => {
-              if (item.condicional === false) return null;
-
-              const resposta = item.isText
-                ? item.valor || "Não informado"
-                : formatarResposta(item.valor, item.extra);
-
-              return (
-                <div
-                  key={idx}
-                  className="list-group-item px-0 py-2 border-0 d-flex flex-column flex-md-row justify-content-between align-items-start"
-                  style={{ borderBottom: "1px solid #eee" }}
-                >
-                  <span className="small fw-semibold">{item.pergunta}:</span>
-                  <span
-                    className="small text-muted mt-1 mt-md-0 text-start text-md-end"
-                    style={{ minWidth: "100px" }}
-                  >
-                    {resposta}
-                  </span>
-                </div>
-              );
-            })}
-          </div>
+      <div className="card shadow-sm mb-4">
+        <div className="card-body">
+          <h6 className="fw-bold mb-3 text-secondary">Dados do Paciente</h6>
+          <p className="mb-1 small"><strong>Nome:</strong> {paciente.nome || "Não informado"}</p>
+          <p className="mb-1 small"><strong>CPF:</strong> {paciente.cpf || "Não informado"}</p>
+          <p className="mb-0 small"><strong>Nascimento:</strong> {paciente.dataNascimento || "Não informado"}</p>
         </div>
       </div>
-    </>
+
+      <div className="card shadow-sm mb-5">
+        <div className="card-body">
+          <h6 className="fw-bold mb-3 text-secondary">Condições de Saúde</h6>
+          {dadosSaude.map((item, idx) => {
+            if (item.condicional === false) return null;
+            const resposta = item.isText
+              ? item.valor || "Não informado"
+              : formatarResposta(item.valor, item.extra);
+
+            return (
+              <div key={idx} className="d-flex justify-content-between border-bottom py-2">
+                <span className="fw-semibold">{item.pergunta}</span>
+                <span className="text-muted">{resposta}</span>
+              </div>
+            );
+          })}
+        </div>
+      </div>
+    </div>
   );
 };
 

@@ -405,7 +405,6 @@ const RelatorioDocumentos = () => {
                 {loading ? (
                   <>
                     <span className="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span>
-                    Carregando...
                   </>
                 ) : (
                   "Aplicar Filtros"
@@ -437,7 +436,7 @@ const RelatorioDocumentos = () => {
         {loading ? (
           <div className="text-center mt-4">
             <div className="spinner-border text-primary" role="status">
-              <span className="sr-only">Carregando...</span>
+
             </div>
           </div>
         ) : documentos.length === 0 ? (

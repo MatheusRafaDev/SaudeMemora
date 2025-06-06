@@ -10,8 +10,9 @@ const Nav = () => {
     { path: "/home", icon: "bi-house", text: "Início" },
     { path: "/perfil", icon: "bi-person", text: "Perfil" },
     { path: "/meus-documentos", icon: "bi-file-earmark-medical", text: "Docs" },
-    { path: "/upload-documentos", icon: "bi-cloud-arrow-up", text: "Enviar" },
-    { path: "/visualizar-ficha", icon: "bi-file-text", text: "Ficha" }
+    { path: "/upload-documentos", icon: "bi-cloud-arrow-up", text: "Processar Doc" },
+    { path: "/visualizar-ficha", icon: "bi-file-text", text: "Ficha" },
+     { path: "/relatorios", icon: "bi-clipboard2-data", text: "Relatórios" }
   ];
 
   return (
