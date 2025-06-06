@@ -316,7 +316,7 @@ export async function tratarOCRParaReceitas(textoOCR) {
     }
 
     return {
-      dataReceita: dataFormatada || "",
+      dataReceita: dataFormatada || new Date(),
       medico: jsonReceita.medico || "",
       crm: jsonReceita.crm || "",
       medicamentos: Array.isArray(jsonReceita.medicamentos)
@@ -430,7 +430,7 @@ export async function tratarOCRParaExames(textoOCR) {
     }
 
     return {
-      dataExame: dataFormatada || "",
+      dataExame: dataFormatada || new Date(),
       tipo: jsonExame.tipo || "",
       laboratorio: jsonExame.laboratorio || "",
       resultado: jsonExame.resultado || "",
@@ -527,7 +527,7 @@ export async function tratarOCRParaDocumentoClinico(textoOCR) {
     }
 
     return {
-      dataDocumentoCli: jsonDocumento.dataDocumentoCli || "",
+      dataDocumentoCli: jsonDocumento.dataDocumentoCli || new Date(),
       medico: jsonDocumento.medico || "",
       especialidade: jsonDocumento.especialidade || "",
       tipo: jsonDocumento.tipo || "",
