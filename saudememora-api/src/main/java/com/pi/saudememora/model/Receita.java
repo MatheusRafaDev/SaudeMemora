@@ -24,7 +24,7 @@ public class Receita {
     @Column(name = "ds_observacoes")
     private String observacoes;
 
-    @Lob
+
     @Column(name = "ds_resumo", columnDefinition = "TEXT")
     private String resumo;
 

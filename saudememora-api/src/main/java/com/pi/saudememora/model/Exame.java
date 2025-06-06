@@ -34,7 +34,7 @@ public class Exame {
     @Column(name = "ds_imagem")
     private String imagem;
 
-    @Lob
+
     @Column(name = "ds_resumo", columnDefinition = "TEXT")
     private String resumo;
 
