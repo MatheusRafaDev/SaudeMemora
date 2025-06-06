@@ -310,7 +310,7 @@ const CadastroPaciente = () => {
                   onChange={handleChange}
                   className="form-control"
                   placeholder="(00) 00000-0000"
-                  autoComplete="tel"
+                  autoComplete="text"
                 />
               </div>
 
