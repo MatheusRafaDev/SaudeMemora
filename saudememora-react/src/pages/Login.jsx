@@ -53,7 +53,7 @@ export default function Login() {
           <div className="row justify-content-center">
             <div className="col-12 col-sm-10 col-md-8 col-lg-5 col-xl-4">
               <div className="p-4 rounded shadow border bg-white">
-                <h4 className="text-center mb-4 text-primary">Login do Paciente</h4>
+                <h4 className="text-center mb-4 text-primary">Login</h4>
                 <form onSubmit={handleLogin}>
                   <div className="mb-3">
                     <label className="form-label" htmlFor="email">
