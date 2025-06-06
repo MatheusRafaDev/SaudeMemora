@@ -183,11 +183,23 @@ const Perfil = () => {
             </button>
 
             <button
+              className="btn profile-button"
+              onClick={() => {
+                localStorage.removeItem("paciente");
+                navigate("/relatorios"); 
+              }}
+            >
+              Relatórios
+            </button>
+
+
+            <button
               className="btn btn-danger profile-button"
               onClick={() => setShowModal(true)}
             >
               <FaTrash /> Deletar Perfil
             </button>
+
 
             <button
               className="btn btn-danger profile-button"
