@@ -63,7 +63,7 @@ public class ReceitaService {
     public Optional<Receita> buscarPorId(Long id) {
         return receitaRepository.findById(id);
     }
-    
+
     @Transactional
     public Receita createReceita(Receita receita) {
         return receitaRepository.save(receita);

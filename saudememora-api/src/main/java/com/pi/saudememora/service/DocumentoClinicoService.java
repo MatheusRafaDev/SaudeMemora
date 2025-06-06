@@ -4,6 +4,7 @@ import com.pi.saudememora.model.DocumentoClinico;
 import com.pi.saudememora.repository.DocumentoClinicoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -25,7 +26,7 @@ public class DocumentoClinicoService {
     public Optional<DocumentoClinico> buscarPorId(Long id) {
         return repository.findById(id);
     }
-
+    @Transactional
     public DocumentoClinico salvar(DocumentoClinico documento) {
         return repository.save(documento);
     }

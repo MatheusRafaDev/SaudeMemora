@@ -4,6 +4,7 @@ import com.pi.saudememora.model.Exame;
 import com.pi.saudememora.repository.ExameRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
@@ -13,7 +14,7 @@ public class ExameService {
 
     @Autowired
     private ExameRepository exameRepository;
-
+    @Transactional
     public Exame save(Exame exame) {
         return exameRepository.save(exame);
     }
