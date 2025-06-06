@@ -3,7 +3,7 @@ import { useLocation } from "react-router-dom";
 import ReceitaComMedicamentos from "../components/visualizacao/VisualizadorReceita";
 import VisualizadorExame from "../components/visualizacao/VisualizadorExame"; 
 import VisualizadorDocumentoClinico from "../components/visualizacao/VisualizadorDocumentoClinico"; 
-import Nav from "../components/Nav";
+
 
 const VisualizadorDocumento = () => {
   const location = useLocation();
@@ -19,7 +19,7 @@ const VisualizadorDocumento = () => {
   if (!documento) {
     return (
       <div>
-        <Nav />
+
         <p>Nenhum documento selecionado.</p>
       </div>
     );
@@ -29,7 +29,7 @@ const VisualizadorDocumento = () => {
     case "R": 
       return (
         <div>
-          <Nav />
+
           <ReceitaComMedicamentos receita={documento} />
         </div>
       );
@@ -37,7 +37,7 @@ const VisualizadorDocumento = () => {
     case "E":
       return (
         <div>
-          <Nav />
+
           <VisualizadorExame exame={documento} />
         </div>
       );
@@ -45,7 +45,7 @@ const VisualizadorDocumento = () => {
       case "D":
       return (
         <div>
-          <Nav />
+
           <VisualizadorDocumentoClinico documentoClinico={documento} />
         </div>
       );
@@ -54,7 +54,7 @@ const VisualizadorDocumento = () => {
     default:
       return (
         <div>
-          <Nav />
+
           <p>Tipo de documento não suportado para visualização.</p>
         </div>
       );

@@ -20,3 +20,19 @@ html, body {
   box-shadow: 0 0 20px rgba(0, 123, 255, 0.05);
   padding: 30px;
 }
+/* Oculta mensagens de erro em telas pequenas (menos que 576px) */
+@media (max-width: 575.98px) {
+  .error-mobile-hide {
+    display: none !important;
+  }
+
+  /* Opcional: Ajuste o tamanho do botão para caber melhor */
+  .btn {
+    font-size: 1rem;
+  }
+}
+
+/* Estilo para alertas de erro com ícones */
+.alert .bi-exclamation-triangle-fill {
+  font-size: 1.5rem;
+}

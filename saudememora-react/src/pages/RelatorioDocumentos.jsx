@@ -5,7 +5,7 @@ import "../styles/RelatorioDocumentos.css";
 import DocumentoService from "../services/DocumentoService";
 import ExameService from "../services/ExameService";
 import ReceitaService from "../services/ReceitaService";
-import Nav from "../components/Nav";
+
 import * as XLSX from "xlsx";
 import { saveAs } from "file-saver";
 import jsPDF from "jspdf";
@@ -330,7 +330,7 @@ const RelatorioDocumentos = () => {
 
   return (
     <div>
-      <Nav />
+      
       <div className="container relatorio-container mt-4">
         <h4 className="text-center mb-4">
           <FiFileText /> Relatório de Documentos

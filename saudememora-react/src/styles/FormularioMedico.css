@@ -1,145 +1,201 @@
-body {
-  background-color: #f8f9fa;
+:root {
+  /* Cores */
+  --primary: #4361ee;
+  --primary-hover: #3a56d4;
+  --secondary: #f8f9fa;
+  --text: #343a40;
+  --text-light: #6c757d;
+  --border: #e0e3e7;
+  --border-focus: #b7c1ff;
+  
+  /* Espaçamentos */
+  --space-xs: 0.5rem;
+  --space-sm: 0.75rem;
+  --space-md: 1rem;
+  --space-lg: 1.5rem;
+  --space-xl: 2rem;
+  
+  /* Tamanhos */
+  --input-height: 2.5rem;
+  --btn-height: 2.75rem;
+  --radio-size: 1.25rem;
+}
+
+/* Layout Principal */
+.formulario-medico {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background-color: #f5f7fa;
+}
+
+.container {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: var(--space-xl) var(--space-md);
 }
 
 .saude-card {
-  background-color: #ffffff;
-  border-radius: 1rem;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
-  padding: 2rem;
-  max-width: 900px;
-  margin: auto;
+  background-color: white;
+  border-radius: 0.75rem;
+  box-shadow: 0 0.25rem 0.5rem rgba(0, 0, 0, 0.05);
+  padding: var(--space-xl);
+  max-width: 800px;
+  width: 100%;
+  margin: 0 auto;
 }
 
-h4 {
+/* Cabeçalho */
+.formulario-medico h4 {
+  color: var(--text);
   font-weight: 600;
-  color: #343a40;
+  margin-bottom: var(--space-lg);
+  font-size: 1.5rem;
 }
 
-textarea#textoOCR {
-  resize: none;
+/* Layout Compacto */
+.pergunta-item {
+  padding: var(--space-md) 0;
+  border-bottom: 1px solid var(--border);
+  margin-bottom: var(--space-md);
 }
 
-.form-label {
+.pergunta-texto {
+  font-size: 1rem;
   font-weight: 500;
-  color: #495057;
+  margin-bottom: var(--space-sm);
+  color: var(--text);
 }
 
-input[type="text"] {
-  border-radius: 0.5rem;
+/* Grupo de Botões SIM/NÃO */
+.btn-group-toggle {
+  display: flex;
+  gap: var(--space-sm);
+  margin: var(--space-xs) 0;
 }
 
-.form-check-label {
-  margin-left: 0.3rem;
+.btn-option {
+  flex: 1;
+  height: 2.5rem;
+  padding: 0 var(--space-md);
+  font-size: 0.8rem;
+  font-weight: 400;
+  background-color: white;
+  color: var(--text);
+  border: 2px solid var(--border);
+  border-radius: 6px;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-option:hover {
+  border-color: var(--primary);
+  background-color: #f5f7ff;
+}
+
+.btn-option.active {
+  background-color: var(--primary);
+  color: white;
+  border-color: var(--primary);
+}
+
+/* Campo Extra */
+.extra-input {
+  margin-top: var(--space-sm);
+  animation: fadeIn 0.3s ease-out;
+}
+
+.input-group-compact {
+  display: flex;
+  height: var(--input-height);
+  border-radius: 6px;
+  overflow: hidden;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+  border: 1px solid var(--border);
+}
+
+.input-group-compact .input-group-text {
+  padding: 0 var(--space-sm);
+  font-size: 0.875rem;
+  background-color: #f5f7ff;
+  color: var(--primary);
+  border: none;
+  display: flex;
+  align-items: center;
+  white-space: nowrap;
+}
+
+.input-group-compact .form-control {
+  flex: 1;
+  height: 100%;
+  padding: 0 var(--space-sm);
+  font-size: 0.875rem;
+  border: none;
+  border-left: 1px solid var(--border);
+  transition: all 0.2s ease;
+}
+
+.input-group-compact .form-control:focus {
+  outline: none;
+  box-shadow: inset 0 0 0 1px var(--primary);
+}
+
+/* Botão de Envio */
+.btn-submit {
+  height: var(--btn-height);
   font-weight: 500;
+  margin-top: var(--space-lg);
 }
 
-.form-check-input:checked {
-  background-color: #0d6efd;
-  border-color: #0d6efd;
+/* Mensagens */
+.alert {
+  margin-top: var(--space-md);
 }
 
-select.form-select {
-  border-radius: 0.5rem;
+/* Animações */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-5px); }
+  to { opacity: 1; transform: translateY(0); }
 }
 
-.btn {
-  border-radius: 0.5rem;
-}
-
-.border-bottom {
-  border-color: #dee2e6 !important;
+/* Responsividade */
+@media (max-width: 768px) {
+  .saude-card {
+    padding: var(--space-lg);
+  }
+  
+  .container {
+    padding: var(--space-md);
+  }
 }
 
 @media (max-width: 576px) {
   .saude-card {
-    padding: 1rem;
-  }
-}
-
-.formulario-medico {
-  background-color: #f8f9fa;
-  min-height: 100vh;
-}
-
-.card {
-  border-radius: 0.5rem;
-  overflow: hidden;
-  border: none;
-}
-
-.card-header {
-  border-radius: 0 !important;
-}
-
-.pergunta {
-  transition: all 0.2s ease;
-}
-
-.pergunta:hover {
-  box-shadow: 0 0.125rem 0.5rem rgba(0, 0, 0, 0.1);
-}
-
-.upload-section, .ocr-result {
-  border-left: 4px solid #0d6efd;
-}
-
-.form-check-input:checked {
-  background-color: #0d6efd;
-  border-color: #0d6efd;
-}
-
-.btn-primary {
-  background-color: #0d6efd;
-  border-color: #0d6efd;
-}
-
-.btn-primary:hover {
-  background-color: #0b5ed7;
-  border-color: #0a58ca;
-}
-
-/* Estilos para a visualização da ficha */
-.list-group-item {
-  padding: 1rem 1.25rem;
-  border-left: 4px solid transparent;
-  transition: all 0.2s;
-}
-
-.list-group-item:hover {
-  border-left-color: #0d6efd;
-  background-color: #f8f9fa;
-}
-
-
-@media print {
-  .saude-card {
-    border: none;
+    padding: var(--space-md);
     box-shadow: none;
-    padding: 0;
+    border-radius: 0;
   }
   
-  .btn {
-    display: none !important;
+  .pergunta-item {
+    padding: var(--space-sm) 0;
   }
   
-  body {
-    background-color: white !important;
-    color: black !important;
-  }
-}
-
-@media (max-width: 992px) {
-  .pergunta .row {
-    flex-direction: column;
+  .btn-group-toggle {
+    gap: var(--space-xs);
   }
   
-  .pergunta .col-lg-5, 
-  .pergunta .col-lg-7 {
-    width: 100%;
+  .btn-option {
+    padding: 0 var(--space-sm);
+    font-size: 0.8125rem;
   }
   
-  .pergunta .col-lg-5 {
-    margin-bottom: 1rem;
+  .input-group-compact .input-group-text,
+  .input-group-compact .form-control {
+    font-size: 1rem;
   }
 }

@@ -12,7 +12,7 @@ import {
   FaTimes,
   FaCheck,
 } from "react-icons/fa";
-import Nav from "../components/Nav";
+
 import {deletarPaciente} from "../services/pacienteService"; // Supondo que você tenha esse serviço
 import "../styles/Perfil.css";
 
@@ -121,7 +121,7 @@ const Perfil = () => {
   if (!paciente) {
     return (
       <div>
-        <Nav />
+
         <div className="profile-container">
           <h2 className="profile-header">Perfil</h2>
           <p className="profile-message">
@@ -141,7 +141,7 @@ const Perfil = () => {
 
   return (
     <div>
-      <Nav />
+
       <div className="profile-container">
         <h2 className="profile-header">Perfil do Paciente</h2>
 

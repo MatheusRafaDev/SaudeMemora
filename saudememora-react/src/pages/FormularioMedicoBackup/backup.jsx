@@ -3,7 +3,7 @@ import "bootstrap/dist/css/bootstrap.min.css";
 import { ocrSpace } from "../ocr/ocrSpace";
 import { aplicarCamposComOCR } from "../ocr/aplicarCamposComOCR";
 import "../styles/FormularioMedico.css";
-import Nav from "../components/Nav";
+
 import { useNavigate } from "react-router-dom";
 import {
   cadastrarFichaMedica,
@@ -364,7 +364,6 @@ const FormularioMedico = () => {
 
   return (
     <div>
-      <Nav />
 
       <div className="container mt-4">
         <div className="saude-card shadow-sm p-4 rounded bg-white">

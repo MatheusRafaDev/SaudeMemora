@@ -6,7 +6,7 @@ import formatarData from "../utils/formatarData";
 import ReceitaService from "../services/ReceitaService";
 import ExameService from "../services/ExameService";
 import DocumentoClinicoService from "../services/DocumentoClinicoService";
-import Nav from "../components/Nav";
+
 import ReactModal from "react-modal";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
@@ -574,7 +574,6 @@ export default function ListarDocumentos() {
 
   return (
     <div>
-      <Nav />
 
       <ConfirmationModal
         show={confirmationModal.show}

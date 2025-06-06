@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import Nav from "../components/Nav";
+
 import {
   FaFileMedical,
   FaUser,
@@ -15,6 +15,7 @@ function Home() {
 
   useEffect(() => {
     const paciente = JSON.parse(localStorage.getItem("paciente"));
+
     if (paciente && paciente.nome) {
       setNome(paciente.nome);
     }
@@ -55,7 +56,6 @@ function Home() {
 
   return (
     <div className="home-container">
-      <Nav />
 
       <main className="main-content">
         <div className="home-header">

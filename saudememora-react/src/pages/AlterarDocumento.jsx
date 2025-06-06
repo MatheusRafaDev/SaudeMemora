@@ -6,7 +6,6 @@ import DocumentoClinicoForm from "../components/forms/DocumentoClinicoForm";
 import ExameForm from "../components/forms/ExameForm";
 import ReceitaForm from "../components/forms/ReceitaForm";
 import Notification from "../components/Notification";
-import Nav from "../components/Nav";
 
 import DocumentoClinicoService from "../services/DocumentoClinicoService";
 import ExameService from "../services/ExameService";
@@ -216,7 +215,7 @@ const AlterarDocumento = () => {
 
   return (
     <div>
-      <Nav />
+
       <div className="container mt-4">
 
         {notification.show && (

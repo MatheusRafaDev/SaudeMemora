@@ -14,10 +14,11 @@ export const loginPaciente = async (email, senha) => {
     }
   } catch (error) {
     if (error.response && error.response.data) {
+
       const mensagem =
         typeof error.response.data === "string"
           ? error.response.data
-          : error.response.data.message || "Erro inesperado ao fazer login.";
+          : error.response.data.message || "Credenciais inválidas";
       return { success: false, message: mensagem };
     } else {
       return { success: false, message: "Erro ao conectar com o servidor." };

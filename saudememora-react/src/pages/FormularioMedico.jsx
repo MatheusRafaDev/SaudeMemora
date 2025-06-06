@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "../styles/FormularioMedico.css";
-import Nav from "../components/Nav";
+
 import { useNavigate } from "react-router-dom";
 import {
   cadastrarFichaMedica,
@@ -290,8 +290,8 @@ const FormularioMedico = () => {
             : "Ficha cadastrada com sucesso!"
         );
 
-        if (!isAtualizar) {       
-                 
+        if (!isAtualizar) {
+
           navigate("/home");
         } else {
           navigate("/formulario-medico");
@@ -309,153 +309,109 @@ const FormularioMedico = () => {
     }
   };
 
-  return (
-    <div>
-      <Nav />
 
-      <div className="container mt-4">
-        <div className="saude-card shadow-sm p-4 rounded bg-white">
-          <h4 className="mb-4 text-center">Formulário Médico (Anamnese)</h4>
+  return (
+    <div className="formulario-medico">
+
+      <div className="container">
+        <div className="saude-card">
+          <h4 className="text-center">Formulário Médico (Anamnese)</h4>
+
           <form>
             {perguntas.map((item) => {
+              console.log(respostas)
               if (item.dependeSexo && paciente.sexo?.toLowerCase() === "m") {
                 return null;
               }
 
               return (
-                <div key={item.chave} className="mb-4 border-bottom pb-3">
-                  <div className="row">
-                    <div className="col-12 col-md-6 mb-2 mb-md-0">
-                      <label className="form-label">{item.pergunta}</label>
-                    </div>
-                    <div className="col-12 col-md-6">
-                      {item.tipo === "pressao" ? (
-                        <select
-                          className="form-select"
-                          value={respostas[item.chave] || ""}
-                          onChange={(e) =>
-                            handleChange(item.chave, e.target.value)
-                          }
-                          required
-                          disabled={carregando}
-                        >
-                          <option value="">Selecione</option>
-                          <option value="NORMAL">NORMAL</option>
-                          <option value="ALTA">ALTA</option>
-                          <option value="BAIXA">BAIXA</option>
-                        </select>
-                      ) : (
-                        <>
-                          <div className="d-flex align-items-center gap-3">
-                            <div className="form-check form-check-inline">
-                              <input
-                                className="form-check-input"
-                                type="radio"
-                                id={`${item.chave}-sim`}
-                                name={item.chave}
-                                value="SIM"
-                                checked={respostas[item.chave] === "SIM"}
-                                onChange={() => handleChange(item.chave, "SIM")}
-                                required
-                                disabled={carregando}
-                              />
-                              <label
-                                className="form-check-label"
-                                htmlFor={`${item.chave}-sim`}
-                              >
-                                Sim
-                              </label>
-                            </div>
-                            <div className="form-check form-check-inline">
-                              <input
-                                className="form-check-input"
-                                type="radio"
-                                id={`${item.chave}-nao`}
-                                name={item.chave}
-                                value="NAO"
-                                checked={respostas[item.chave] === "NAO"}
-                                onChange={() => handleChange(item.chave, "NAO")}
-                                required
-                                disabled={carregando}
-                              />
-                              <label
-                                className="form-check-label"
-                                htmlFor={`${item.chave}-nao`}
-                              >
-                                Não
-                              </label>
-                            </div>
-                          </div>
+                <div key={item.chave} className="pergunta-item">
+                  <div className="pergunta-texto">{item.pergunta}</div>
 
-                          {item.mostrarExtra &&
-                            respostas[item.chave] === "SIM" && (
-                              <div className="mt-2">
-                                <div className="input-group">
-                                  <span className="input-group-text bg-light">
-                                    {item.extra}
-                                  </span>
-                                  <input
-                                    type="text"
-                                    className="form-control"
-                                    value={
-                                      respostas[`${item.chave}_extra`] || ""
-                                    }
-                                    onChange={(e) =>
-                                      handleExtraChange(
-                                        item.chave,
-                                        e.target.value
-                                      )
-                                    }
-                                    disabled={carregando}
-                                    required={respostas[item.chave] === "SIM"}
-                                    placeholder={`Informe ${item.extra.toLowerCase()}`}
-                                  />
-                                </div>
-                              </div>
-                            )}
-                        </>
+                  {item.tipo === "pressao" ? (
+                    <select
+                      className="form-select"
+                      value={respostas[item.chave] || ""}
+                      onChange={(e) =>
+                        handleChange(item.chave, e.target.value)
+                      }
+                      required
+                      disabled={carregando}
+                    >
+                      <option value="">Selecione</option>
+                      <option value="NORMAL">NORMAL</option>
+                      <option value="ALTA">ALTA</option>
+                      <option value="BAIXA">BAIXA</option>
+                    </select>
+                  ) : (
+                    <>
+                      <div className="btn-group-toggle">
+                        <button
+                          type="button"
+                          className={`btn-option ${respostas[item.chave] === 'SIM' ? 'active' : ''}`}
+                          onClick={() => handleChange(item.chave, "SIM")}
+                        >
+                          Sim
+                        </button>
+
+                        <button
+                          type="button"
+                          className={`btn-option ${respostas[item.chave] === 'NAO' ? 'active' : ''}`}
+                          onClick={() => handleChange(item.chave, "NAO")}
+                        >
+                          Não
+                        </button>
+                      </div>
+
+                      {item.mostrarExtra && respostas[item.chave] === "SIM" && (
+                        <div className="extra-input">
+                          <div className="input-group-compact">
+                            <span className="input-group-text">{item.extra}</span>
+                            <input
+                              type="text"
+                              className="form-control"
+                              value={respostas[`${item.chave}_extra`] || ""}
+                              onChange={(e) => handleExtraChange(item.chave, e.target.value)}
+                              disabled={carregando}
+                              required
+                              placeholder={item.extra.toLowerCase()}
+                            />
+                          </div>
+                        </div>
                       )}
-                    </div>
-                  </div>
+                    </>
+                  )}
                 </div>
               );
             })}
 
             {mensagem && (
-              <div
-                className={`alert ${
-                  mensagem.includes("sucesso")
-                    ? "alert-success"
-                    : "alert-danger"
-                }`}
-              >
+              <div className={`alert ${mensagem.includes("sucesso") ? "alert-success" : "alert-danger"}`}>
                 {mensagem}
               </div>
             )}
 
-            <div className="text-end mt-4">
+            <div className="d-flex justify-content-center mt-4">
               <button
                 type="button"
-                className="btn btn-primary px-4 w-100"
+                className={`btn btn-primary px-4 ${carregando ? 'loading-state' : ''}`}
+                style={{ minWidth: '200px' }}
                 onClick={handleFinalizar}
-                disabled={!todosCamposPreenchidos()}
+                disabled={!todosCamposPreenchidos() || carregando}
               >
                 {carregando ? (
-                  <span>
-                    <span
-                      className="spinner-border spinner-border-sm me-2"
-                      role="status"
-                      aria-hidden="true"
-                    ></span>
+                  <>
+                    <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
                     {isAtualizar ? "Atualizando..." : "Salvando..."}
-                  </span>
+                  </>
                 ) : isAtualizar ? (
-                  "Atualizar Ficha"
+                  "Atualizar Ficha Médica"
                 ) : (
-                  "Salvar Ficha"
+                  "Salvar Ficha Médica"
                 )}
               </button>
             </div>
+
           </form>
         </div>
       </div>

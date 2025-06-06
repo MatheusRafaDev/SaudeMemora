@@ -20,64 +20,37 @@ import VisualizarFichaMedica from "./pages/VisualizarFichaMedica";
 import AlterarDocumento from "./pages/AlterarDocumento";
 import "bootstrap/dist/js/bootstrap.bundle.min.js";
 import "./styles/global.css";
+import Nav from "./components/Nav";
 import { obterPaciente } from "./services/pacienteService";
 
 
 let lastVerification = 0;
 const CACHE_TIME = 5 * 60 * 1000; 
 
-const isPacienteLoggedIn = async () => {
+const isPacienteLoggedIn = () => {
   const data = localStorage.getItem("paciente");
   if (!data) return false;
 
   try {
     const paciente = JSON.parse(data);
-
-    if (!paciente?.id) {
+    if (!paciente || !paciente.id) {
       localStorage.removeItem("paciente");
       return false;
     }
-
-    // Desativa a verificação no banco temporariamente
-    /*
-    if (Date.now() - lastVerification < CACHE_TIME) {
-      return true;
-    }
-
-    const response = await obterPaciente(paciente.id);
-
-    if (!response.success) {
-      localStorage.removeItem("paciente");
-      return false;
-    }
-
-    lastVerification = Date.now();
-    localStorage.setItem("paciente", JSON.stringify(response.data));
-    */
-
-    // Assume que está autenticado só com base no localStorage
     return true;
-  } catch (error) {
-    console.error("Erro na verificação do paciente:", error);
+  } catch (e) {
     localStorage.removeItem("paciente");
     return false;
   }
 };
 
-
 const AuthWrapper = ({ children }) => {
-  const [authState, setAuthState] = useState({
-    loading: true,
-    isAuthenticated: false,
-  });
+  const [authState, setAuthState] = useState({ loading: true, isAuthenticated: false });
 
   useEffect(() => {
     const checkAuth = async () => {
       const isAuth = await isPacienteLoggedIn();
-      setAuthState({
-        loading: false,
-        isAuthenticated: isAuth,
-      });
+      setAuthState({ loading: false, isAuthenticated: isAuth });
     };
     checkAuth();
   }, []);
@@ -97,18 +70,12 @@ const AuthWrapper = ({ children }) => {
 
 
 const PublicWrapper = ({ children }) => {
-  const [authState, setAuthState] = useState({
-    loading: true,
-    isAuthenticated: false,
-  });
+  const [authState, setAuthState] = useState({ loading: true, isAuthenticated: false });
 
   useEffect(() => {
     const checkAuth = async () => {
       const isAuth = await isPacienteLoggedIn();
-      setAuthState({
-        loading: false,
-        isAuthenticated: isAuth,
-      });
+      setAuthState({ loading: false, isAuthenticated: isAuth });
     };
     checkAuth();
   }, []);
@@ -126,12 +93,13 @@ const PublicWrapper = ({ children }) => {
   return authState.isAuthenticated ? <Navigate to="/home" replace /> : children;
 };
 
+
 function App() {
   return (
     <div className="app-container">
       <Router>
         <Routes>
-          {/* Rota raiz - redireciona conforme autenticação */}
+
           <Route
             path="/"
             element={
@@ -141,7 +109,7 @@ function App() {
             }
           />
 
-          {/* Rotas públicas */}
+
           <Route
             path="/login"
             element={
@@ -159,11 +127,11 @@ function App() {
             }
           />
 
-          {/* Rotas protegidas */}
           <Route
             path="/home"
             element={
               <AuthWrapper>
+                <Nav />
                 <Home />
               </AuthWrapper>
             }
@@ -172,6 +140,7 @@ function App() {
             path="/perfil"
             element={
               <AuthWrapper>
+                <Nav />
                 <Perfil />
               </AuthWrapper>
             }
@@ -180,6 +149,7 @@ function App() {
             path="/formulario-medico"
             element={
               <AuthWrapper>
+                <Nav />
                 <FormularioMedico />
               </AuthWrapper>
             }
@@ -188,22 +158,17 @@ function App() {
             path="/relatorios"
             element={
               <AuthWrapper>
+                <Nav />
                 <RelatorioDocumentos />
               </AuthWrapper>
             }
           />
-          <Route
-            path="/ocr"
-            element={
-              <AuthWrapper>
-                <OCRLeituraCursiva />
-              </AuthWrapper>
-            }
-          />
+
           <Route
             path="/upload-documentos"
             element={
               <AuthWrapper>
+                <Nav />
                 <UploadDocumentos />
               </AuthWrapper>
             }
@@ -212,6 +177,7 @@ function App() {
             path="/editar-documento"
             element={
               <AuthWrapper>
+                <Nav />
                 <AlterarDocumento />
               </AuthWrapper>
             }
@@ -220,6 +186,7 @@ function App() {
             path="/alterar-perfil"
             element={
               <AuthWrapper>
+                <Nav />
                 <EditarPerfil />
               </AuthWrapper>
             }
@@ -228,6 +195,7 @@ function App() {
             path="/meus-documentos"
             element={
               <AuthWrapper>
+                <Nav />
                 <ListarDocumentos />
               </AuthWrapper>
             }
@@ -244,12 +212,13 @@ function App() {
             path="/visualizar-ficha"
             element={
               <AuthWrapper>
+                <Nav />
                 <VisualizarFichaMedica />
               </AuthWrapper>
             }
           />
 
-          {/* Rota fallback - redireciona conforme autenticação */}
+
           <Route
             path="*"
             element={

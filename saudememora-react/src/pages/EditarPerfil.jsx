@@ -3,7 +3,6 @@ import { useNavigate } from 'react-router-dom';
 import { IMaskInput } from 'react-imask';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { atualizarPaciente } from '../services/pacienteService';
-import Nav from "../components/Nav";
 
 function EditarPerfil() {
   const navigate = useNavigate();
@@ -86,8 +85,8 @@ function EditarPerfil() {
   }
 
   return (
-     <div>
-      <Nav />
+    <div>
+
     <div className="container mt-5">
       <div className="card shadow">
         <div className="card-body">

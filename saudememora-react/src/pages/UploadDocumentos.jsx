@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import { FiUpload, FiCamera, FiFileText, FiCheckCircle } from "react-icons/fi";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "../styles/UploadDocumento.css";
-import Nav from "../components/Nav";
+
 import { ocrSpace, ocrSpace2 } from "../ocr/ocrSpace";
 import { formatarTextoOCR } from "../services/OpenRouter";
 import { useNavigate } from "react-router-dom";
@@ -237,7 +237,7 @@ export default function UploadDocumentos() {
 
   return (
     <div>
-      <Nav />
+
       <div className="container upload-container mt-4">
         <h4 className="text-center mb-3">
           <FiUpload /> Processamento de Documento

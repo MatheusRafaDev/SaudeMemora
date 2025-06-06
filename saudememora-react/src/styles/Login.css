@@ -1,121 +1,130 @@
-/* Ajustes globais */
+/* Reset e base mobile-first */
 body {
   margin: 0;
+  padding: 0 10px;
   font-family: Arial, sans-serif;
   background: #f0f2f5;
   display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  box-sizing: border-box;
+}
+
+/* Cabeçalho */
+header {
+  background: white;
+  padding: 16px 0;
+  text-align: center;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  cursor: pointer;
+}
+
+header h1 {
+  font-size: 20px;
+  color: #3498db;
+  margin: 0;
+}
+
+header small {
+  font-size: 12px;
+  color: #888;
+}
+
+/* Container do conteúdo principal */
+main {
+  flex-grow: 1;
+  display: flex;
   align-items: center;
   justify-content: center;
-  height: 100vh;
-  padding: 0 10px;
-  box-sizing: border-box;
 }
 
-/* Container do Formulário */
+/* Formulário */
 .box {
   background: #fff;
-  padding: 20px; /* Menos padding para dispositivos pequenos */
-  border-radius: 12px;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
-  max-width: 350px; /* Reduzimos o tamanho máximo */
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 0 8px rgba(0,0,0,0.05);
   width: 100%;
+  max-width: 360px;
   box-sizing: border-box;
 }
 
-/* Título */
+/* Título do login */
 .title {
   text-align: center;
-  margin-bottom: 15px; /* Diminuímos o espaço */
+  font-size: 18px;
   color: #2c3e50;
-  font-size: 20px; /* Tamanho menor para tela pequena */
+  margin-bottom: 15px;
 }
 
-/* Rótulo dos campos */
+/* Labels e inputs */
 .label {
   display: block;
-  margin-bottom: 4px; /* Menos margem */
-  margin-top: 10px; /* Menos espaço no topo */
-  color: #333;
-  font-size: 12px; /* Fonte menor */
+  margin-top: 10px;
+  font-size: 13px;
+  color: #444;
 }
 
-/* Campos de entrada */
 .input {
   width: 100%;
-  padding: 6px; /* Diminuímos o padding para deixar os inputs mais finos */
+  padding: 6px 8px;
+  font-size: 14px;
+  margin-top: 4px;
+  margin-bottom: 10px;
   border: 1px solid #ccc;
-  border-radius: 6px; /* Menos arredondado */
-  font-size: 12px; /* Fonte menor nos campos */
-  margin-bottom: 10px; /* Menos espaço entre os campos */
+  border-radius: 6px;
+  box-sizing: border-box;
 }
 
-/* Botão de Submissão */
+/* Botão */
 .btn {
-  margin-top: 15px;
-  background-color: #3498db;
-  color: white;
-  border: none;
-  padding: 8px;
-  font-size: 14px; /* Tamanho menor para dispositivos pequenos */
-  border-radius: 8px;
   width: 100%;
+  padding: 10px;
+  background: #3498db;
+  color: white;
+  font-size: 14px;
+  border: none;
+  border-radius: 6px;
   cursor: pointer;
-  transition: background-color 0.3s ease;
+  margin-top: 12px;
 }
 
 .btn:hover {
-  background-color: #2980b9;
+  background: #2980b9;
 }
 
-/* Links de Autenticação (Criar conta / Esqueci a senha) */
+/* Links extras */
 .auth-links {
+  margin-top: 10px;
+  font-size: 12px;
   display: flex;
-  justify-content: space-between;
-  margin-top: 8px;
-  font-size: 12px; /* Fonte menor */
+  flex-direction: column;
+  align-items: center;
 }
 
 .link-btn {
   background: none;
   border: none;
   color: #3498db;
-  font-size: 12px; /* Fonte menor */
   cursor: pointer;
+  margin: 4px 0;
 }
 
 .link-btn:hover {
   text-decoration: underline;
 }
 
-/* Responsividade para telas menores */
-@media (max-width: 480px) {
-  .box {
-      padding: 15px; /* Menos padding */
-      width: 100%;
+/* Responsivo acima de 480px */
+@media (min-width: 481px) {
+  header h1 {
+    font-size: 24px;
   }
 
   .title {
-      font-size: 18px; /* Tamanho da fonte reduzido */
-  }
-
-  .input {
-      font-size: 12px; /* Reduzimos ainda mais o tamanho da fonte */
-      padding: 5px; /* Menos padding nos inputs */
-      border-radius: 4px; /* Inputs mais finos */
+    font-size: 20px;
   }
 
   .btn {
-      padding: 8px;
-      font-size: 12px; /* Menor botão */
-  }
-
-  .auth-links {
-      flex-direction: column; /* Empilhar os links */
-      align-items: center;
-      font-size: 12px; /* Menor fonte */
-  }
-
-  .link-btn {
-      margin-top: 6px; /* Espaço reduzido entre os links */
+    font-size: 15px;
   }
 }

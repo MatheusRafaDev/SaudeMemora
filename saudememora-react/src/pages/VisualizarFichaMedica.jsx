@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { buscarFichaMedica } from "../services/FichaMedicaService";
-import Nav from "../components/Nav";
+
 import "../styles/VisualizarFichaMedica.css";
 
 const VisualizarFichaMedica = () => {
@@ -48,7 +48,7 @@ const VisualizarFichaMedica = () => {
   if (carregando) {
     return (
       <>
-        <Nav />
+
         <div className="container mt-3 text-center">
           <p className="mt-2">Carregando ficha médica...</p>
         </div>
@@ -59,7 +59,7 @@ const VisualizarFichaMedica = () => {
   if (!ficha) {
     return (
       <>
-        <Nav />
+
         <div className="container mt-3">
           <div className="alert alert-warning text-center py-3 px-2">
             <p className="mb-3 fs-6">
@@ -134,7 +134,7 @@ const VisualizarFichaMedica = () => {
 
   return (
     <>
-      <Nav />
+
 
       <div className="container container-custom">
         <div className="header-flex">
