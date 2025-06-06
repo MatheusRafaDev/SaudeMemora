@@ -32,27 +32,30 @@ const isPacienteLoggedIn = async () => {
 
   try {
     const paciente = JSON.parse(data);
-    
+
     if (!paciente?.id) {
       localStorage.removeItem("paciente");
       return false;
     }
 
-
+    // Desativa a verificação no banco temporariamente
+    /*
     if (Date.now() - lastVerification < CACHE_TIME) {
       return true;
     }
 
     const response = await obterPaciente(paciente.id);
-    
+
     if (!response.success) {
       localStorage.removeItem("paciente");
       return false;
     }
 
-
     lastVerification = Date.now();
     localStorage.setItem("paciente", JSON.stringify(response.data));
+    */
+
+    // Assume que está autenticado só com base no localStorage
     return true;
   } catch (error) {
     console.error("Erro na verificação do paciente:", error);
