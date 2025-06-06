@@ -20,7 +20,7 @@
   status = 200
 
 # Headers para melhor segurança e performance
-[[headers]]
+[headers]
   for = "/*"
   [headers.values]
     Content-Security-Policy = """
@@ -29,10 +29,11 @@
       connect-src 'self' https://saudememora.onrender.com;
       script-src 'self' 'unsafe-inline' 'unsafe-eval';
       style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
-      img-src 'self' data:;
+      img-src 'self' data: https://saudememora.onrender.com;
       frame-src 'none';
       object-src 'none';
     """
+
 
 # Configurações opcionais para melhorar o tempo de build
 [build.processing]

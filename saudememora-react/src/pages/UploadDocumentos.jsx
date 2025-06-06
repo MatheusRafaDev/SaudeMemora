@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import { FiUpload, FiCamera, FiFileText, FiCheckCircle } from "react-icons/fi";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "../styles/UploadDocumento.css";
@@ -30,14 +30,22 @@ export default function UploadDocumentos() {
   const [errosQuantidade, setErrosQuantidade] = useState({});
   const navigate = useNavigate();
 
+  // Carrega paciente do localStorage e faz cleanup da URL de preview
   useEffect(() => {
     const pacienteData = JSON.parse(localStorage.getItem("paciente")) || {};
     setPaciente(pacienteData);
-  }, []);
+    
+    return () => {
+      if (preview) URL.revokeObjectURL(preview);
+    };
+  }, [preview]);
 
   const handleFileChange = (e) => {
     const file = e.target.files[0];
     if (file) {
+      // Revogar URL anterior se existir
+      if (preview) URL.revokeObjectURL(preview);
+      
       setDocumento(file);
       setPreview(URL.createObjectURL(file));
       setStatus("Arquivo selecionado. Pronto para envio.");
@@ -57,85 +65,23 @@ export default function UploadDocumentos() {
     document.getElementById("cameraInput").click();
   };
 
-  const handleUpload = async () => {
-    if (!documento) {
-      setMensagemErro("Selecione ou tire uma foto do documento.");
-      return;
-    }
-
-    if (processando) return;
-
-    setProcessando(true);
-    setStatus("Enviando...");
+  const resetState = useCallback((initialStatus = "Aguardando envio...") => {
+    if (preview) URL.revokeObjectURL(preview);
+    setStatus(initialStatus);
     setProgresso(0);
-
-    const intervalo = setInterval(() => {
-      setProgresso((prev) => {
-        if (prev >= 90) clearInterval(intervalo);
-        return Math.min(prev + 10, 90);
-      });
-    }, 200);
-
-    try {
-      const textoOriginal = await ocrSpace(documento);
-      const textoOriginal2 = await ocrSpace2(documento);
-
-      setTextoOCR(textoOriginal);
-
-      const formatado = await formatarTextoOCR(textoOriginal, textoOriginal2);
-
-      //const formatado = await formatarTextoOCR(textoOriginal);
-      setTextoExibicao(formatado);
-
-      if (tipoDocumento === "R") {
-        const medicamentos = await extrairMedicamentosDoOCR(formatado);
-        if (!Array.isArray(medicamentos) || medicamentos.length === 0) {
-          console.error(
-            "Erro ao extrair medicamentos: Nenhum medicamento encontrado"
-          );
-          setRemedios([]);
-          setQuantidades({});
-          setFormasDeUso({});
-          return;
-        }
-
-        setMedicamentos(medicamentos);
-        setRemedios(medicamentos.map((m) => m.nome));
-
-        const inicialQuantidades = {};
-        const inicialFormas = {};
-        medicamentos.forEach((med) => {
-          inicialQuantidades[med.nome] = med.quantidade || "";
-          inicialFormas[med.nome] = med.formaDeUso || "";
-        });
-        setQuantidades(inicialQuantidades);
-        setFormasDeUso(inicialFormas);
-      } else {
-        setMedicamentos([]);
-        setRemedios([]);
-        setQuantidades({});
-        setFormasDeUso({});
-      }
-
-      clearInterval(intervalo);
-      setProgresso(100);
-      setStatus("Documento processado com sucesso!");
-      setBotaoHabilitado(true);
-      setMensagemErro("");
-    } catch (erro) {
-      clearInterval(intervalo);
-      setProgresso(0);
-      setStatus("Erro ao processar o documento.");
-      setTextoExibicao("Erro no processamento: " + erro.message);
-      setBotaoHabilitado(false);
-      setMensagemErro("Erro ao processar o documento: " + erro.message);
-      setRemedios([]);
-      setQuantidades({});
-      setFormasDeUso({});
-    } finally {
-      setProcessando(false);
-    }
-  };
+    setTextoOCR("");
+    setTextoExibicao("");
+    setRemedios([]);
+    setMedicamentos([]);
+    setQuantidades({});
+    setFormasDeUso({});
+    setErrosQuantidade({});
+    setBotaoHabilitado(false);
+    setMensagemErro("");
+    setTipoDocumento("");
+    setDocumento(null);
+    setPreview(null);
+  }, [preview]);
 
   const handleQuantidadeChange = (remedio, valor) => {
     const erro = !valor.trim()
@@ -152,6 +98,84 @@ export default function UploadDocumentos() {
     setFormasDeUso((prev) => ({ ...prev, [remedio]: valor }));
   };
 
+  const handleUpload = async () => {
+    if (!documento) {
+      setMensagemErro("Selecione ou tire uma foto do documento.");
+      return;
+    }
+
+    if (!tipoDocumento) {
+      setMensagemErro("Selecione o tipo de documento antes de processar.");
+      return;
+    }
+
+    if (processando) return;
+
+    setProcessando(true);
+    setStatus("Enviando...");
+    setProgresso(0);
+    setMensagemErro("");
+
+    const intervalo = setInterval(() => {
+      setProgresso((prev) => {
+        if (prev >= 90) clearInterval(intervalo);
+        return Math.min(prev + 10, 90);
+      });
+    }, 200);
+
+    try {
+      const [textoOriginal, textoOriginal2] = await Promise.all([
+        ocrSpace(documento),
+        ocrSpace2(documento)
+      ]);
+
+      setTextoOCR(textoOriginal);
+
+      const formatado = await formatarTextoOCR(textoOriginal, textoOriginal2);
+      setTextoExibicao(formatado);
+
+      if (tipoDocumento === "R") {
+        const medicamentosExtraidos = await extrairMedicamentosDoOCR(formatado);
+        if (!Array.isArray(medicamentosExtraidos) || medicamentosExtraidos.length === 0) {
+          throw new Error("Nenhum medicamento encontrado no documento");
+        }
+
+        setMedicamentos(medicamentosExtraidos);
+        setRemedios(medicamentosExtraidos.map((m) => m.nome));
+
+        const inicialQuantidades = {};
+        const inicialFormas = {};
+        medicamentosExtraidos.forEach((med) => {
+          inicialQuantidades[med.nome] = med.quantidade || "";
+          inicialFormas[med.nome] = med.formaDeUso || "";
+        });
+        setQuantidades(inicialQuantidades);
+        setFormasDeUso(inicialFormas);
+      } else {
+        setMedicamentos([]);
+        setRemedios([]);
+        setQuantidades({});
+        setFormasDeUso({});
+      }
+
+      clearInterval(intervalo);
+      setProgresso(100);
+      setStatus("Documento processado com sucesso!");
+      setBotaoHabilitado(true);
+    } catch (erro) {
+      console.error("Erro no processamento:", erro);
+      clearInterval(intervalo);
+      setProgresso(0);
+      setStatus("Erro ao processar o documento.");
+      setTextoExibicao(erro.message || "Erro no processamento do documento");
+      setBotaoHabilitado(false);
+      setMensagemErro(erro.message || "Erro ao processar o documento");
+      resetState("Erro ao processar. Tente novamente.");
+    } finally {
+      setProcessando(false);
+    }
+  };
+
   const handleAddDocument = async () => {
     if (adicionandoDocumento) return;
 
@@ -166,7 +190,7 @@ export default function UploadDocumentos() {
     }
 
     if (!paciente || !paciente.id) {
-      setMensagemErro("Nenhum paciente encontrado. Verifique o localStorage.");
+      setMensagemErro("Nenhum paciente selecionado.");
       return;
     }
 
@@ -175,16 +199,17 @@ export default function UploadDocumentos() {
       return;
     }
 
-    for (const remedio of remedios) {
-      if (!quantidades[remedio] || !quantidades[remedio].trim()) {
-        setMensagemErro(
-          `Informe a quantidade válida para o remédio: ${remedio}`
-        );
-        setErrosQuantidade((prev) => ({
-          ...prev,
-          [remedio]: "Quantidade é obrigatória",
-        }));
-        return;
+    // Validação de medicamentos para receitas
+    if (tipoDocumento === "R") {
+      for (const remedio of remedios) {
+        if (!quantidades[remedio] || !quantidades[remedio].trim()) {
+          setMensagemErro(`Informe a quantidade válida para o remédio: ${remedio}`);
+          setErrosQuantidade((prev) => ({
+            ...prev,
+            [remedio]: "Quantidade é obrigatória",
+          }));
+          return;
+        }
       }
     }
 
@@ -208,36 +233,20 @@ export default function UploadDocumentos() {
       );
 
       if (response.success) {
-        setMensagemErro("");
-        setDocumento(null);
-        setPreview(null);
         resetState("Documento adicionado com sucesso!");
       } else {
-        setMensagemErro(response.message);
+        setMensagemErro(response.message || "Erro ao adicionar documento");
       }
     } catch (error) {
-      setMensagemErro("Erro ao adicionar o documento: " + error.message);
+      console.error("Erro ao adicionar documento:", error);
+      setMensagemErro(error.message || "Erro ao adicionar o documento");
     } finally {
       setAdicionandoDocumento(false);
     }
   };
 
-  const resetState = (initialStatus) => {
-    setStatus(initialStatus);
-    setProgresso(0);
-    setTextoOCR("");
-    setTextoExibicao("");
-    setRemedios([]);
-    setQuantidades({});
-    setFormasDeUso({});
-    setErrosQuantidade({});
-    setBotaoHabilitado(false);
-    setMensagemErro("");
-  };
-
   return (
     <div>
-
       <div className="container upload-container mt-4">
         <h4 className="text-center mb-3">
           <FiUpload /> Processamento de Documento
@@ -250,10 +259,7 @@ export default function UploadDocumentos() {
         </div>
 
         {preview && (
-          <div
-            className="d-flex justify-content-center mb-3"
-            style={{ height: "400px" }}
-          >
+          <div className="d-flex justify-content-center mb-3" style={{ height: "400px" }}>
             <TransformWrapper
               initialScale={1}
               minScale={1}
@@ -308,7 +314,7 @@ export default function UploadDocumentos() {
           </label>
           <select
             id="tipoDocumento"
-            className="form-control"
+            className={`form-control ${!tipoDocumento && mensagemErro.includes("tipo de documento") ? "is-invalid" : ""}`}
             value={tipoDocumento}
             onChange={(e) => setTipoDocumento(e.target.value)}
             disabled={processando || adicionandoDocumento}
@@ -338,7 +344,7 @@ export default function UploadDocumentos() {
             <input
               id="cameraInput"
               type="file"
-              accept="/*"
+              accept="image/*,.pdf"
               onChange={handleFileChange}
               hidden
               disabled={processando || adicionandoDocumento}
@@ -400,6 +406,7 @@ export default function UploadDocumentos() {
               value={textoExibicao}
               onChange={(e) => setTextoExibicao(e.target.value)}
               style={{ whiteSpace: "pre-wrap" }}
+              disabled={adicionandoDocumento}
             />
           </div>
         )}
@@ -434,7 +441,7 @@ export default function UploadDocumentos() {
                       <td>
                         <input
                           type="text"
-                          className="form-control"
+                          className={`form-control ${errosQuantidade[medicamento.nome] ? "is-invalid" : ""}`}
                           value={quantidades[medicamento.nome] || ""}
                           onChange={(e) =>
                             handleQuantidadeChange(
@@ -444,6 +451,11 @@ export default function UploadDocumentos() {
                           }
                           disabled={adicionandoDocumento}
                         />
+                        {errosQuantidade[medicamento.nome] && (
+                          <div className="invalid-feedback">
+                            {errosQuantidade[medicamento.nome]}
+                          </div>
+                        )}
                       </td>
                     </tr>
 
@@ -460,7 +472,7 @@ export default function UploadDocumentos() {
                               e.target.value
                             )
                           }
-                          placeholder=""
+                          placeholder="Ex: 1 comprimido a cada 8 horas"
                           disabled={adicionandoDocumento}
                         />
                       </td>
