@@ -34,7 +34,7 @@ export default function UploadDocumentos() {
   useEffect(() => {
     const pacienteData = JSON.parse(localStorage.getItem("paciente")) || {};
     setPaciente(pacienteData);
-    
+
     return () => {
       if (preview) URL.revokeObjectURL(preview);
     };
@@ -45,7 +45,7 @@ export default function UploadDocumentos() {
     if (file) {
       // Revogar URL anterior se existir
       if (preview) URL.revokeObjectURL(preview);
-      
+
       setDocumento(file);
       setPreview(URL.createObjectURL(file));
       setStatus("Arquivo selecionado. Pronto para envio.");
@@ -65,23 +65,26 @@ export default function UploadDocumentos() {
     document.getElementById("cameraInput").click();
   };
 
-  const resetState = useCallback((initialStatus = "Aguardando envio...") => {
-    if (preview) URL.revokeObjectURL(preview);
-    setStatus(initialStatus);
-    setProgresso(0);
-    setTextoOCR("");
-    setTextoExibicao("");
-    setRemedios([]);
-    setMedicamentos([]);
-    setQuantidades({});
-    setFormasDeUso({});
-    setErrosQuantidade({});
-    setBotaoHabilitado(false);
-    setMensagemErro("");
-    setTipoDocumento("");
-    setDocumento(null);
-    setPreview(null);
-  }, [preview]);
+  const resetState = useCallback(
+    (initialStatus = "Aguardando envio...") => {
+      if (preview) URL.revokeObjectURL(preview);
+      setStatus(initialStatus);
+      setProgresso(0);
+      setTextoOCR("");
+      setTextoExibicao("");
+      setRemedios([]);
+      setMedicamentos([]);
+      setQuantidades({});
+      setFormasDeUso({});
+      setErrosQuantidade({});
+      setBotaoHabilitado(false);
+      setMensagemErro("");
+      setTipoDocumento("");
+      setDocumento(null);
+      setPreview(null);
+    },
+    [preview]
+  );
 
   const handleQuantidadeChange = (remedio, valor) => {
     const erro = !valor.trim()
@@ -126,7 +129,7 @@ export default function UploadDocumentos() {
     try {
       const [textoOriginal, textoOriginal2] = await Promise.all([
         ocrSpace(documento),
-        ocrSpace2(documento)
+        ocrSpace2(documento),
       ]);
 
       setTextoOCR(textoOriginal);
@@ -136,7 +139,10 @@ export default function UploadDocumentos() {
 
       if (tipoDocumento === "R") {
         const medicamentosExtraidos = await extrairMedicamentosDoOCR(formatado);
-        if (!Array.isArray(medicamentosExtraidos) || medicamentosExtraidos.length === 0) {
+        if (
+          !Array.isArray(medicamentosExtraidos) ||
+          medicamentosExtraidos.length === 0
+        ) {
           throw new Error("Nenhum medicamento encontrado no documento");
         }
 
@@ -203,7 +209,9 @@ export default function UploadDocumentos() {
     if (tipoDocumento === "R") {
       for (const remedio of remedios) {
         if (!quantidades[remedio] || !quantidades[remedio].trim()) {
-          setMensagemErro(`Informe a quantidade válida para o remédio: ${remedio}`);
+          setMensagemErro(
+            `Informe a quantidade válida para o remédio: ${remedio}`
+          );
           setErrosQuantidade((prev) => ({
             ...prev,
             [remedio]: "Quantidade é obrigatória",
@@ -253,13 +261,15 @@ export default function UploadDocumentos() {
         </h4>
 
         <div className="alert alert-info mt-3" role="alert">
-          🔍 Para melhores resultados, recomendamos fazer um{" "}
-          <strong>escaneamento do documento</strong> antes de enviá-lo. Fotos
-          com baixa qualidade podem prejudicar o reconhecimento do texto.
+          📷 Para melhores resultados, tire fotos com boa qualidade. Imagens
+          borradas ou escuras podem dificultar o reconhecimento do texto.
         </div>
 
         {preview && (
-          <div className="d-flex justify-content-center mb-3" style={{ height: "400px" }}>
+          <div
+            className="d-flex justify-content-center mb-3"
+            style={{ height: "400px" }}
+          >
             <TransformWrapper
               initialScale={1}
               minScale={1}
@@ -314,7 +324,11 @@ export default function UploadDocumentos() {
           </label>
           <select
             id="tipoDocumento"
-            className={`form-control ${!tipoDocumento && mensagemErro.includes("tipo de documento") ? "is-invalid" : ""}`}
+            className={`form-control ${
+              !tipoDocumento && mensagemErro.includes("tipo de documento")
+                ? "is-invalid"
+                : ""
+            }`}
             value={tipoDocumento}
             onChange={(e) => setTipoDocumento(e.target.value)}
             disabled={processando || adicionandoDocumento}
@@ -441,7 +455,11 @@ export default function UploadDocumentos() {
                       <td>
                         <input
                           type="text"
-                          className={`form-control ${errosQuantidade[medicamento.nome] ? "is-invalid" : ""}`}
+                          className={`form-control ${
+                            errosQuantidade[medicamento.nome]
+                              ? "is-invalid"
+                              : ""
+                          }`}
                           value={quantidades[medicamento.nome] || ""}
                           onChange={(e) =>
                             handleQuantidadeChange(

@@ -1,98 +1,65 @@
-import React, { useState } from "react";
-import { Link } from "react-router-dom";
+import React from "react";
+import { Link, useLocation } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css";
 import "bootstrap-icons/font/bootstrap-icons.css";
 
 const Nav = () => {
-  const [open, setOpen] = useState(false);
-
-  const toggleMenu = () => setOpen(!open);
-  const closeMenu = () => setOpen(false);
+  const location = useLocation();
 
   const menuItems = [
     { path: "/home", icon: "bi-house", text: "Início" },
     { path: "/perfil", icon: "bi-person", text: "Perfil" },
-    { path: "/meus-documentos", icon: "bi-file-earmark-medical", text: "Documentos" },
-    { path: "/upload-documentos", icon: "bi-cloud-arrow-up", text: "Processar" },
-    { path: "/visualizar-ficha", icon: "bi-file-text", text: "Ficha Médica" },
-    { path: "/relatorios", icon: "bi-clipboard2-data", text: "Relatórios" }
+    { path: "/meus-documentos", icon: "bi-file-earmark-medical", text: "Docs" },
+    { path: "/upload-documentos", icon: "bi-cloud-arrow-up", text: "Enviar" },
+    { path: "/visualizar-ficha", icon: "bi-file-text", text: "Ficha" }
   ];
 
   return (
-    <nav className="navbar navbar-expand-lg navbar-dark bg-primary shadow-sm">
-      <div className="container-fluid px-3">
-        {/* Logo */}
-        <Link 
-          className="navbar-brand d-flex align-items-center py-2" 
-          to="/home" 
-          onClick={closeMenu}
-        >
-          <i className="bi bi-heart-pulse me-2" style={{ fontSize: '1.8rem', color: '#7ad6ff' }}></i>
-          <span className="d-none d-sm-inline fw-semibold" style={{ fontSize: '1.2rem' }}>SaúdeMemora</span>
-        </Link>
+    <>
+      <nav className="bottom-nav d-flex justify-content-around align-items-center shadow-lg bg-primary text-white">
+        {menuItems.map((item, index) => (
+          <Link
+            key={index}
+            to={item.path}
+            className={`nav-item text-center px-2 py-1 flex-fill ${
+              location.pathname === item.path ? "active" : ""
+            }`}
+            style={{
+              color: location.pathname === item.path ? "#ffffff" : "#d1e5ff",
+              fontWeight: location.pathname === item.path ? "600" : "400",
+              textDecoration: "none",
+              fontSize: "0.85rem"
+            }}
+          >
+            <i className={`bi ${item.icon}`} style={{ fontSize: "1.2rem" }}></i>
+            <div>{item.text}</div>
+          </Link>
+        ))}
+      </nav>
 
-        {/* Botão Hamburguer */}
-        <button 
-          className="navbar-toggler border-0 p-1" 
-          type="button"
-          onClick={toggleMenu}
-          aria-label="Menu"
-        >
-          <i className={`bi ${open ? "bi-x-lg" : "bi-list"}`} style={{ fontSize: '1.8rem', color: 'white' }}></i>
-        </button>
+      <style jsx="true">{`
+        .bottom-nav {
+          position: fixed;
+          bottom: 0;
+          left: 0;
+          right: 0;
+          height: 60px;
+          z-index: 1050;
+        }
+        .bottom-nav .nav-item:hover {
+          background-color: rgba(255, 255, 255, 0.1);
+        }
+        .bottom-nav .active {
+          border-top: 3px solid #ffffff;
+        }
 
-        {/* Itens do Menu */}
-        <div className={`collapse navbar-collapse ${open ? "show" : ""}`}>
-          <ul className="navbar-nav ms-auto">
-            {menuItems.map((item, index) => (
-              <li className="nav-item" key={index}>
-                <Link 
-                  className="nav-link d-flex align-items-center py-2 px-3 rounded mx-lg-2 my-1 hover-effect"
-                  to={item.path}
-                  onClick={closeMenu}
-                >
-                  <i className={`bi ${item.icon} me-2`} style={{ fontSize: '1.2rem' }}></i>
-                  <span className="fw-medium">{item.text}</span>
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </div>
-      </div>
-
-      <style jsx>{`
-        .hover-effect {
-          transition: all 0.2s ease;
-        }
-        .hover-effect:hover {
-          background-color: rgba(255, 255, 255, 0.2);
-        }
-        
-        @media (max-width: 992px) {
-          .navbar-collapse {
-            background-color: #0d6efd;
-            margin-top: 0.5rem;
-            padding: 0.5rem 1rem;
-            border-radius: 0.5rem;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
-          }
-          .nav-link {
-            margin: 0.25rem 0;
-            padding: 0.75rem 1rem !important;
-          }
-        }
-        
-        @media (max-width: 576px) {
-          .navbar-brand {
-            padding-top: 0.25rem;
-            padding-bottom: 0.25rem;
-          }
-          .nav-link {
-            font-size: 0.95rem;
+        @media (min-width: 992px) {
+          .bottom-nav {
+            display: none;
           }
         }
       `}</style>
-    </nav>
+    </>
   );
 };
 
