@@ -25,7 +25,7 @@ public class Receita {
     private String observacoes;
 
     @Lob
-    @Column(name = "ds_resumo", columnDefinition = "CLOB")
+    @Column(name = "ds_resumo", columnDefinition = "TEXT")
     private String resumo;
 
     @Column(name = "ds_imagem")

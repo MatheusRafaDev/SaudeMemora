@@ -35,7 +35,7 @@ public class DocumentoClinico {
     private String imagem;
 
     @Lob
-    @Column(name = "ds_resumo", columnDefinition = "CLOB")
+    @Column(name = "ds_resumo", columnDefinition = "TEXT")
     private String resumo;
 
     @ManyToOne
