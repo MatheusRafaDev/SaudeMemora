@@ -35,7 +35,7 @@ public class Exame {
     private String imagem;
 
 
-    @Column(name = "ds_resumo")
+    @Column(name = "ds_resumo", columnDefinition = "TEXT")
     private String resumo;
 
     @Column(name = "nome_exame")
