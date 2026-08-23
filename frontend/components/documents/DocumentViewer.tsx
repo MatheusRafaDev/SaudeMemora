@@ -98,41 +98,15 @@ export function DocumentViewer({ id, onClose }: DocumentViewerProps) {
               ))}
             </div>
           </div>
-          <div className="bg-surface p-5 sm:p-8">
-            <article className="mx-auto aspect-[1/1.35] w-full max-w-xl overflow-hidden rounded-xl bg-card p-6 shadow-lift sm:p-9 relative">
-              {doc.imageUrl && (
+          <div className="bg-surface p-5 sm:p-8 flex justify-center">
+            <div className="relative mx-auto w-full max-w-xl overflow-hidden rounded-xl border border-border bg-card shadow-lift flex items-center justify-center min-h-[500px]">
+              {doc.imageUrl ? (
                  /* eslint-disable-next-line @next/next/no-img-element */
-                 <img src={doc.imageUrl} alt="Documento" className="absolute inset-0 w-full h-full object-cover opacity-10" />
+                 <img src={doc.imageUrl} alt="Documento" className="w-full h-auto max-h-[80vh] object-contain rounded-xl" />
+              ) : (
+                <p className="text-muted-foreground text-sm">Nenhuma imagem disponível.</p>
               )}
-              <div className="relative z-10">
-                <header className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-3 border-b border-border pb-4">
-                  <div className="min-w-0">
-                    <p className="truncate text-sm font-semibold uppercase tracking-wide">
-                      {doc.clinic}
-                    </p>
-                    <p className="text-xs text-muted-foreground">CRM 12.345 · São Paulo/SP</p>
-                  </div>
-                  <DocTypeIcon type={doc.type} className="h-9 w-9" />
-                </header>
-                <h2 className="mt-5 font-display text-lg">{doc.title}</h2>
-                <p className="mt-1 text-xs text-muted-foreground">
-                  Paciente: Matheus Rafael · Emitido em {doc.date}
-                </p>
-                <div className="mt-5 space-y-2.5">
-                  {Array.from({ length: 11 }).map((_, i) => (
-                    <div
-                      key={i}
-                      className="h-2.5 rounded-full bg-muted"
-                      style={{ width: `${94 - ((i * 13) % 45)}%` }}
-                    />
-                  ))}
-                </div>
-                <div className="mt-7 border-t border-dashed border-border pt-4">
-                  <div className="h-2.5 w-40 rounded-full bg-muted" />
-                  <p className="mt-2 text-xs text-muted-foreground">{doc.doctor}</p>
-                </div>
-              </div>
-            </article>
+            </div>
           </div>
         </section>
 
@@ -169,6 +143,10 @@ export function DocumentViewer({ id, onClose }: DocumentViewerProps) {
               <div className="space-y-2">
                 <Label htmlFor="resumo">Resumo clínico</Label>
                 <Textarea id="resumo" defaultValue={doc.summary} rows={3} className="rounded-xl" />
+              </div>
+              <div className="space-y-2">
+                <Label htmlFor="texto-extraido">Texto Extraído (OCR)</Label>
+                <Textarea id="texto-extraido" defaultValue={doc.extractedText} rows={8} className="rounded-xl font-mono text-xs bg-muted/50" readOnly />
               </div>
             </div>
           </div>
