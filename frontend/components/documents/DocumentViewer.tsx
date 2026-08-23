@@ -80,7 +80,22 @@ export function DocumentViewer({ id, onClose }: DocumentViewerProps) {
           <Button variant="outline" className="rounded-xl">
             <Download className="mr-1 h-4 w-4" /> Baixar
           </Button>
-          <Button variant="ghost" size="icon" className="rounded-xl text-destructive" aria-label="Excluir">
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            className="rounded-xl text-destructive" 
+            aria-label="Excluir"
+            onClick={async () => {
+              if (confirm("Tem certeza que deseja excluir este documento?")) {
+                try {
+                  await api.delete(`/documents/${id}`);
+                  onClose();
+                } catch (error) {
+                  alert("Erro ao excluir o documento.");
+                }
+              }
+            }}
+          >
             <Trash2 className="h-4.5 w-4.5" />
           </Button>
         </div>
