@@ -1,8 +1,30 @@
-# dependencies
-/node_modules
+# dependências (para todas as pastas)
+node_modules/
 /saudememora-api/uploads/
-# production
+
+# produção
 /build
+dist/
+out/
+
+# Next.js
+.next/
+*.tsbuildinfo
+next-env.d.ts
+
+# C# / .NET
+[Bb]in/
+[Oo]bj/
+[Tt]est[Rr]esult*/
+[Bb]uild[Ll]og.*
+.vs/
+*.user
+*.suo
+*.userprefs
+*.dbmdl
+*.jfm
+*.pfx
+*.publishsettings
 
 # misc
 .DS_Store

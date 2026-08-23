@@ -2,9 +2,10 @@
 
 <p align="center">
   <img src="https://img.shields.io/badge/version-1.0.0-green?style=for-the-badge" />
-  <img src="https://img.shields.io/badge/React-18-61dafb?style=for-the-badge&logo=react" />
-  <img src="https://img.shields.io/badge/Spring%20Boot-3.x-6DB33F?style=for-the-badge&logo=springboot" />
-  <img src="https://img.shields.io/badge/PostgreSQL-15-316192?style=for-the-badge&logo=postgresql" />
+  <img src="https://img.shields.io/badge/Next.js-14-000000?style=for-the-badge&logo=next.js" />
+  <img src="https://img.shields.io/badge/Spring%20Boot%20/%20.NET-API-6DB33F?style=for-the-badge" />
+  <img src="https://img.shields.io/badge/MongoDB-NoSQL-47A248?style=for-the-badge&logo=mongodb" />
+  <img src="https://img.shields.io/badge/Cloudinary-Image%20Storage-3448C5?style=for-the-badge&logo=cloudinary" />
   <img src="https://img.shields.io/badge/OCR-AI-blueviolet?style=for-the-badge" />
 </p>
 
@@ -21,8 +22,9 @@
 
 | Categoria | Variáveis |
 |----------|----------|
-| **Frontend** | REACT_APP_API_URL |
-| **Banco de Dados** | DB_URL, DB_USERNAME, DB_PASSWORD |
+| **Frontend** | NEXT_PUBLIC_API_URL |
+| **Banco de Dados (MongoDB)** | MongoDbSettings__ConnectionString, MongoDbSettings__DatabaseName |
+| **Armazenamento de Imagens** | CloudinarySettings__CloudName, CloudinarySettings__ApiKey, CloudinarySettings__ApiSecret |
 | **APIs externas** | GROQ_API_KEY, OCR_SPACE_API_KEY |
 | **IA config** | IA_PROCESSING_MODE, IA_TIMEOUT_MS |
 | **OCR config** | OCR_LANGUAGE, OCR_ENGINE |
@@ -42,10 +44,10 @@ Com o **SaúdeMemora**, o usuário pode:
 
 ## ⚙️ Funcionalidades
 
-- Upload de documentos médicos (exames, receitas, prontuários)
+- Upload de documentos médicos (exames, receitas, prontuários) no Cloudinary
 - Processamento OCR para extração automática de texto
 - Organização dos documentos por tipo e paciente
-- Consulta rápida ao histórico médico
+- Consulta rápida ao histórico médico (salvos no MongoDB)
 - Armazenamento estruturado e seguro
 
 ---
@@ -54,7 +56,8 @@ Com o **SaúdeMemora**, o usuário pode:
 
 - OCR (Reconhecimento Óptico de Caracteres)
 - Inteligência Artificial
-- Backend e Frontend Web
-- Banco de Dados Relacional
+- Next.js (Frontend) & ASP.NET Core (Backend)
+- MongoDB (Banco de Dados NoSQL)
+- Cloudinary (Armazenamento em Nuvem para Imagens)
 
 ---
