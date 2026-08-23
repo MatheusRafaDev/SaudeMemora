@@ -43,30 +43,12 @@ public class GeminiOcrService : IOcrAiService
         // Caso a chave exista, faz a chamada real pro Google Gemini
         var url = $"https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key={_apiKey}";
 
-        // O prompt pede para ler a imagem hospedada (via URL) e retornar JSON restrito
+        // O prompt pede para atuar apenas como OCR (Reconhecimento Óptico de Caracteres)
         var prompt = $@"
-        ATENÇÃO: VOCÊ É UM EXTRATOR DE TEXTO LITERAL, NÃO UM MÉDICO NEM UM ESCRITOR.
-        O documento na URL fornecida é do tipo: {documentType}.
-        
-        REGRAS DE EXTRAÇÃO LITERAL (OBRIGATÓRIO):
-        1. É ESTRITAMENTE PROIBIDO INFERIR, ADIVINHAR OU COMPLETAR DADOS.
-        2. TRANSCREVA APENAS O QUE ESTÁ CLARAMENTE VISÍVEL E LEGÍVEL NA IMAGEM.
-        3. Se um campo não estiver no documento de forma explícita, você DEVE retornar uma string vazia ("""").
-        4. O 'summary' deve ser um resumo mecânico do que o documento é (ex: ""Receita médica do dia X""), não tente interpretar o caso do paciente.
-        
-        Retorne estritamente um JSON limpo, sem markdown, seguindo exatamente esta estrutura:
-        {{
-            ""title"": ""O título oficial que aparece no documento"",
-            ""doctor"": ""Nome literal do médico que assina (se não achar, string vazia)"",
-            ""clinic"": ""Nome literal do hospital/clínica (se não achar, string vazia)"",
-            ""date"": ""Data legível no formato dd/MM/yyyy (se não achar, string vazia)"",
-            ""summary"": ""Uma única frase descrevendo objetivamente qual é o documento."",
-            ""diagnosis"": ""O CID ou diagnóstico, APENAS se estiver expressamente escrito"",
-            ""medicines"": [
-                {{ ""name"": ""nome exato do remédio"", ""dosage"": ""dosagem exata escrita"" }}
-            ],
-            ""extractedText"": ""Transcrição crua de todo o texto encontrado na imagem""
-        }}
+        Você é uma ferramenta de OCR (Reconhecimento Óptico de Caracteres).
+        Apenas transcreva literalmente TODO o texto contido na imagem, de cima para baixo.
+        Não adicione introduções, não tente organizar em JSON, não estruture os dados.
+        Retorne única e exclusivamente o texto cru que você enxerga na imagem.
         URL DA IMAGEM: {imageUrl}
         ";
 
@@ -84,8 +66,8 @@ public class GeminiOcrService : IOcrAiService
             },
             generationConfig = new
             {
-                temperature = 0.0, // temperatura 0 para extração 100% mecânica
-                responseMimeType = "application/json"
+                temperature = 0.0, // temperatura 0 para extração mecânica
+                responseMimeType = "text/plain"
             }
         };
 
@@ -104,7 +86,7 @@ public class GeminiOcrService : IOcrAiService
             textContent = jsonResult.GetProperty("candidates")[0].GetProperty("content").GetProperty("parts")[0].GetProperty("text").GetString() ?? "";
             
             if (string.IsNullOrWhiteSpace(textContent))
-                throw new Exception("IA retornou resultado vazio.");
+                throw new Exception("OCR retornou resultado vazio.");
         }
         catch (Exception ex)
         {
@@ -120,22 +102,19 @@ public class GeminiOcrService : IOcrAiService
             }
         }
 
-        try 
+        // Como foi solicitado apenas OCR, retornamos o texto bruto na propriedade ExtractedText
+        // As demais propriedades ficam em branco para o usuário preencher ou o sistema ignorar.
+        return new ExtractedDocumentDto
         {
-            var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
-            return JsonSerializer.Deserialize<ExtractedDocumentDto>(textContent, options) 
-                   ?? throw new Exception("Falha ao desserializar");
-        }
-        catch
-        {
-            // Fallback se a IA errar o formato JSON
-            return new ExtractedDocumentDto
-            {
-                Title = "Documento Analisado",
-                Summary = "Não foi possível estruturar o texto perfeitamente.",
-                ExtractedText = textContent
-            };
-        }
+            Title = $"Documento Digitalizado ({documentType})",
+            Doctor = "Não identificado (OCR)",
+            Clinic = "Não identificado (OCR)",
+            Date = DateTime.Now.ToString("dd/MM/yyyy"),
+            Summary = "Texto transcrito via OCR direto.",
+            Diagnosis = "",
+            ExtractedText = textContent,
+            Medicines = new List<ExtractedMedicineDto>()
+        };
     }
 
     private async Task<string> CallGroqFallbackAsync(string imageUrl, string prompt, string apiKey)
