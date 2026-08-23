@@ -1,64 +1,62 @@
 "use client";
 
-import { useState, useMemo, useEffect } from "react";
+import { useEffect, useState } from "react";
 import { CalendarDays, Search, SlidersHorizontal, Upload, UserRound, MoreVertical, Pencil, Trash2 } from "lucide-react";
 import { AppShell } from "@/components/layout/AppShell";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { DocTypeIcon, StatusBadge, TypeBadge } from "@/components/documents/DocumentBits";
-import { useAuth } from "@/contexts/AuthContext";
-import { api } from "@/lib/api";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 import { DocumentViewer } from "@/components/documents/DocumentViewer";
-import { useRouter } from "next/navigation";
+import { UploadModal } from "@/components/documents/UploadModal";
+import { api } from "@/lib/api";
 
 const tabs = [
-  { value: "todos", label: "Todos" },
-  { value: "exame", label: "Exames" },
-  { value: "receita", label: "Receitas" },
-  { value: "laudo", label: "Laudos clínicos" },
+  { value: "todos", label: "Todos os arquivos" },
+  { value: "recentes", label: "Recentes" },
+  { value: "receitas", label: "Receitas" },
+  { value: "exames", label: "Exames" },
 ];
 
 export default function DocumentsPage() {
   const [tab, setTab] = useState("todos");
   const [query, setQuery] = useState("");
-  const { user } = useAuth();
-  const [docs, setDocs] = useState<any[]>([]);
+  const [documents, setDocuments] = useState<any[]>([]);
   const [selectedDocId, setSelectedDocId] = useState<string | null>(null);
-  const router = useRouter();
+  const [isUploadModalOpen, setIsUploadModalOpen] = useState(false);
+
+  const fetchDocuments = () => {
+    api.get("/documents").then((res) => setDocuments(res.data)).catch(console.error);
+  };
 
   useEffect(() => {
-    if (user) {
-      api.get("/documents").then(res => setDocs(res.data)).catch(console.error);
-    }
-  }, [user]);
-
-  const filtered = useMemo(() => {
-    const q = query.trim().toLowerCase();
-    return docs.filter((doc) => {
-      const matchesTab = tab === "todos" || doc.type === tab;
-      const matchesQuery =
-        !q ||
-        [doc.title, doc.doctor, doc.clinic, doc.diagnosis, ...(doc.medicines ?? []).map((m: any) => m.name)]
-          .join(" ")
-          .toLowerCase()
-          .includes(q);
-      return matchesTab && matchesQuery;
-    });
-  }, [tab, query, docs]);
+    fetchDocuments();
+  }, []);
 
   if (selectedDocId) {
     return <DocumentViewer id={selectedDocId} onClose={() => setSelectedDocId(null)} />;
   }
 
+  const filtered = documents.filter(d => 
+    d.title?.toLowerCase().includes(query.toLowerCase()) || 
+    d.clinic?.toLowerCase().includes(query.toLowerCase()) ||
+    d.doctor?.toLowerCase().includes(query.toLowerCase())
+  );
+
   return (
-    <AppShell
-      title="Biblioteca médica"
-      subtitle="Todo o seu histórico clínico organizado e pesquisável."
+    <AppShell 
+      title="Biblioteca de Saúde" 
+      subtitle="Todos os seus exames, receitas e laudos em um só lugar."
     >
-      <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-3">
-        <div className="relative min-w-0">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="relative flex-1 max-w-md">
           <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
           <Input
             value={query}
@@ -71,7 +69,7 @@ export default function DocumentsPage() {
           <Button variant="outline" size="icon" className="h-12 w-12 rounded-2xl" aria-label="Filtros">
             <SlidersHorizontal className="h-4.5 w-4.5" />
           </Button>
-          <Button onClick={() => router.push("/documents/new")} className="hidden h-12 rounded-2xl sm:inline-flex">
+          <Button onClick={() => setIsUploadModalOpen(true)} className="hidden h-12 rounded-2xl sm:inline-flex">
             <Upload className="mr-1 h-4 w-4" /> Enviar
           </Button>
         </div>
@@ -87,83 +85,95 @@ export default function DocumentsPage() {
         </TabsList>
       </Tabs>
 
-      <p className="mt-5 text-sm text-muted-foreground">
-        {filtered.length} documento{filtered.length === 1 ? "" : "s"} encontrado
-        {filtered.length === 1 ? "" : "s"}
-      </p>
-
-      <div className="mt-4 grid gap-5 sm:grid-cols-2 xl:grid-cols-3">
+      <div className="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
         {filtered.map((doc) => (
           <div
             key={doc.id}
-            role="button"
-            tabIndex={0}
-            onClick={() => setSelectedDocId(doc.id)}
-            onKeyDown={(e) => e.key === "Enter" && setSelectedDocId(doc.id)}
-            className="flex flex-col text-left rounded-2xl border border-border bg-card p-5 shadow-soft transition-shadow hover:shadow-lift w-full focus:outline-none focus-visible:ring-2 focus-visible:ring-ring relative group"
+            className="group relative flex flex-col justify-between overflow-hidden rounded-2xl border border-border bg-card p-5 shadow-soft transition-all hover:border-primary/20 hover:shadow-hover"
           >
-            <div className="absolute top-4 right-4 z-10" onClick={(e) => e.stopPropagation()}>
-              <DropdownMenu>
-                <DropdownMenuTrigger asChild>
-                  <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity focus:opacity-100">
-                    <MoreVertical className="h-4 w-4" />
-                  </Button>
-                </DropdownMenuTrigger>
-                <DropdownMenuContent align="end">
-                  <DropdownMenuItem onClick={() => { /* Edit logic */ }}>
-                    <Pencil className="mr-2 h-4 w-4" /> Editar
-                  </DropdownMenuItem>
-                  <DropdownMenuItem 
-                    onClick={async (e) => {
-                      e.stopPropagation();
-                      if (confirm("Tem certeza que deseja excluir este documento?")) {
-                        try {
-                          await api.delete(`/documents/${doc.id}`);
-                          setDocs((prev) => prev.filter((d) => d.id !== doc.id));
-                        } catch (err) {
-                          console.error(err);
-                          alert("Erro ao excluir o documento.");
+            <div>
+              <div className="flex items-start justify-between gap-4">
+                <DocTypeIcon type={doc.type} className="h-10 w-10" />
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" size="icon" className="h-8 w-8 rounded-lg -mr-2">
+                      <MoreVertical className="h-4 w-4 text-muted-foreground" />
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end" className="w-40 rounded-xl">
+                    <DropdownMenuItem className="rounded-lg cursor-pointer" onClick={() => setSelectedDocId(doc.id)}>
+                      <Search className="mr-2 h-4 w-4" /> Visualizar
+                    </DropdownMenuItem>
+                    <DropdownMenuItem className="rounded-lg cursor-pointer">
+                      <Pencil className="mr-2 h-4 w-4" /> Editar
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem 
+                      className="rounded-lg text-destructive focus:text-destructive cursor-pointer"
+                      onClick={async () => {
+                        if (confirm("Tem certeza que deseja excluir este documento?")) {
+                          try {
+                            await api.delete(`/documents/${doc.id}`);
+                            setDocuments((prev) => prev.filter((d) => d.id !== doc.id));
+                          } catch (error) {
+                            alert("Erro ao excluir o documento.");
+                          }
                         }
-                      }
-                    }} 
-                    className="text-destructive focus:text-destructive"
-                  >
-                    <Trash2 className="mr-2 h-4 w-4" /> Excluir
-                  </DropdownMenuItem>
-                </DropdownMenuContent>
-              </DropdownMenu>
+                      }}
+                    >
+                      <Trash2 className="mr-2 h-4 w-4" /> Excluir
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </div>
+              <h3 
+                className="mt-4 font-display text-base font-semibold leading-tight tracking-tight cursor-pointer hover:text-primary transition-colors"
+                onClick={() => setSelectedDocId(doc.id)}
+              >
+                {doc.title}
+              </h3>
+              <p className="mt-1.5 text-sm text-muted-foreground line-clamp-2">
+                {doc.summary || doc.clinic}
+              </p>
             </div>
             
-            <div className="grid grid-cols-[auto_minmax(0,1fr)] items-start gap-3 w-full pr-8">
-              <DocTypeIcon type={doc.type} />
-              <div className="min-w-0 w-full">
-                <h2 className="truncate font-semibold">{doc.title}</h2>
-                <div className="mt-1 flex items-center gap-1.5 text-sm text-muted-foreground">
-                  <UserRound className="h-3.5 w-3.5 shrink-0" />
-                  <span className="truncate">{doc.doctor}</span>
-                </div>
+            <div className="mt-5 space-y-3">
+              <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                <CalendarDays className="h-3.5 w-3.5" />
+                {doc.date}
+                <span className="mx-1.5 h-1 w-1 rounded-full bg-border" />
+                <UserRound className="h-3.5 w-3.5" />
+                <span className="truncate">{doc.doctor}</span>
               </div>
-            </div>
-            <p className="mt-4 line-clamp-2 text-sm text-muted-foreground">{doc.summary}</p>
-            <div className="mt-4 flex flex-wrap items-center gap-2 border-t border-border pt-4 w-full">
-              <TypeBadge type={doc.type} />
-              <StatusBadge status={doc.status} />
-              <span className="ml-auto inline-flex items-center gap-1.5 text-xs text-muted-foreground">
-                <CalendarDays className="h-3.5 w-3.5" /> {doc.date}
-              </span>
+              <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-border/50">
+                <TypeBadge type={doc.type} />
+                <StatusBadge status={doc.status} />
+              </div>
             </div>
           </div>
         ))}
       </div>
 
-      {filtered.length === 0 ? (
-        <div className="mt-6 rounded-2xl border border-dashed border-border p-12 text-center">
-          <p className="font-medium">Nenhum documento encontrado</p>
-          <p className="mt-1 text-sm text-muted-foreground">
+      {filtered.length === 0 && (
+        <div className="mt-12 text-center">
+          <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-3xl bg-secondary">
+            <Search className="h-8 w-8 text-muted-foreground" />
+          </div>
+          <h3 className="mt-6 font-display text-lg font-medium">Nenhum documento encontrado</h3>
+          <p className="mt-2 text-sm text-muted-foreground">
             Tente outro termo de busca ou envie um novo documento.
           </p>
+          <Button onClick={() => setIsUploadModalOpen(true)} className="mt-6 rounded-xl">
+            <Upload className="mr-2 h-4 w-4" /> Enviar Documento
+          </Button>
         </div>
-      ) : null}
+      )}
+
+      <UploadModal 
+        isOpen={isUploadModalOpen} 
+        onClose={() => setIsUploadModalOpen(false)} 
+        onSuccess={fetchDocuments} 
+      />
     </AppShell>
   );
 }

@@ -1,18 +1,21 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
-import { UploadCloud, File, X, ArrowLeft, Loader2 } from "lucide-react";
-import { AppShell } from "@/components/layout/AppShell";
+import { UploadCloud, File, X, Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { api } from "@/lib/api";
 import { toast } from "sonner";
-import Link from "next/link";
 
-export default function UploadPage() {
-  const router = useRouter();
+interface UploadModalProps {
+  isOpen: boolean;
+  onClose: () => void;
+  onSuccess: () => void;
+}
+
+export function UploadModal({ isOpen, onClose, onSuccess }: UploadModalProps) {
   const [file, setFile] = useState<File | null>(null);
   const [type, setType] = useState<string>("receita");
   const [isUploading, setIsUploading] = useState(false);
@@ -27,6 +30,14 @@ export default function UploadPage() {
     e.preventDefault();
     if (e.dataTransfer.files && e.dataTransfer.files[0]) {
       setFile(e.dataTransfer.files[0]);
+    }
+  };
+
+  const handleClose = () => {
+    if (!isUploading) {
+      setFile(null);
+      setType("receita");
+      onClose();
     }
   };
 
@@ -48,13 +59,14 @@ export default function UploadPage() {
       });
       
       toast.promise(promise, {
-        loading: "Fazendo upload e processando via IA...",
+        loading: "Fazendo upload e extraindo dados...",
         success: "Documento processado com sucesso!",
         error: "Erro ao enviar o documento. Tente novamente.",
       });
 
       await promise;
-      router.push("/documents");
+      onSuccess();
+      handleClose();
     } catch (err) {
       console.error(err);
     } finally {
@@ -63,17 +75,16 @@ export default function UploadPage() {
   };
 
   return (
-    <AppShell title="Novo Documento" subtitle="Envie exames, receitas ou laudos para análise.">
-      <div className="mb-6">
-        <Button asChild variant="ghost" size="sm" className="rounded-lg">
-          <Link href="/documents">
-            <ArrowLeft className="mr-1 h-4 w-4" /> Voltar à biblioteca
-          </Link>
-        </Button>
-      </div>
+    <Dialog open={isOpen} onOpenChange={handleClose}>
+      <DialogContent className="sm:max-w-xl">
+        <DialogHeader>
+          <DialogTitle>Novo Documento Médico</DialogTitle>
+          <DialogDescription>
+            Envie exames, receitas ou laudos para extração automática.
+          </DialogDescription>
+        </DialogHeader>
 
-      <div className="max-w-2xl">
-        <form onSubmit={handleSubmit} className="space-y-8">
+        <form onSubmit={handleSubmit} className="space-y-6 py-4">
           <div className="space-y-3">
             <Label>Tipo de documento</Label>
             <Select value={type} onValueChange={setType}>
@@ -92,16 +103,16 @@ export default function UploadPage() {
             <Label>Arquivo</Label>
             {!file ? (
               <div 
-                className="flex flex-col items-center justify-center w-full h-64 border-2 border-dashed border-border rounded-2xl bg-card hover:bg-secondary/50 transition-colors cursor-pointer"
+                className="flex flex-col items-center justify-center w-full h-48 border-2 border-dashed border-border rounded-2xl bg-card hover:bg-secondary/50 transition-colors cursor-pointer"
                 onDragOver={(e) => e.preventDefault()}
                 onDrop={handleDrop}
-                onClick={() => document.getElementById("file-upload")?.click()}
+                onClick={() => document.getElementById("file-upload-modal")?.click()}
               >
                 <UploadCloud className="w-10 h-10 text-muted-foreground mb-4" />
                 <p className="text-sm font-medium">Clique para escolher ou arraste o arquivo aqui</p>
                 <p className="text-xs text-muted-foreground mt-1">PNG, JPG, PDF (max. 10MB)</p>
                 <input 
-                  id="file-upload" 
+                  id="file-upload-modal" 
                   type="file" 
                   className="hidden" 
                   accept="image/*,application/pdf"
@@ -138,11 +149,11 @@ export default function UploadPage() {
                 <Loader2 className="w-5 h-5 mr-2 animate-spin" /> Processando...
               </>
             ) : (
-              "Enviar e Analisar com IA"
+              "Enviar Documento"
             )}
           </Button>
         </form>
-      </div>
-    </AppShell>
+      </DialogContent>
+    </Dialog>
   );
 }
