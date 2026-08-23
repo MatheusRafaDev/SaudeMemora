@@ -102,19 +102,105 @@ public class GeminiOcrService : IOcrAiService
             }
         }
 
-        // Como foi solicitado apenas OCR, retornamos o texto bruto na propriedade ExtractedText
-        // As demais propriedades ficam em branco para o usuário preencher ou o sistema ignorar.
-        return new ExtractedDocumentDto
+        // Passo 2: IA Estruturadora (Lê o texto do OCR e formata em JSON)
+        var groqKey = Environment.GetEnvironmentVariable("GROQ_API_KEY");
+        return await ParseTextToStructuredDataAsync(textContent, documentType, _apiKey, groqKey);
+    }
+
+    private async Task<ExtractedDocumentDto> ParseTextToStructuredDataAsync(string rawText, string documentType, string? apiKey, string? groqKey)
+    {
+        var prompt = $@"
+        ATENÇÃO: VOCÊ É UM EXTRATOR DE DADOS DE TEXTO.
+        Aqui está a transcrição bruta via OCR de um documento do tipo '{documentType}':
+        
+        {rawText}
+        
+        Sua tarefa é ler este texto e extrair os dados. Se não achar algo de forma óbvia, retorne string vazia.
+        Retorne estritamente um JSON no seguinte formato:
+        {{
+            ""title"": ""O título que aparece no texto (ex: Receita Médica)"",
+            ""doctor"": ""Nome literal do médico"",
+            ""clinic"": ""Nome literal da clínica/hospital"",
+            ""date"": ""Data legível no formato dd/MM/yyyy"",
+            ""summary"": ""Uma única frase resumindo o que é."",
+            ""diagnosis"": ""O CID ou diagnóstico, se houver explícito"",
+            ""medicines"": [
+                {{ ""name"": ""nome do remédio"", ""dosage"": ""dosagem escrita"" }}
+            ]
+        }}
+        ";
+
+        string jsonResult = "";
+
+        // Tenta pelo Groq primeiro (modelo de texto ultra-rápido Llama 3)
+        if (!string.IsNullOrEmpty(groqKey))
         {
-            Title = $"Documento Digitalizado ({documentType})",
-            Doctor = "Não identificado (OCR)",
-            Clinic = "Não identificado (OCR)",
-            Date = DateTime.Now.ToString("dd/MM/yyyy"),
-            Summary = "Texto transcrito via OCR direto.",
-            Diagnosis = "",
-            ExtractedText = textContent,
-            Medicines = new List<ExtractedMedicineDto>()
-        };
+            try
+            {
+                var groqUrl = "https://api.groq.com/openai/v1/chat/completions";
+                var payload = new
+                {
+                    model = "llama-3.3-70b-versatile",
+                    messages = new[] { new { role = "user", content = prompt } },
+                    temperature = 0.0,
+                    response_format = new { type = "json_object" }
+                };
+                
+                var request = new HttpRequestMessage(HttpMethod.Post, groqUrl);
+                request.Headers.Add("Authorization", $"Bearer {groqKey}");
+                request.Content = JsonContent.Create(payload);
+                var response = await _httpClient.SendAsync(request);
+                if (response.IsSuccessStatusCode)
+                {
+                    var groqJson = await response.Content.ReadFromJsonAsync<JsonElement>();
+                    jsonResult = groqJson.GetProperty("choices")[0].GetProperty("message").GetProperty("content").GetString() ?? "";
+                }
+            }
+            catch { /* Ignora e tenta o Gemini */ }
+        }
+        
+        // Se o Groq falhar ou não existir chave, usa o Gemini Text
+        if (string.IsNullOrEmpty(jsonResult) && !string.IsNullOrEmpty(apiKey))
+        {
+            try
+            {
+                var url = $"https://generativelanguage.googleapis.com/v1beta/models/gemini-flash-latest:generateContent?key={apiKey}";
+                var payload = new
+                {
+                    contents = new[] { new { parts = new[] { new { text = prompt } } } },
+                    generationConfig = new { temperature = 0.0, responseMimeType = "application/json" }
+                };
+                var response = await _httpClient.PostAsJsonAsync(url, payload);
+                if (response.IsSuccessStatusCode)
+                {
+                    var geminiJson = await response.Content.ReadFromJsonAsync<JsonElement>();
+                    jsonResult = geminiJson.GetProperty("candidates")[0].GetProperty("content").GetProperty("parts")[0].GetProperty("text").GetString() ?? "";
+                }
+            }
+            catch { /* Cai pro fallback final */ }
+        }
+
+        try 
+        {
+            var options = new JsonSerializerOptions { PropertyNameCaseInsensitive = true };
+            var dto = JsonSerializer.Deserialize<ExtractedDocumentDto>(jsonResult, options) ?? new ExtractedDocumentDto();
+            dto.ExtractedText = rawText; // Mantenha o texto bruto do OCR no DTO final
+            return dto;
+        }
+        catch
+        {
+            // Fallback total se tudo der errado (ao menos preservamos o OCR bruto)
+            return new ExtractedDocumentDto
+            {
+                Title = $"Documento Digitalizado ({documentType})",
+                Doctor = "Não identificado",
+                Clinic = "Não identificado",
+                Date = DateTime.Now.ToString("dd/MM/yyyy"),
+                Summary = "Texto transcrito via OCR direto, mas falhou ao estruturar.",
+                ExtractedText = rawText,
+                Medicines = new List<ExtractedMedicineDto>()
+            };
+        }
     }
 
     private async Task<string> CallGroqFallbackAsync(string imageUrl, string prompt, string apiKey)
