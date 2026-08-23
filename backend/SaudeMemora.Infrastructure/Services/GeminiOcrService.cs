@@ -123,7 +123,7 @@ public class GeminiOcrService : IOcrAiService
         
         var payload = new
         {
-            model = "llama-3.2-90b-vision-preview",
+            model = "llama-3.2-11b-vision-preview",
             messages = new[]
             {
                 new 
@@ -136,8 +136,7 @@ public class GeminiOcrService : IOcrAiService
                     }
                 }
             },
-            temperature = 0.1,
-            response_format = new { type = "json_object" }
+            temperature = 0.0
         };
 
         var request = new HttpRequestMessage(HttpMethod.Post, groqUrl);
