@@ -1,6 +1,6 @@
 # dependências (para todas as pastas)
 node_modules/
-/saudememora-api/uploads/
+/backend/uploads/
 
 # produção
 /build

@@ -22,7 +22,8 @@ public class PacienteRepository : IPacienteRepository
 
     public async Task<Paciente?> GetByIdAsync(string id)
     {
-        return await _pacientes.Find(p => p.Id == id).FirstOrDefaultAsync();
+        var filter = Builders<Paciente>.Filter.Eq(p => p.Id, id);
+        return await _pacientes.Find(filter).FirstOrDefaultAsync();
     }
 
     public async Task<Paciente?> GetByEmailAsync(string email)

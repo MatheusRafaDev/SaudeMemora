@@ -48,15 +48,7 @@ export function AppShell({
             );
           })}
         </nav>
-        <div className="mt-auto rounded-2xl bg-primary-soft p-4">
-          <p className="text-sm font-semibold text-accent-foreground">Plano Cuidar+</p>
-          <p className="mt-1 text-xs text-muted-foreground">
-            Documentos ilimitados e leitura por IA prioritária.
-          </p>
-          <Button size="sm" className="mt-3 w-full">
-            Fazer upgrade
-          </Button>
-        </div>
+        <div className="mt-auto" />
         <Link
           href="/"
           className="mt-4 flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium text-muted-foreground transition-colors hover:bg-secondary"

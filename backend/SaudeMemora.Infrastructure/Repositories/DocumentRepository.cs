@@ -22,7 +22,8 @@ public class DocumentRepository : IDocumentRepository
 
     public async Task<DocumentRecord?> GetByIdAsync(string id)
     {
-        return await _documents.Find(d => d.Id == id).FirstOrDefaultAsync();
+        var filter = Builders<DocumentRecord>.Filter.Eq(d => d.Id, id);
+        return await _documents.Find(filter).FirstOrDefaultAsync();
     }
 
     public async Task<IEnumerable<DocumentRecord>> GetAllByPatientIdAsync(string patientId)

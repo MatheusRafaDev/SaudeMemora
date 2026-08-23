@@ -1,7 +1,5 @@
 "use client";
 
-import Link from "next/link";
-import { notFound, useParams } from "next/navigation";
 import { useEffect, useState } from "react";
 import {
   ArrowLeft,
@@ -23,9 +21,12 @@ import { DocTypeIcon, StatusBadge, TypeBadge } from "@/components/documents/Docu
 import { api } from "@/lib/api";
 import { useAuth } from "@/contexts/AuthContext";
 
-export default function DocumentDetail() {
-  const params = useParams();
-  const id = params.id as string;
+interface DocumentViewerProps {
+  id: string;
+  onClose: () => void;
+}
+
+export function DocumentViewer({ id, onClose }: DocumentViewerProps) {
   const { user } = useAuth();
   const [doc, setDoc] = useState<any>(null);
   const [loading, setLoading] = useState(true);
@@ -33,6 +34,8 @@ export default function DocumentDetail() {
 
   useEffect(() => {
     if (!user) return;
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setLoading(true);
     api
       .get(`/documents/${id}`)
       .then((res) => setDoc(res.data))
@@ -54,17 +57,21 @@ export default function DocumentDetail() {
   }
 
   if (error || !doc) {
-    notFound();
-    return null;
+    return (
+      <AppShell title="Erro" subtitle="Documento não encontrado">
+        <div className="py-20 text-center">
+          <p className="text-muted-foreground">Não foi possível carregar este documento.</p>
+          <Button onClick={onClose} className="mt-4">Voltar à biblioteca</Button>
+        </div>
+      </AppShell>
+    );
   }
 
   return (
     <AppShell title={doc.title} subtitle={`${doc.clinic} · ${doc.date}`}>
       <div className="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-4">
-        <Button asChild variant="ghost" size="sm" className="justify-self-start rounded-lg">
-          <Link href="/documents">
-            <ArrowLeft className="mr-1 h-4 w-4" /> Voltar à biblioteca
-          </Link>
+        <Button onClick={onClose} variant="ghost" size="sm" className="justify-self-start rounded-lg">
+          <ArrowLeft className="mr-1 h-4 w-4" /> Voltar à biblioteca
         </Button>
         <div className="flex shrink-0 flex-wrap justify-end gap-2">
           <Button variant="outline" className="rounded-xl">
@@ -92,32 +99,38 @@ export default function DocumentDetail() {
             </div>
           </div>
           <div className="bg-surface p-5 sm:p-8">
-            <article className="mx-auto aspect-[1/1.35] w-full max-w-xl overflow-hidden rounded-xl bg-card p-6 shadow-lift sm:p-9">
-              <header className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-3 border-b border-border pb-4">
-                <div className="min-w-0">
-                  <p className="truncate text-sm font-semibold uppercase tracking-wide">
-                    {doc.clinic}
-                  </p>
-                  <p className="text-xs text-muted-foreground">CRM 12.345 · São Paulo/SP</p>
+            <article className="mx-auto aspect-[1/1.35] w-full max-w-xl overflow-hidden rounded-xl bg-card p-6 shadow-lift sm:p-9 relative">
+              {doc.imageUrl && (
+                 /* eslint-disable-next-line @next/next/no-img-element */
+                 <img src={doc.imageUrl} alt="Documento" className="absolute inset-0 w-full h-full object-cover opacity-10" />
+              )}
+              <div className="relative z-10">
+                <header className="grid grid-cols-[minmax(0,1fr)_auto] items-start gap-3 border-b border-border pb-4">
+                  <div className="min-w-0">
+                    <p className="truncate text-sm font-semibold uppercase tracking-wide">
+                      {doc.clinic}
+                    </p>
+                    <p className="text-xs text-muted-foreground">CRM 12.345 · São Paulo/SP</p>
+                  </div>
+                  <DocTypeIcon type={doc.type} className="h-9 w-9" />
+                </header>
+                <h2 className="mt-5 font-display text-lg">{doc.title}</h2>
+                <p className="mt-1 text-xs text-muted-foreground">
+                  Paciente: Matheus Rafael · Emitido em {doc.date}
+                </p>
+                <div className="mt-5 space-y-2.5">
+                  {Array.from({ length: 11 }).map((_, i) => (
+                    <div
+                      key={i}
+                      className="h-2.5 rounded-full bg-muted"
+                      style={{ width: `${94 - ((i * 13) % 45)}%` }}
+                    />
+                  ))}
                 </div>
-                <DocTypeIcon type={doc.type} className="h-9 w-9" />
-              </header>
-              <h2 className="mt-5 font-display text-lg">{doc.title}</h2>
-              <p className="mt-1 text-xs text-muted-foreground">
-                Paciente: Matheus Rafael · Emitido em {doc.date}
-              </p>
-              <div className="mt-5 space-y-2.5">
-                {Array.from({ length: 11 }).map((_, i) => (
-                  <div
-                    key={i}
-                    className="h-2.5 rounded-full bg-muted"
-                    style={{ width: `${94 - ((i * 13) % 45)}%` }}
-                  />
-                ))}
-              </div>
-              <div className="mt-7 border-t border-dashed border-border pt-4">
-                <div className="h-2.5 w-40 rounded-full bg-muted" />
-                <p className="mt-2 text-xs text-muted-foreground">{doc.doctor}</p>
+                <div className="mt-7 border-t border-dashed border-border pt-4">
+                  <div className="h-2.5 w-40 rounded-full bg-muted" />
+                  <p className="mt-2 text-xs text-muted-foreground">{doc.doctor}</p>
+                </div>
               </div>
             </article>
           </div>
@@ -162,13 +175,13 @@ export default function DocumentDetail() {
 
           <div className="rounded-2xl border border-border bg-card p-5 shadow-soft">
             <h3 className="text-sm font-semibold">Medicamentos prescritos</h3>
-            {doc.medicines.length === 0 ? (
+            {!doc.medicines || doc.medicines.length === 0 ? (
               <p className="mt-2 text-sm text-muted-foreground">
                 Nenhum medicamento identificado neste documento.
               </p>
             ) : (
               <ul className="mt-4 space-y-4">
-                {doc.medicines.map((med, i) => (
+                {doc.medicines.map((med: { name: string; dosage: string; schedule?: string }, i: number) => (
                   <li key={med.name} className="space-y-2">
                     <Label htmlFor={`med-${i}`}>Medicamento {i + 1}</Label>
                     <Input id={`med-${i}`} defaultValue={med.name} className="h-11 rounded-xl" />

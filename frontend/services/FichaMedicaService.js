@@ -209,6 +209,7 @@ export const buscarImagemFichaMedica = async (id) => {
 };
 
 // Helper functions
+// eslint-disable-next-line no-unused-vars
 const convertFileToBase64 = (file) => {
   return new Promise((resolve, reject) => {
     const reader = new FileReader();

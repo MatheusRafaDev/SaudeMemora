@@ -2,27 +2,48 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import { toast } from "sonner";
 import { Eye, EyeOff, Lock, Mail } from "lucide-react";
 import { AuthLayout } from "@/components/layout/AuthLayout";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Checkbox } from "@/components/ui/checkbox";
+import { api } from "@/lib/api";
+import { useAuth } from "@/contexts/AuthContext";
 
 export default function LoginPage() {
   const [show, setShow] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const { login } = useAuth();
+
+  const handleLogin = async (e: React.FormEvent) => {
+    e.preventDefault();
+    try {
+      setIsLoading(true);
+      const res = await api.post("/auth/login", { email, senha: password });
+      toast.success("Login realizado com sucesso!");
+      login(res.data.token, res.data.user);
+    } catch (err: any) {
+      toast.error(err.response?.data?.[0] || "Erro ao fazer login");
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   return (
     <AuthLayout
       title="Bem-vindo de volta"
       subtitle="Entre para acessar seus exames, receitas e laudos organizados."
     >
-      <form className="space-y-5" onSubmit={(e) => e.preventDefault()}>
+      <form className="space-y-5" onSubmit={handleLogin}>
         <div className="space-y-2">
           <Label htmlFor="email">E-mail</Label>
           <div className="relative">
             <Mail className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
-            <Input id="email" type="email" placeholder="voce@email.com" className="h-11 rounded-xl pl-9" />
+            <Input id="email" type="email" placeholder="voce@email.com" className="h-11 rounded-xl pl-9" value={email} onChange={(e) => setEmail(e.target.value)} required />
           </div>
         </div>
 
@@ -40,6 +61,9 @@ export default function LoginPage() {
               type={show ? "text" : "password"}
               placeholder="••••••••"
               className="h-11 rounded-xl px-9"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
             />
             <button
               type="button"
@@ -56,8 +80,8 @@ export default function LoginPage() {
           <Checkbox id="remember" /> Manter-me conectado
         </label>
 
-        <Button asChild size="lg" className="w-full rounded-xl">
-          <Link href="/dashboard">Entrar</Link>
+        <Button type="submit" size="lg" className="w-full rounded-xl" disabled={isLoading}>
+          {isLoading ? "Entrando..." : "Entrar"}
         </Button>
 
         <p className="text-center text-sm text-muted-foreground">

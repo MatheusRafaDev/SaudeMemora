@@ -2,8 +2,10 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import { toast } from "sonner";
 import { AlertCircle, CheckCircle2 } from "lucide-react";
 import { AuthLayout } from "@/components/layout/AuthLayout";
+import { api } from "@/lib/api";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -58,12 +60,40 @@ export default function CadastroPage() {
     setTouched((t) => ({ ...t, [field]: true }));
   };
 
+  const handleRegister = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    const hasErrors = (Object.keys(values) as (keyof Fields)[]).some(
+      (key) => validate(key, values[key]) !== null
+    );
+
+    if (hasErrors) {
+      toast.error("Preencha todos os campos corretamente.");
+      return;
+    }
+
+    try {
+      await api.post("/auth/register", {
+        nome: values.nome,
+        cpf: values.cpf,
+        dataNascimento: values.nascimento,
+        sexo: values.genero,
+        email: values.email,
+        senha: values.senha
+      });
+      toast.success("Conta criada com sucesso! Faça login.");
+      window.location.href = "/login";
+    } catch (err: any) {
+      toast.error(err.response?.data?.[0] || "Erro ao criar conta");
+    }
+  };
+
   return (
     <AuthLayout
       title="Criar sua conta"
       subtitle="Leva menos de dois minutos. Seus dados são criptografados de ponta a ponta."
     >
-      <form className="space-y-5" onSubmit={(e) => e.preventDefault()}>
+      <form className="space-y-5" onSubmit={handleRegister}>
         <Field
           id="nome"
           label="Nome completo"
@@ -136,8 +166,8 @@ export default function CadastroPage() {
           </span>
         </label>
 
-        <Button asChild size="lg" className="w-full rounded-xl">
-          <Link href="/dashboard">Criar conta</Link>
+        <Button type="submit" size="lg" className="w-full rounded-xl">
+          Criar conta
         </Button>
 
         <p className="text-center text-sm text-muted-foreground">

@@ -4,9 +4,8 @@ const nextConfig: NextConfig = {
   typescript: {
     ignoreBuildErrors: true,
   },
-  eslint: {
-    ignoreDuringBuilds: true,
-  }
+  // @ts-expect-error
+  allowedDevOrigins: ["192.168.15.12", "192.168.1.102"]
 };
 
 export default nextConfig;
