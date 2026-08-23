@@ -103,8 +103,8 @@ public class GeminiOcrService : IOcrAiService
         }
 
         // Passo 2: IA Estruturadora (Lê o texto do OCR e formata em JSON)
-        var groqKey = Environment.GetEnvironmentVariable("GROQ_API_KEY");
-        return await ParseTextToStructuredDataAsync(textContent, documentType, _apiKey, groqKey);
+        var groqApiKey = Environment.GetEnvironmentVariable("GROQ_API_KEY");
+        return await ParseTextToStructuredDataAsync(textContent, documentType, _apiKey, groqApiKey);
     }
 
     private async Task<ExtractedDocumentDto> ParseTextToStructuredDataAsync(string rawText, string documentType, string? apiKey, string? groqKey)
